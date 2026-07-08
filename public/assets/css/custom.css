@@ -1,0 +1,20 @@
+
+
+@media only screen and (min-width: 576px){
+    .dataTables_filter{margin-right: 1.5rem !important;}
+}
+.logoVertical{
+  width: 100%;
+  height: 100%;
+}
+#app-brand-logo{
+  width: 100%;
+  height: 100%;
+  justify-content: start;
+}
+.primary_hr{
+  color: #7367f0;
+}
+
+  
+  

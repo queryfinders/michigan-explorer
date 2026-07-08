@@ -1,0 +1,23 @@
+<svg width="60" height="60" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 88 88" style="enable-background:new 0 0 88 88;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#9CC0FF;}
+	.st1{fill:#FFFFFF;}
+	.st2{fill:#276EF1;}
+</style>
+<g>
+	<g>
+		<path d="M78.8,13.8v60.3H9.3v4.7c0,2.6-2.1,4.6-4.7,4.6c-1.3,0-2.4-0.5-3.3-1.4c-0.8-0.8-1.4-2-1.4-3.3V4.5h29.4l9.3,9.3H78.8z"/>
+		<path class="st0" d="M83.4,83.5H4.7l0,0c2.6,0,4.7-2.1,4.7-4.7V23.1h78.7v55.7C88.1,81.4,85.9,83.5,83.4,83.5z"/>
+	</g>
+	<circle class="st1" cx="48.7" cy="53.2" r="22"/>
+	<g>
+		<g>
+			<g>
+				<polygon class="st2" points="55.1,52.1 48.7,60.1 42.4,52.1 46.6,52.1 46.6,39.9 50.9,39.9 50.9,52.1 				"/>
+			</g>
+		</g>
+		<rect x="38.7" y="62.2" class="st2" width="20" height="4.2"/>
+	</g>
+</g>
+</svg>

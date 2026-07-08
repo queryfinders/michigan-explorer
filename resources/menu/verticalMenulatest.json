@@ -1,0 +1,247 @@
+{
+  "menu": [
+    {
+      "name": "Dashboards",
+      "url": "/dashboard",
+      "icon": "menu-icon tf-icons ti ti-smart-home",
+      "slug": "dashboard"
+    },
+       {
+      "name": "Button Details",
+      "url": "/admin/button_details",
+      "icon": "menu-icon tf-icons ti ti-id",
+      "slug": "button-details"
+    },
+     {
+      "name": "Mail Data",
+      "url": "/admin/mail",
+      "icon": "menu-icon tf-icons ti ti-id",
+      "slug": "mail-add"
+    },
+      {
+      "name": "Brochure",
+      "url": "/admin/brochure",
+      "icon": "menu-icon tf-icons ti ti-id",
+      "slug": "brochure"
+    } ,
+       {
+      "name": "Exhibitors",
+      "icon": "menu-icon tf-icons ti ti-id",
+      "slug": "exhibitors",
+      "submenu": [
+        {
+          "name": "Exhibitor Category",
+          "url": "admin/exhibitor_category",
+          "icon": "menu-icon tf-icons ti ti-id",
+          "slug": "category-exhibitor"
+        },
+         {
+          "name": "Exhibitor Profile",
+          "url": "admin/exhibitor_profile",
+          "icon": "menu-icon tf-icons ti ti-id",
+          "slug": "profile-exhibitor"
+        }
+        
+      ]
+    },
+    {
+      "name": "Users",
+      "url": "/admin/user",
+      "icon": "menu-icon tf-icons ti ti-users",
+      "slug": "user-add"
+    },
+    {
+      "name": "Banner",
+      "url": "/admin/banner",
+      "icon": "menu-icon tf-icons ti ti-id",
+      "slug": "banner"
+    },
+ 
+    {
+      "name": "Counter",
+      "url": "/admin/counter",
+      "icon": "menu-icon tf-icons ti ti-id",
+      "slug": "counter"
+    },
+    {
+      "name": "Image Brochure",
+      "url": "/admin/image_brochure",
+      "icon": "menu-icon tf-icons ti ti-id",
+      "slug": "image-brochure"
+    },
+   
+    {
+      "name": "Conference",
+      "icon": "menu-icon tf-icons ti ti-id",
+      "slug": "speakers",
+      "submenu": [
+        {
+          "name": "Visionary Speakers",
+          "url": "admin/visionary_speakers",
+          "icon": "menu-icon tf-icons ti ti-id",
+          "slug": "speakers-visionary"
+        },
+        {
+          "name": "Technical Speakers",
+          "url": "admin/technical_speakers",
+          "icon": "menu-icon tf-icons ti ti-id",
+          "slug": "speakers-technical"
+        }
+        ,
+        {
+          "name": "Committee Members",
+          "url": "admin/committee_members",
+          "icon": "menu-icon tf-icons ti ti-id",
+          "slug": "speakers-committee-members"
+        }
+      ]
+    },
+     {
+      "name": "Conference Themes",
+      "icon": "menu-icon tf-icons ti ti-id",
+      "slug": "faq",
+      "submenu": [
+        {
+          "name": "Visionary Conference Theme",
+          "url": "admin/visionary-faq",
+          "icon": "menu-icon tf-icons ti ti-id",
+          "slug": "faq-visionary-list"
+        },
+         {
+          "name": "Technical Conference Theme",
+          "url": "admin/technical-faq",
+          "icon": "menu-icon tf-icons ti ti-id",
+          "slug": "faq-technical-list"
+        }
+   
+      ]
+    },
+    
+     {
+      "name": "Visionary Conference",
+      "icon": "menu-icon tf-icons ti ti-id",
+      "slug": "visionary",
+      "submenu": [
+        {
+          "name": "Visionary Session Category",
+          "url": "admin/visionary-session-category",
+          "icon": "menu-icon tf-icons ti ti-id",
+          "slug": "visionary-session-category-list"
+        },
+          {
+          "name": "Visionary Speaker Position",
+          "url": "admin/visionary-speaker-position",
+          "icon": "menu-icon tf-icons ti ti-id",
+          "slug": "visionary-speaker-position-list"
+        },
+        {
+          "name": "Visionary Conference",
+          "url": "admin/visionary-conference",
+          "icon": "menu-icon tf-icons ti ti-id",
+          "slug": "visionary-conference-list"
+        }
+   
+      ]
+    },
+    {
+      "name": "Technical Conference",
+      "icon": "menu-icon tf-icons ti ti-id",
+      "slug": "technical",
+      "submenu": [
+        {
+          "name": "Technical Session Category",
+          "url": "admin/technical-session-category",
+          "icon": "menu-icon tf-icons ti ti-id",
+          "slug": "technical-session-category-list"
+        },
+          {
+          "name": "Technical Speaker Position",
+          "url": "admin/technical-speaker-position",
+          "icon": "menu-icon tf-icons ti ti-id",
+          "slug": "technical-speaker-position-list"
+        },
+          {
+          "name": "Technical Conference",
+          "url": "admin/technical-conference",
+          "icon": "menu-icon tf-icons ti ti-id",
+          "slug": "technical-conference-list"
+        }
+   
+      ]
+    }
+ ,
+    {
+      "name": "Registered Users",
+      "icon": "menu-icon tf-icons ti ti-id",
+      "slug": "register",
+      "submenu": [
+        {
+          "name": "Association Partners",
+          "url": "admin/association_partners",
+          "icon": "menu-icon tf-icons ti ti-id",
+          "slug": "register-association-partners"
+        },
+         {
+          "name": "Media Partners",
+          "url": "admin/media_partners",
+          "icon": "menu-icon tf-icons ti ti-id",
+          "slug": "register-media-partners"
+        },
+       
+         {
+          "name": "Contact",
+          "url": "admin/contact",
+          "icon": "menu-icon tf-icons ti ti-id",
+          "slug": "register-contact"
+        },
+         {
+          "name": "Sponsor",
+          "url": "admin/sponsor",
+          "icon": "menu-icon tf-icons ti ti-id",
+          "slug": "register-sponsor"
+        }
+        ,
+         {
+          "name": "Book Your Space",
+          "url": "admin/bookyour_space",
+          "icon": "menu-icon tf-icons ti ti-id",
+          "slug": "register-bookyour-space"
+        },
+         {
+          "name": "Speaker",
+          "url": "admin/speaker",
+          "icon": "menu-icon tf-icons ti ti-id",
+          "slug": "register-speaker"
+        },
+         {
+          "name": "Delegate Registration",
+          "url": "admin/delegateregistration",
+          "icon": "menu-icon tf-icons ti ti-id",
+          "slug": "register-delegateregistration"
+        },
+         {
+          "name": "Visitor Registration",
+          "url": "admin/visitorregistration",
+          "icon": "menu-icon tf-icons ti ti-id",
+          "slug": "register-visitorregistration"
+        }
+        ,
+         {
+          "name": "Download Brochure",
+          "url": "admin/downloadbrochure",
+          "icon": "menu-icon tf-icons ti ti-id",
+          "slug": "register-downloadbrochure"
+        },
+         {
+          "name": "Download Conference Agenda",
+          "url": "admin/downloadagenda",
+          "icon": "menu-icon tf-icons ti ti-id",
+          "slug": "register-downloadagenda"
+        }
+        
+        
+      ]
+    }
+  
+  ]
+}

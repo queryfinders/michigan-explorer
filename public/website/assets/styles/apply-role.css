@@ -1,0 +1,64 @@
+      p,
+      ul li {
+        color: #414141;
+        font-size: 16px;
+        font-family: "Source Sans 3";
+      }
+      ul {
+        padding-left: 30px;
+      }
+      #loader {
+        top: -14px;
+      }
+      @media (max-width: 768px) {
+        #loader {
+          top: 16px;
+        }
+      }
+      .custom-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 110%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        width: 100%;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin: 0;
+        padding: 30px 40px;
+        transform: translateY(-20px);
+        opacity: 1;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+        border-radius: 0px;
+      }
+
+      .modal-content {
+        background: white;
+        text-align: left;
+        padding: 40px 20px;
+        border-radius: 0px;
+        max-width: 450px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .job-form-container .inactive {
+        height: 48px;
+        background-color: #e6e6e6;
+        color: #808080;
+        font-size: 16px;
+        font-family: "Source Sans 3", sans-serif;
+        border: none;
+        padding: 0 20px;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+      .job-form-container .active {
+        background: red !important;
+        border: none;
+        color: #fff !important;
+      }
