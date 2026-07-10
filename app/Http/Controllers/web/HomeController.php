@@ -11,8 +11,26 @@ class HomeController extends Controller
 {
     public function index(Request $request)
     {
-      
+        $hotels = \Illuminate\Support\Facades\Cache::remember('home_hotels', 3600, function() {
+            return \App\Models\Hotel::where('status', 1)->take(3)->get();
+        });
+        
+        $restaurants = \Illuminate\Support\Facades\Cache::remember('home_restaurants', 3600, function() {
+            return \App\Models\Restaurant::where('status', 1)->take(3)->get();
+        });
+        
+        $attractions = \Illuminate\Support\Facades\Cache::remember('home_attractions', 3600, function() {
+            return \App\Models\Attraction::where('status', 1)->take(3)->get();
+        });
+        
+        $events = \Illuminate\Support\Facades\Cache::remember('home_events', 3600, function() {
+            return \App\Models\Event::where('status', 1)->orderBy('start_date', 'asc')->take(3)->get();
+        });
+        
+        $blogs = \Illuminate\Support\Facades\Cache::remember('home_blogs', 3600, function() {
+            return \App\Models\Blog::where('status', 'published')->orderBy('published_at', 'desc')->take(3)->get();
+        });
 
-        return view('web.pages.index');
+        return view('web.pages.index', compact('hotels', 'restaurants', 'attractions', 'events', 'blogs'));
     }
 }

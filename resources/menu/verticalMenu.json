@@ -12,9 +12,109 @@
       "url": "/admin/user",
       "icon": "menu-icon tf-icons ti ti-users",
       "slug": "user-add"
+    },
+    {
+      "name": "Hotels",
+      "icon": "menu-icon tf-icons ti ti-building",
+      "slug": ["hotels", "hotel-categories"],
+      "submenu": [
+        {
+          "name": "All Hotels",
+          "url": "/admin/hotels",
+          "slug": "hotels.index"
+        },
+        {
+          "name": "Categories",
+          "url": "/admin/hotel-categories",
+          "slug": "hotel-categories.index"
+        }
+      ]
+    },
+    {
+      "name": "Restaurants",
+      "icon": "menu-icon tf-icons ti ti-tools-kitchen-2",
+      "slug": ["restaurants", "restaurant-categories"],
+      "submenu": [
+        {
+          "name": "All Restaurants",
+          "url": "/admin/restaurants",
+          "slug": "restaurants.index"
+        },
+        {
+          "name": "Categories",
+          "url": "/admin/restaurant-categories",
+          "slug": "restaurant-categories.index"
+        }
+      ]
+    },
+    {
+      "name": "Attractions",
+      "icon": "menu-icon tf-icons ti ti-map-pin",
+      "slug": ["attractions", "attraction-categories"],
+      "submenu": [
+        {
+          "name": "All Attractions",
+          "url": "/admin/attractions",
+          "slug": "attractions.index"
+        },
+        {
+          "name": "Categories",
+          "url": "/admin/attraction-categories",
+          "slug": "attraction-categories.index"
+        }
+      ]
+    },
+    {
+      "name": "Events",
+      "icon": "menu-icon tf-icons ti ti-calendar-event",
+      "slug": ["events", "event-categories"],
+      "submenu": [
+        {
+          "name": "All Events",
+          "url": "/admin/events",
+          "slug": "events.index"
+        },
+        {
+          "name": "Categories",
+          "url": "/admin/event-categories",
+          "slug": "event-categories.index"
+        }
+      ]
+    },
+    {
+      "name": "Blogs",
+      "icon": "menu-icon tf-icons ti ti-file-text",
+      "slug": ["blogs", "blog-categories"],
+      "submenu": [
+        {
+          "name": "All Blogs",
+          "url": "/admin/blogs",
+          "slug": "blogs.index"
+        },
+        {
+          "name": "Categories",
+          "url": "/admin/blog-categories",
+          "slug": "blog-categories.index"
+        }
+      ]
+    },
+    {
+      "name": "Pages",
+      "url": "/admin/pages",
+      "icon": "menu-icon tf-icons ti ti-file-description",
+      "slug": "pages.index"
+    },
+    {
+      "name": "Settings",
+      "url": "/admin/settings",
+      "icon": "menu-icon tf-icons ti ti-settings",
+      "slug": "settings.index"
+    },
+    {
+      "name": "Contact Messages",
+      "url": "/admin/contact-messages",
+      "icon": "menu-icon tf-icons ti ti-messages",
+      "slug": "contact-messages.index"
     }
- 
- 
-  
   ]
 }

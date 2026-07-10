@@ -89,7 +89,59 @@ Route::group(['middleware' => 'admin_auth'], function () {
         session()->flash('error', 'Logout success');
         return redirect('admin');
     })->name('logout');
+    
+    // Hotels Module
+    Route::resource('/admin/hotel-categories', \App\Http\Controllers\Admin\HotelCategoryController::class);
+    Route::resource('/admin/hotels', \App\Http\Controllers\Admin\HotelController::class);
+
+    // Restaurants Module
+    Route::resource('/admin/restaurant-categories', \App\Http\Controllers\Admin\RestaurantCategoryController::class);
+    Route::resource('/admin/restaurants', \App\Http\Controllers\Admin\RestaurantController::class);
+
+    // Attractions Module
+    Route::resource('/admin/attraction-categories', \App\Http\Controllers\Admin\AttractionCategoryController::class);
+    Route::resource('/admin/attractions', \App\Http\Controllers\Admin\AttractionController::class);
+
+    // Events Module
+    Route::resource('/admin/event-categories', \App\Http\Controllers\Admin\EventCategoryController::class);
+    Route::resource('/admin/events', \App\Http\Controllers\Admin\EventController::class);
+
+    // Blogs Module
+    Route::resource('/admin/blog-categories', \App\Http\Controllers\Admin\BlogCategoryController::class);
+    Route::resource('/admin/blogs', \App\Http\Controllers\Admin\BlogController::class);
+
+    // Pages & Settings
+    Route::resource('/admin/contact-messages', \App\Http\Controllers\Admin\ContactMessageController::class)->only(['index', 'show', 'destroy']);
+    Route::resource('/admin/pages', \App\Http\Controllers\Admin\PageController::class);
+    Route::resource('/admin/settings', \App\Http\Controllers\Admin\SettingController::class);
 });
 
 //web
 Route::get('/', [HomeController::class, 'index'])->name('web.home');
+Route::get('/search', [App\Http\Controllers\Frontend\SearchController::class, 'index'])->name('web.search');
+Route::get('/sitemap.xml', [App\Http\Controllers\Frontend\SitemapController::class, 'index'])->name('web.sitemap');
+Route::get('/contact', [App\Http\Controllers\Frontend\ContactController::class, 'index'])->name('web.contact');
+Route::post('/contact', [App\Http\Controllers\Frontend\ContactController::class, 'submit'])->name('web.contact.submit');
+Route::get('/hotels', [App\Http\Controllers\Frontend\HotelController::class, 'index'])->name('web.hotels.index');
+Route::get('/hotels/category/{slug}', [App\Http\Controllers\Frontend\HotelController::class, 'category'])->name('web.hotels.category');
+Route::get('/hotels/{slug}', [\App\Http\Controllers\Frontend\HotelController::class, 'show'])->name('web.hotels.show');
+
+// Restaurants
+Route::get('/restaurants', [\App\Http\Controllers\Frontend\RestaurantController::class, 'index'])->name('web.restaurants.index');
+Route::get('/restaurants/category/{slug}', [\App\Http\Controllers\Frontend\RestaurantController::class, 'category'])->name('web.restaurants.category');
+Route::get('/restaurants/{slug}', [\App\Http\Controllers\Frontend\RestaurantController::class, 'show'])->name('web.restaurants.show');
+
+// Attractions
+Route::get('/attractions', [\App\Http\Controllers\Frontend\AttractionController::class, 'index'])->name('web.attractions.index');
+Route::get('/attractions/{slug}', [\App\Http\Controllers\Frontend\AttractionController::class, 'show'])->name('web.attractions.show');
+
+// Events
+Route::get('/events', [\App\Http\Controllers\Frontend\EventController::class, 'index'])->name('web.events.index');
+Route::get('/events/{slug}', [\App\Http\Controllers\Frontend\EventController::class, 'show'])->name('web.events.show');
+
+// Blogs
+Route::get('/blog', [\App\Http\Controllers\Frontend\BlogController::class, 'index'])->name('web.blogs.index');
+Route::get('/blog/{slug}', [\App\Http\Controllers\Frontend\BlogController::class, 'show'])->name('web.blogs.show');
+
+// Pages
+Route::get('/{slug}', [\App\Http\Controllers\Frontend\PageController::class, 'show'])->name('web.pages.show');

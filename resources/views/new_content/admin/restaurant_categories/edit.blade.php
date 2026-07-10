@@ -1,0 +1,38 @@
+@extends('layouts/layoutMaster')
+
+@section('title', 'Edit Restaurant Category')
+
+@section('content')
+<div class="card mb-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">Edit Restaurant Category</h5>
+  </div>
+  <div class="card-body">
+    <form action="{{ route('restaurant-categories.update', $restaurantCategory->id) }}" method="POST">
+      @csrf
+      @method('PUT')
+      <div class="mb-3">
+        <label class="form-label" for="name">Name</label>
+        <input type="text" class="form-control" id="name" name="name" value="{{ $restaurantCategory->name }}" required />
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="slug">Slug</label>
+        <input type="text" class="form-control" id="slug" name="slug" value="{{ $restaurantCategory->slug }}" required />
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="description">Description</label>
+        <textarea class="form-control" id="description" name="description">{{ $restaurantCategory->description }}</textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="status">Status</label>
+        <select class="form-select" id="status" name="status">
+          <option value="1" {{ $restaurantCategory->status == 1 ? 'selected' : '' }}>Active</option>
+          <option value="0" {{ $restaurantCategory->status == 0 ? 'selected' : '' }}>Inactive</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">Update</button>
+      <a href="{{ route('restaurant-categories.index') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+</div>
+@endsection

@@ -1,107 +1,92 @@
-    <script src="{{ asset('website/assets/js/custom.js') }}"></script>
-    <footer class="footer">
-      <div class="container">
-        <div class="footer-upper px-0">
-          <div class="mailing-list">
-            <span class="footer-top-left-span"
-              >Join the mailing list for the latest PTN updates.</span
-            >
-            <button id="show-popup" class="btn-gray-thin-border">
-              Sign up
-            </button>
-          </div>
-          <div class="social-section">
-            <span class="footer-top-left-span"
-              >Stay connected with PTN on social.</span
-            >
-            <div class="social-icons">
-              <a
-                href="https://www.facebook.com/ptnevents/"
-                class="social-icon"
-                target="blank"
-                ><i class="fab fa-facebook"></i
-              ></a>
-              <a
-                href="https://x.com/ptn_events/"
-                class="social-icon"
-                target="blank"
-                ><i class="fab fa-twitter"></i
-              ></a>
-              <a
-                href="https://www.instagram.com/ptnevents/"
-                class="social-icon"
-                target="blank"
-                ><i class="fab fa-instagram"></i
-              ></a>
-              <a
-                href="https://www.linkedin.com/company/ptnevents"
-                class="social-icon"
-                target="blank"
-                ><i class="fab fa-linkedin"></i
-              ></a>
-              <a
-                href="https://www.youtube.com/@ptnevents"
-                class="social-icon"
-                target="blank"
-                ><i class="fab fa-youtube"></i
-              ></a>
+<footer class="main-footer position-relative pt-5 pb-4 border-top" style="background-color: var(--dark-bg); border-color: rgba(255,255,255,0.05) !important;">
+    <div class="container pt-4">
+        <div class="row g-5 mb-5">
+            <div class="col-lg-4 col-md-6 pe-lg-5">
+                <h3 class="text-white fw-bold mb-4" style="font-family: var(--font-heading); font-size: 1.8rem; letter-spacing: -0.5px;">Michigan Explorer</h3>
+                <p class="text-white-50 lh-lg mb-4" style="font-size: 1.05rem;">Your premium guide to discovering the best hotels, fine dining, hidden attractions, and vibrant events across the beautiful state of Michigan.</p>
+                <div class="social-icons d-flex gap-3">
+                    <a href="#" class="d-flex align-items-center justify-content-center text-white text-decoration-none rounded-circle" style="width: 45px; height: 45px; background: rgba(255,255,255,0.05); transition: all 0.3s ease;"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="d-flex align-items-center justify-content-center text-white text-decoration-none rounded-circle" style="width: 45px; height: 45px; background: rgba(255,255,255,0.05); transition: all 0.3s ease;"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="d-flex align-items-center justify-content-center text-white text-decoration-none rounded-circle" style="width: 45px; height: 45px; background: rgba(255,255,255,0.05); transition: all 0.3s ease;"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="d-flex align-items-center justify-content-center text-white text-decoration-none rounded-circle" style="width: 45px; height: 45px; background: rgba(255,255,255,0.05); transition: all 0.3s ease;"><i class="fab fa-youtube"></i></a>
+                </div>
             </div>
-          </div>
+            
+            <div class="col-lg-2 col-md-6 col-6">
+                <h5 class="text-white mb-4 fw-bold text-uppercase tracking-wider fs-6">Quick Links</h5>
+                <ul class="list-unstyled footer-links">
+                    <li class="mb-3"><a href="{{ route('web.home') }}" class="text-white-50 text-decoration-none transition-base">Home</a></li>
+                    <li class="mb-3"><a href="{{ route('web.hotels.index') }}" class="text-white-50 text-decoration-none transition-base">Luxury Hotels</a></li>
+                    <li class="mb-3"><a href="{{ route('web.restaurants.index') }}" class="text-white-50 text-decoration-none transition-base">Fine Dining</a></li>
+                    <li class="mb-3"><a href="{{ route('web.attractions.index') }}" class="text-white-50 text-decoration-none transition-base">Attractions</a></li>
+                    <li class="mb-3"><a href="{{ route('web.events.index') }}" class="text-white-50 text-decoration-none transition-base">Upcoming Events</a></li>
+                </ul>
+            </div>
+            
+            <div class="col-lg-2 col-md-6 col-6">
+                <h5 class="text-white mb-4 fw-bold text-uppercase tracking-wider fs-6">Support</h5>
+                <ul class="list-unstyled footer-links">
+                    <li class="mb-3"><a href="{{ route('web.contact') }}" class="text-white-50 text-decoration-none transition-base">Contact Us</a></li>
+                    <li class="mb-3"><a href="#" class="text-white-50 text-decoration-none transition-base">Privacy Policy</a></li>
+                    <li class="mb-3"><a href="#" class="text-white-50 text-decoration-none transition-base">Terms & Conditions</a></li>
+                    <li class="mb-3"><a href="{{ route('web.sitemap') }}" class="text-white-50 text-decoration-none transition-base">Sitemap</a></li>
+                </ul>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <h5 class="text-white mb-4 fw-bold text-uppercase tracking-wider fs-6">Stay Updated</h5>
+                <p class="text-white-50 mb-4">Subscribe to our newsletter for the latest luxury guides and exclusive escapes.</p>
+                <form action="#" class="footer-newsletter">
+                    <div class="input-group p-1 bg-white rounded-pill overflow-hidden shadow-sm">
+                        <input type="email" class="form-control border-0 shadow-none px-4 text-dark" placeholder="Email address" required>
+                        <button class="btn btn-primary rounded-pill px-4 fw-bold" type="submit">Join</button>
+                    </div>
+                </form>
+            </div>
         </div>
-        <div class="footer-divider"></div>
-        <div class="footer-lower px-0">
-          <div class="legal-links">
-            <span class="copyright"
-              >Copyright © 2025 PTN Events Pvt. Ltd. or its affiliates. All
-              rights reserved.</span
-            >
-            <span class="separator">/</span>
-            <a href="ptn-privacy-policy" class="legal-link">Privacy Policy</a>
-            <span class="separator">/</span>
-            <a href="terms" class="legal-link">Terms of Use</a>
-            <span class="separator">/</span>
-            <a href="cookie-policy" class="legal-link">Cookie preferences</a>
-            <span class="separator">/</span>
-            <a href="code-of-conduct" class="legal-link">Code Of Conduct</a>
-          </div>
+        
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center border-top pt-4 mt-4" style="border-color: rgba(255,255,255,0.05) !important;">
+            <p class="mb-2 mb-md-0 text-white-50 small">&copy; {{ date('Y') }} Michigan Explorer. Designed for luxury travel.</p>
+            <div class="d-flex gap-3 small">
+                <a href="#" class="text-white-50 text-decoration-none transition-base">Privacy</a>
+                <a href="#" class="text-white-50 text-decoration-none transition-base">Terms</a>
+                <a href="#" class="text-white-50 text-decoration-none transition-base">Sitemap</a>
+            </div>
         </div>
-      </div>
-    </footer>
-
-    <div
-      id="responseModal"
-      class="modal"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="commonModalTitle"
-      aria-describedby="commonModalMessage"
-    >
-      <div class="modal-content">
-        <!--<span class="close-modal" aria-label="Close modal">×</span>-->
-        <h3
-          id="modalTitle"
-          class="card-header-title a-fs-24 a-ff-ss a-fw-600 a-fc-00"
-        ></h3>
-        <span id="modalMessage"></span>
-        <div>
-          <button id="modal-ok-btn" class="btn-blue-thin-fill mb-4 mt-4">
-            OK
-          </button>
-        </div>
-      </div>
     </div>
-    <script src="{{ asset('website/assets/js/jquery.slim.min.js') }}"></script>
-    <script src="{{ asset('website/assets/js/bootstrap.bundle.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('website/assets/js/slick.min.js') }}"></script>
-    <script src="{{ asset('website/assets/js/script.js') }}"></script>
- 
-    <!-- Add these scripts at the end of your body -->
     
-    <script src="{{ asset('website/assets/js/jquery-3.6.0.min.js') }}"></script>
-    <script src="{{ asset('website/assets/js/slick.min.js') }}"></script>
+    <!-- Back to top button -->
+    <a href="#" class="btn btn-primary rounded-circle shadow d-flex align-items-center justify-content-center" id="backToTop" style="position: fixed; bottom: 30px; right: 30px; display: none !important; width: 55px; height: 55px; z-index: 999; transition: all 0.3s ease;">
+        <i class="fas fa-arrow-up fs-5"></i>
+    </a>
+</footer>
 
+<style>
+.social-icons a:hover {
+    background: var(--primary-color) !important;
+    transform: translateY(-3px);
+}
+.footer-links a:hover {
+    color: #fff !important;
+    padding-left: 5px;
+}
+.transition-base {
+    transition: all 0.3s ease;
+}
+#backToTop:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(255, 159, 28, 0.4) !important;
+}
+</style>
 
-
-
-    
-@include('web.layout.sections.all_modal')
+<script>
+    // Back to top logic
+    window.addEventListener('scroll', function() {
+        const topBtn = document.getElementById('backToTop');
+        if (window.scrollY > 400) {
+            topBtn.style.setProperty('display', 'flex', 'important');
+        } else {
+            topBtn.style.setProperty('display', 'none', 'important');
+        }
+    });
+</script>

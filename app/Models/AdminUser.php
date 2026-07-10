@@ -6,8 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
-class AdminUser extends Model 
+class AdminUser extends Model
 {
+    protected $guarded = [];
+
     use HasFactory, SoftDeletes;
 
     protected $table = 'admin_user';
