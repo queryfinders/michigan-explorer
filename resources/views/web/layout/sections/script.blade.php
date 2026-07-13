@@ -158,6 +158,17 @@
             offset: 50,
         });
         
+        // Reading Progress Bar (Global)
+        const progressBar = document.getElementById('readingProgressBar');
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            if(progressBar) {
+                progressBar.style.width = scrolled + '%';
+            }
+        });
+        
         console.log("Michigan Explorer Theme Initialized.");
     });
 </script>

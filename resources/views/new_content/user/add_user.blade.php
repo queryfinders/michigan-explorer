@@ -33,7 +33,7 @@
                 <div class="mb-3 col-4">
                     <label class="form-label" for="email">Email</label>
                     <input type="text" name="email_id" id="email_id" class="form-control" placeholder="Enter Email Addess" value="{{ isset($user) && isset($user->email_id) ? $user->email_id : old('email_id') }}"/>
-                    <span id="email_error" style="color:red">
+                    <span id="email_error" class="auto-style-5">
                 </div>
                 <div class="mb-3 col-4">
                     <label class="form-label" for="contact_no">Contact No.</label>

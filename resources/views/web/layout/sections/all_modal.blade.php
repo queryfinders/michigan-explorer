@@ -1,17 +1,16 @@
   <!-- modals -->
     <div id="popup-overlay" class="overlay common-modal" data-type="1">
       <div class="popup">
-        <div style="padding: 1rem 1rem">
+        <div class="p-3">
           <button
-            class="close-modal-btn close-popup-btn"
-            style="padding: 10px 15px"
+            class="close-modal-btn close-popup-btn px-3 py-2"
           >
             ×
           </button>
         </div>
         <div class="re-logo pb-3">
           <img
-            style="min-height: 40px; height: 40px"
+            class="logo-modal"
             src="{{ asset('website/assets/images/logo.png') }}"
           />
         </div>
@@ -38,7 +37,7 @@
         </div>
 
         <!-- Step 2 -->
-        <div class="step step2" style="display: none">
+        <div class="step step2 d-none">
           <h2>Confirm Contact Information</h2>
           <p>All fields are required.</p>
           <form class="detailsForm">
@@ -79,7 +78,7 @@
                 </div>
               </div>
             </div>
-            <div style="margin-top: 1rem">
+            <div class="mt-3">
               <button type="button" class="btn-gray-thin-border backBtn">
                 Back
               </button>
@@ -89,7 +88,7 @@
         </div>
 
         <!-- Step 3 -->
-        <div class="step step3" style="display: none">
+        <div class="step step3 d-none">
           <h2 class="finalTitle">Thank you!</h2>
           <p class="finalMessage">
             Please check your email inbox to confirm your subscription...
@@ -103,17 +102,16 @@
       data-type="5"
     >
       <div class="popup">
-        <div style="padding: 1rem 1rem">
+        <div class="p-3">
           <button
-            class="close-modal-btn close-register-interest-btn"
-            style="padding: 10px 15px"
+            class="close-modal-btn close-register-interest-btn px-3 py-2"
           >
             ×
           </button>
         </div>
         <div class="re-logo pb-3">
           <img
-            style="min-height: 40px; height: 40px"
+            class="logo-modal"
             src="images/ptn-logo.png"
           />
         </div>
@@ -141,7 +139,7 @@
         </div>
 
         <!-- Step 2 -->
-        <div class="step step2" style="display: none">
+        <div class="step step2 d-none">
           <h2>Confirm Contact Information</h2>
           <p>All fields are required.</p>
           <form class="detailsForm">
@@ -170,7 +168,7 @@
               <label for="contactNumber">Contact Number *</label>
             </div>
 
-            <div style="margin-top: 1rem">
+            <div class="mt-3">
               <button type="button" class="btn-gray-thin-border backBtn">
                 Back
               </button>
@@ -180,7 +178,7 @@
         </div>
 
         <!-- Step 3 -->
-        <div class="step step3" style="display: none">
+        <div class="step step3 d-none">
           <h2 class="finalTitle">Thank you!</h2>
           <p class="finalMessage">
             Please check your email inbox to confirm your subscription and add
@@ -196,17 +194,16 @@
       data-type="2"
     >
       <div class="popup">
-        <div style="padding: 1rem 1rem">
+        <div class="p-3">
           <button
-            class="close-modal-btn close-download-brochure-btn"
-            style="padding: 10px 15px"
+            class="close-modal-btn close-download-brochure-btn px-3 py-2"
           >
             ×
           </button>
         </div>
         <div class="re-logo pb-3">
           <img
-            style="min-height: 40px; height: 40px"
+            class="logo-modal"
             src="images/ptn-logo.png"
           />
         </div>
@@ -233,7 +230,7 @@
         </div>
 
         <!-- Step 2 -->
-        <div class="step step2" style="display: none">
+        <div class="step step2 d-none">
           <h2>Confirm Contact Information</h2>
           <p>All fields are required.</p>
           <form class="detailsForm">
@@ -262,7 +259,7 @@
               <label for="contactNumber">Contact Number *</label>
             </div>
 
-            <div style="margin-top: 1rem">
+            <div class="mt-3">
               <button type="button" class="btn-gray-thin-border backBtn">
                 Back
               </button>
@@ -272,7 +269,7 @@
         </div>
 
         <!-- Step 3 -->
-        <div class="step step3" style="display: none">
+        <div class="step step3 d-none">
           <h2 class="finalTitle">Thank you!</h2>
           <p class="finalMessage">
             Please check your email inbox to confirm your subscription...
@@ -283,17 +280,16 @@
 
     <div id="attendee-list-overlay" class="overlay common-modal" data-type="9">
       <div class="popup">
-        <div style="padding: 1rem 1rem">
+        <div class="p-3">
           <button
-            class="close-modal-btn close-attendee-list-btn"
-            style="padding: 10px 15px"
+            class="close-modal-btn close-attendee-list-btn px-3 py-2"
           >
             ×
           </button>
         </div>
         <div class="re-logo pb-3">
           <img
-            style="min-height: 40px; height: 40px"
+            class="logo-modal"
             src="images/ptn-logo.png"
           />
         </div>
@@ -320,7 +316,7 @@
         </div>
 
         <!-- Step 2 -->
-        <div class="step step2" style="display: none">
+        <div class="step step2 d-none">
           <h2>Confirm Contact Information</h2>
           <p>All fields are required.</p>
           <form class="detailsForm">
@@ -349,7 +345,7 @@
               <label for="contactNumber">Contact Number *</label>
             </div>
 
-            <div style="margin-top: 1rem">
+            <div class="mt-3">
               <button type="button" class="btn-gray-thin-border backBtn">
                 Back
               </button>
@@ -359,7 +355,7 @@
         </div>
 
         <!-- Step 3 -->
-        <div class="step step3" style="display: none">
+        <div class="step step3 d-none">
           <h2 class="finalTitle">Thank you!</h2>
           <p class="finalMessage">
             Please check your email inbox to confirm your subscription...
@@ -374,17 +370,16 @@
       data-type="4"
     >
       <div class="popup">
-        <div style="padding: 1rem 1rem">
+        <div class="p-3">
           <button
-            class="close-modal-btn close-media-partnership-btn"
-            style="padding: 10px 15px"
+            class="close-modal-btn close-media-partnership-btn px-3 py-2"
           >
             ×
           </button>
         </div>
         <div class="re-logo pb-3">
           <img
-            style="min-height: 40px; height: 40px"
+            class="logo-modal"
             src="images/ptn-logo.png"
           />
         </div>
@@ -411,7 +406,7 @@
         </div>
 
         <!-- Step 2 -->
-        <div class="step step2" style="display: none">
+        <div class="step step2 d-none">
           <h2>Confirm Contact Information</h2>
           <p>All fields are required.</p>
           <form class="detailsForm">
@@ -440,7 +435,7 @@
               <label for="contactNumber">Contact Number *</label>
             </div>
 
-            <div style="margin-top: 1rem">
+            <div class="mt-3">
               <button type="button" class="btn-gray-thin-border backBtn">
                 Back
               </button>
@@ -450,7 +445,7 @@
         </div>
 
         <!-- Step 3 -->
-        <div class="step step3" style="display: none">
+        <div class="step step3 d-none">
           <h2 class="finalTitle">Thank you!</h2>
           <p class="finalMessage">
             Please check your email inbox to confirm your subscription...
@@ -460,17 +455,16 @@
     </div>
     <div id="contact-us-overlay" class="overlay common-modal" data-type="5">
       <div class="popup">
-        <div style="padding: 1rem 1rem">
+        <div class="p-3">
           <button
-            class="close-modal-btn close-contact-us-btn"
-            style="padding: 10px 15px"
+            class="close-modal-btn close-contact-us-btn px-3 py-2"
           >
             ×
           </button>
         </div>
         <div class="re-logo pb-3">
           <img
-            style="min-height: 40px; height: 40px"
+            class="logo-modal"
             src="images/ptn-logo.png"
           />
         </div>
@@ -497,7 +491,7 @@
         </div>
 
         <!-- Step 2 -->
-        <div class="step step2" style="display: none">
+        <div class="step step2 d-none">
           <h2>Confirm Contact Information</h2>
           <p>All fields are required.</p>
           <form class="detailsForm">
@@ -526,7 +520,7 @@
               <label for="contactNumber">Contact Number *</label>
             </div>
 
-            <div style="margin-top: 1rem">
+            <div class="mt-3">
               <button type="button" class="btn-gray-thin-border backBtn">
                 Back
               </button>
@@ -536,7 +530,7 @@
         </div>
 
         <!-- Step 3 -->
-        <div class="step step3" style="display: none">
+        <div class="step step3 d-none">
           <h2 class="finalTitle">Thank you!</h2>
           <p class="finalMessage">
             Please check your email inbox to confirm your subscription...
@@ -567,8 +561,7 @@
             rel="noopener noreferrer"
           >
             <i
-              class="fab fa-linkedin"
-              style="font-size: 17px; margin-top: 30px"
+              class="fab fa-linkedin auto-style-52"
             ></i>
           </a>
           <div class="speaker-sessions d-none">
@@ -607,8 +600,7 @@
             rel="noopener noreferrer"
           >
             <i
-              class="fab fa-linkedin"
-              style="font-size: 17px; margin-top: 30px"
+              class="fab fa-linkedin auto-style-52"
             ></i>
           </a>
           <div class="sponsor-sessions d-none">
@@ -645,7 +637,7 @@
                   <h4
                     class="card-header-title"
                     id="myModalLabel"
-                    style="color: #000"
+                    class="auto-style-53"
                   >
                     Cancel Order
                   </h4>

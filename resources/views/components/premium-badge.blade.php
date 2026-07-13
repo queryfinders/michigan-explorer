@@ -15,7 +15,7 @@
     };
 @endphp
 
-<span class="{{ $baseClasses }} {{ $typeClasses }}" style="font-size: 0.85rem;">
+<span class="{{ $baseClasses }} {{ $typeClasses }} fs-085rem">
     @if($icon)
         <i class="{{ $icon }}"></i>
     @elseif($type === 'rating')

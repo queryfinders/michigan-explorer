@@ -4,7 +4,10 @@
     @include('web.layout.sections.head')
   </head>
   <body class="home page-template page-template-index page-template-index-php page page-id-2 page-parent main-layout">
-
+    <!-- Reading Progress Bar (Global) -->
+    <div class="reading-progress-container">
+        <div class="reading-progress-bar" id="readingProgressBar"></div>
+    </div>
     @include('web.layout.sections.header')
     @yield('webLayoutContent')
     @include('web.layout.sections.footer')

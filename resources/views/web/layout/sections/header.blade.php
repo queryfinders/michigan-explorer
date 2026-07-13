@@ -1,9 +1,4 @@
-<style>
-    .navbar-nav .nav-link.active {
-        color: #F59E0B !important;
-        font-weight: 600;
-    }
-</style>
+
 <nav class="navbar navbar-expand-lg fixed-top main-navbar {{ request()->routeIs('web.home') ? '' : 'scrolled inner-nav' }}" id="mainNav">
     <div class="container">
         <a class="navbar-brand" href="{{ route('web.home') }}">Michigan Explorer</a>

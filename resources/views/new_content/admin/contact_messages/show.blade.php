@@ -12,7 +12,7 @@
     <table class="table table-bordered mb-4">
       <tbody>
         <tr>
-          <th style="width: 200px;">Date</th>
+          <th class="auto-style-3">Date</th>
           <td>{{ $message->created_at->format('F d, Y h:i A') }}</td>
         </tr>
         <tr>

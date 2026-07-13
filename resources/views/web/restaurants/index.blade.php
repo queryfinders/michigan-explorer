@@ -41,7 +41,7 @@
             </ol>
         </nav>
 
-        <h1 class="display-3 fw-bold text-white mb-3" style="font-family: var(--font-heading);">{{ $pageTitle }}</h1>
+        <h1 class="display-3 fw-bold text-white mb-3 auto-style-7">{{ $pageTitle }}</h1>
         <p class="lead text-white opacity-75 mb-4">{{ $metaDescription }}</p>
         
         <div class="d-flex justify-content-center gap-3 mt-4">
@@ -103,12 +103,12 @@
 </section>
 
 <!-- 3. Restaurant Listing Grid -->
-<section class="py-5" style="background-color: #f8f9fa;">
+<section class="py-5 auto-style-8">
     <div class="container py-4">
         
         <div class="d-flex justify-content-between align-items-end mb-5">
             <div>
-                <h2 class="fw-bold mb-0" style="color: #1A1D20;">{{ isset($currentCategory) ? 'Showing ' . $restaurants->total() . ' ' . $currentCategory->name : 'Available Restaurants' }}</h2>
+                <h2 class="fw-bold mb-0 auto-style-9">{{ isset($currentCategory) ? 'Showing ' . $restaurants->total() . ' ' . $currentCategory->name : 'Available Restaurants' }}</h2>
                 <p class="text-muted mt-2 mb-0">Showing {{ $restaurants->count() }} of {{ $restaurants->total() }} restaurants found</p>
             </div>
         </div>
@@ -176,12 +176,12 @@
                                 @foreach($catGroup as $cat)
                                 <div class="col-md-4 col-sm-6 category-item" data-name="{{ strtolower($cat->name) }}">
                                     <a href="{{ route('web.restaurants.category', $cat->slug) }}" class="text-decoration-none text-dark d-flex align-items-center p-2 rounded-3 hover-bg-light transition-all">
-                                        <div class="icon-box bg-light rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                        <div class="icon-box bg-light rounded-circle d-flex align-items-center justify-content-center me-3 auto-style-10">
                                             <i class="fas {{ $cat->icon ?? 'fa-utensils' }} text-secondary"></i>
                                         </div>
                                         <div>
                                             <div class="fw-bold small">{{ $cat->name }}</div>
-                                            <div class="text-muted" style="font-size: 0.75rem;">{{ $cat->restaurants_count ?? 24 }} Places</div>
+                                            <div class="text-muted auto-style-11">{{ $cat->restaurants_count ?? 24 }} Places</div>
                                         </div>
                                     </a>
                                 </div>

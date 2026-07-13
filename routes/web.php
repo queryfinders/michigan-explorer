@@ -133,10 +133,12 @@ Route::get('/restaurants/{slug}', [\App\Http\Controllers\Frontend\RestaurantCont
 
 // Attractions
 Route::get('/attractions', [\App\Http\Controllers\Frontend\AttractionController::class, 'index'])->name('web.attractions.index');
+Route::get('/attractions/category/{slug}', [\App\Http\Controllers\Frontend\AttractionController::class, 'category'])->name('web.attractions.category');
 Route::get('/attractions/{slug}', [\App\Http\Controllers\Frontend\AttractionController::class, 'show'])->name('web.attractions.show');
 
 // Events
 Route::get('/events', [\App\Http\Controllers\Frontend\EventController::class, 'index'])->name('web.events.index');
+Route::get('/events/category/{slug}', [\App\Http\Controllers\Frontend\EventController::class, 'category'])->name('web.events.category');
 Route::get('/events/{slug}', [\App\Http\Controllers\Frontend\EventController::class, 'show'])->name('web.events.show');
 
 // Blogs

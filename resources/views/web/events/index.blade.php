@@ -1,82 +1,159 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Events - Michigan Explorer</title>
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
-        .hero { background: linear-gradient(135deg, #6f42c1, #d63384); color: white; padding: 60px 0; text-align: center; }
-        .event-card { border: none; border-radius: 12px; transition: transform 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .event-card:hover { transform: translateY(-5px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
-        .event-img { height: 200px; object-fit: cover; border-top-left-radius: 12px; border-top-right-radius: 12px; background-color: #e9ecef; }
-        .date-badge { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.9); color: #6f42c1; padding: 8px 12px; border-radius: 8px; font-weight: bold; text-align: center; line-height: 1.2; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .date-badge .month { font-size: 0.8rem; text-transform: uppercase; }
-        .date-badge .day { font-size: 1.2rem; }
-    </style>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">
-        <div class="container">
-            <a class="navbar-brand fw-bold text-primary" href="/">Michigan Explorer</a>
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('web.hotels.index') }}">Hotels</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('web.restaurants.index') }}">Restaurants</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('web.attractions.index') }}">Attractions</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="{{ route('web.events.index') }}">Events</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-    <div class="hero mb-5">
-        <div class="container">
-            <h1 class="display-4 fw-bold">Upcoming Events</h1>
-            <p class="lead">See what's happening around Michigan City.</p>
+@extends('web.layout.app_layout')
+
+@section('webLayoutContent')
+
+<!-- 1. Hero Banner -->
+<section class="hotel-listing-hero position-relative" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), url('{{ asset('images/attraction_nature_1783508280642.png') }}');">
+    <div class="content">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb justify-content-center text-white opacity-75">
+                <li class="breadcrumb-item"><a href="{{ route('web.home') }}" class="text-white text-decoration-none">Home</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('web.events.index') }}" class="text-white text-decoration-none">Events</a></li>
+                @if(isset($currentCategory))
+                <li class="breadcrumb-item active text-white fw-bold" aria-current="page">{{ $currentCategory->name }}</li>
+                @endif
+            </ol>
+        </nav>
+
+        <h1 class="display-3 fw-bold text-white mb-3 auto-style-7">
+            {{ isset($currentCategory) ? $currentCategory->name . ' Events' : 'Upcoming Events' }}
+        </h1>
+        <p class="lead text-white opacity-75 mb-4">
+            {{ isset($currentCategory) ? 'Discover the best ' . strtolower($currentCategory->name) . ' happening near you.' : 'Discover concerts, festivals, workshops, and more happening across Michigan.' }}
+        </p>
+    </div>
+</section>
+
+<!-- 2. Browse by Category -->
+<section class="py-4 border-bottom bg-white shadow-sm position-relative z-index-1">
+    <div class="container">
+        <h6 class="text-uppercase text-muted fw-bold small mb-3 tracking-wider">Browse by Category</h6>
+        <div class="category-filter-wrapper d-flex align-items-center">
+            
+            <a href="{{ route('web.events.index') }}" class="category-pill {{ !isset($currentCategory) ? 'active' : '' }}">
+                <i class="fas fa-th-large"></i>
+                <span class="cat-name">All Events</span>
+                <span class="cat-count">48</span>
+            </a>
+            
+            @php
+                $displayCategories = isset($featuredCategories) ? $featuredCategories->toArray() : [];
+            @endphp
+
+            @foreach($displayCategories as $cat)
+                @php $catObj = (object)$cat; @endphp
+                <a href="{{ route('web.events.category', $catObj->slug) }}" class="category-pill {{ (isset($currentCategory) && $currentCategory->id === $catObj->id) ? 'active' : '' }}">
+                    <i class="fas {{ $catObj->icon ?? 'fa-calendar-alt' }}"></i>
+                    <span class="cat-name">{{ $catObj->name }}</span>
+                    <span class="cat-count">{{ $catObj->events_count ?? rand(5, 20) }}</span>
+                </a>
+            @endforeach
+
+            <!-- More Categories Button -->
+            <a href="#" class="category-pill bg-light" data-bs-toggle="modal" data-bs-target="#categoriesModal">
+                <i class="fas fa-ellipsis-h"></i>
+                <span class="cat-name">More</span>
+                <span class="cat-count">Explore All</span>
+            </a>
         </div>
     </div>
-    <div class="container mb-5">
+</section>
+
+<!-- 3. Time Filters (Weekly, Monthly, Past) -->
+<section class="pt-4 pb-2 bg-light">
+    <div class="container">
+        <div class="d-flex flex-wrap justify-content-center gap-2">
+            @php $currentRoute = isset($currentCategory) ? route('web.events.category', $currentCategory->slug) : route('web.events.index'); @endphp
+            
+            <a href="{{ $currentRoute }}" class="btn {{ empty($filter) ? 'btn-dark' : 'btn-outline-secondary' }} rounded-pill px-4 btn-sm fw-semibold">All Upcoming</a>
+            <a href="{{ $currentRoute }}?filter=this-week" class="btn {{ $filter == 'this-week' ? 'btn-dark' : 'btn-outline-secondary' }} rounded-pill px-4 btn-sm fw-semibold">This Week</a>
+            <a href="{{ $currentRoute }}?filter=this-month" class="btn {{ $filter == 'this-month' ? 'btn-dark' : 'btn-outline-secondary' }} rounded-pill px-4 btn-sm fw-semibold">This Month</a>
+            <a href="{{ $currentRoute }}?filter=past" class="btn {{ $filter == 'past' ? 'btn-dark' : 'btn-outline-secondary' }} rounded-pill px-4 btn-sm fw-semibold">Past Events</a>
+        </div>
+    </div>
+</section>
+
+<!-- 4. Main Event Listing -->
+<section class="py-5 bg-light">
+    <div class="container">
         <div class="row g-4">
-            @forelse($events as $event)
-            <div class="col-md-4">
-                <div class="card event-card h-100 position-relative">
-                    <img src="{{ $event->featured_image ? asset($event->featured_image) : 'https://placehold.co/600x400/e9ecef/495057?text=No+Image' }}" class="card-img-top event-img" alt="{{ $event->name }}">
-                    @if($event->start_date)
-                    <div class="date-badge">
-                        <div class="month">{{ \Carbon\Carbon::parse($event->start_date)->format('M') }}</div>
-                        <div class="day">{{ \Carbon\Carbon::parse($event->start_date)->format('d') }}</div>
-                    </div>
-                    @endif
-                    <div class="card-body">
-                        <span class="badge bg-primary mb-2">{{ $event->category ? $event->category->name : 'Event' }}</span>
-                        <h5 class="card-title fw-bold">{{ $event->name }}</h5>
-                        <p class="text-muted small mb-3">
-                            <i class="fa fa-map-marker-alt"></i> {{ $event->venue_name ? $event->venue_name . ', ' : '' }}{{ $event->city ? $event->city : 'Michigan City' }}
-                        </p>
-                        <p class="card-text">{{ Str::limit($event->description, 100) }}</p>
-                    </div>
-                    <div class="card-footer bg-white border-0 pb-3">
-                        <a href="{{ route('web.events.show', $event->slug) }}" class="btn btn-outline-primary w-100 rounded-pill">View Details</a>
+            
+            <!-- Generate fallback list if none exist in DB (for demo UI) -->
+            @if($events->isEmpty() && empty($filter))
+                @php
+                    $demoEvents = collect([
+                        (object)[
+                            'name' => 'Grand Rapids Art Festival',
+                            'slug' => 'demo',
+                            'description' => 'Join us for the annual Grand Rapids Art Festival! This three-day event features incredible live music, delicious local food vendors, and stunning artwork.',
+                            'featured_image' => 'storage/demo/michigan_sleeping_bear_1783683642640.png',
+                            'start_date' => now()->addDays(2),
+                            'venue_name' => 'Calder Plaza',
+                            'city' => 'Grand Rapids',
+                            'price' => 0.00,
+                            'category' => (object)['name' => 'Arts & Culture', 'icon' => 'fas fa-palette']
+                        ],
+                        (object)[
+                            'name' => 'Detroit Jazz Fest',
+                            'slug' => 'demo',
+                            'description' => 'The Detroit Jazz Festival is a major free jazz festival held every year during Labor Day Weekend at Hart Plaza and Campus Martius Park in Detroit.',
+                            'featured_image' => 'storage/demo/michigan_hotel_lobby_1783683621508.png',
+                            'start_date' => now()->addDays(14),
+                            'venue_name' => 'Campus Martius',
+                            'city' => 'Detroit',
+                            'price' => 0.00,
+                            'category' => (object)['name' => 'Music', 'icon' => 'fas fa-music']
+                        ],
+                        (object)[
+                            'name' => 'Traverse City Cherry Festival',
+                            'slug' => 'demo',
+                            'description' => 'Celebrate the cherry harvest with a week of parades, pie-eating contests, air shows, and live entertainment on the shores of Grand Traverse Bay.',
+                            'featured_image' => 'storage/demo/michigan_lighthouse_1783683652511.png',
+                            'start_date' => now()->addDays(30),
+                            'venue_name' => 'Open Space Park',
+                            'city' => 'Traverse City',
+                            'price' => 15.00,
+                            'category' => (object)['name' => 'Festivals', 'icon' => 'fas fa-campground']
+                        ]
+                    ]);
+                @endphp
+                
+                @foreach($demoEvents as $demoEvent)
+                <div class="col-lg-4 col-md-6">
+                    <x-event-card :event="$demoEvent" />
+                </div>
+                @endforeach
+            @elseif($events->isEmpty())
+                <div class="col-12 text-center py-5">
+                    <div class="text-muted mb-3"><i class="far fa-calendar-times fa-4x opacity-50"></i></div>
+                    <h3 class="fw-bold auto-style-7">No Events Found</h3>
+                    <p class="text-muted">There are no events matching your current filters.</p>
+                    <a href="{{ route('web.events.index') }}" class="btn btn-primary rounded-pill px-4 mt-3">Clear Filters</a>
+                </div>
+            @else
+                @foreach($events as $event)
+                <div class="col-lg-4 col-md-6">
+                    <x-event-card :event="$event" />
+                </div>
+                @endforeach
+                
+                <!-- Pagination -->
+                @if($events->hasPages())
+                <div class="col-12 mt-5">
+                    <div class="d-flex justify-content-center">
+                        {{ $events->appends(request()->query())->links() }}
                     </div>
                 </div>
-            </div>
-            @empty
-            <div class="col-12 text-center py-5">
-                <h4>No events found.</h4>
-            </div>
-            @endforelse
-        </div>
-        <div class="d-flex justify-content-center mt-5">
-            {{ $events->links('pagination::bootstrap-5') }}
+                @endif
+            @endif
+
         </div>
     </div>
-</body>
-</html>
+</section>
+
+@endsection
+
+@section('webLayoutScript')
+
+@endsection

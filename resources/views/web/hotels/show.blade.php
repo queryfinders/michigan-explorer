@@ -33,7 +33,7 @@
             <div class="hotel-header-location">
                 <i class="fas fa-map-marker-alt text-amber"></i> 
                 {{ !empty($hotel->address) ? $hotel->address . ', ' : '' }}{{ $hotel->city ?? 'Mackinac Island' }}, {{ $hotel->state ?? 'MI' }} {{ $hotel->zip ?? '49757' }}
-                <a href="#location-map" class="text-amber fw-bold ms-2" style="text-decoration: underline;">Show on map</a>
+                <a href="#location-map" class="text-amber fw-bold ms-2 text-underline">Show on map</a>
             </div>
         </div>
         <div class="hotel-actions mt-3 mt-md-0 d-flex gap-2">
@@ -76,7 +76,7 @@
             <!-- Overview -->
             <div class="content-card">
                 <h3>About {{ $hotel->name }}</h3>
-                <div class="text-muted" style="line-height: 1.8;">
+                <div class="text-muted lh-18">
                     <p>{{ $hotel->description ?: 'Experience the pinnacle of luxury and comfort at our exquisite property. Located in the heart of the city, we offer world-class amenities, stunning views, and exceptional service to make your stay truly unforgettable.' }}</p>
                     <p>Whether you are here for business or leisure, our beautifully appointed rooms and state-of-the-art facilities ensure a perfect getaway.</p>
                 </div>
@@ -125,22 +125,7 @@
                 </div>
             </div>
 
-            <!-- Location & Map -->
-            <div class="content-card" id="location-map">
-                <h3>Location</h3>
-                <p class="text-muted mb-3"><i class="fas fa-map-marker-alt text-primary me-2"></i> {{ $hotel->address ?? 'Main Street' }}, {{ $hotel->city ?? 'Mackinac Island' }}, {{ $hotel->state ?? 'MI' }}</p>
-                <div class="map-container bg-light">
-                    <!-- Google Maps Iframe Placeholder -->
-                    <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q={{ urlencode(($hotel->address ?? 'Main Street') . ' ' . ($hotel->city ?? 'Mackinac Island')) }}&t=&z=13&ie=UTF8&iwloc=&output=embed"></iframe>
-                </div>
-                <div class="d-flex justify-content-between align-items-center mt-3">
-                    <div>
-                        <h6 class="fw-bold mb-1">Contact Info</h6>
-                        <p class="mb-0 text-muted small"><i class="fas fa-phone-alt me-2"></i> {{ $hotel->phone ?? '(555) 123-4567' }}</p>
-                    </div>
-                    <a href="https://maps.google.com/?q={{ urlencode(($hotel->address ?? 'Main Street') . ' ' . ($hotel->city ?? 'Mackinac Island')) }}" target="_blank" class="btn btn-outline-primary rounded-pill px-4">Get Directions</a>
-                </div>
-            </div>
+            <!-- Location & Map removed from here -->
 
             <!-- Nearby Attractions -->
             <div class="content-card">
@@ -245,6 +230,23 @@
                         <i class="fas fa-calendar-check"></i> Free Cancellation on most rooms
                     </div>
                 </div>
+            </div>
+        </div>
+        
+        <!-- Full-Width Location & Map -->
+        <div class="content-card mt-4" id="location-map">
+            <h3>Location</h3>
+            <p class="text-muted mb-3"><i class="fas fa-map-marker-alt text-primary me-2"></i> {{ $hotel->address ?? 'Main Street' }}, {{ $hotel->city ?? 'Mackinac Island' }}, {{ $hotel->state ?? 'MI' }}</p>
+            <div class="map-container bg-light h-500px">
+                <!-- Google Maps Iframe Placeholder -->
+                <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q={{ urlencode(($hotel->address ?? 'Main Street') . ' ' . ($hotel->city ?? 'Mackinac Island')) }}&t=&z=13&ie=UTF8&iwloc=&output=embed"></iframe>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <div>
+                    <h6 class="fw-bold mb-1">Contact Info</h6>
+                    <p class="mb-0 text-muted small"><i class="fas fa-phone-alt me-2"></i> {{ $hotel->phone ?? '(555) 123-4567' }}</p>
+                </div>
+                <a href="https://maps.google.com/?q={{ urlencode(($hotel->address ?? 'Main Street') . ' ' . ($hotel->city ?? 'Mackinac Island')) }}" target="_blank" class="btn btn-outline-primary rounded-pill px-4">Get Directions</a>
             </div>
         </div>
 

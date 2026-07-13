@@ -7,11 +7,7 @@
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
-        .hero { background: #0d6efd; color: white; padding: 60px 0; text-align: center; }
-        .contact-box { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-    </style>
+    
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">

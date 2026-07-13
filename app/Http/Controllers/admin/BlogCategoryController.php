@@ -23,6 +23,7 @@ class BlogCategoryController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:blog_categories',
+            'icon' => 'nullable|string|max:255',
             'status' => 'boolean'
         ]);
 
@@ -40,6 +41,7 @@ class BlogCategoryController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:blog_categories,slug,' . $blogCategory->id,
+            'icon' => 'nullable|string|max:255',
             'status' => 'boolean'
         ]);
 

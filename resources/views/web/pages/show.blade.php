@@ -6,13 +6,7 @@
     <title>{{ $page->meta_title ?? $page->title }} - Michigan Explorer</title>
     <meta name="description" content="{{ $page->meta_description ?? '' }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; line-height: 1.8; font-size: 1.1rem; }
-        .hero-img { width: 100%; height: 350px; object-fit: cover; background-color: #212529; }
-        .page-header { background: #212529; color: white; padding: 60px 0; text-align: center; }
-        .page-content { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-top: -50px; position: relative; z-index: 10; }
-        .page-content img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
-    </style>
+    
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-3">

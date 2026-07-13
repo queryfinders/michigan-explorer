@@ -110,7 +110,7 @@ use App\Helpers\AccessRights;
                         { data: 'email_id'},
                         { data: null,
                             render: function (data, type, row, meta) {
-                                return '<a class="text-secondary" target="blank" href="https://api.whatsapp.com/send?phone=91' + data.contact_no + '">' + data.contact_no + '<i style="color: #4FCE5D;" class="fab fa-whatsapp ms-1"></i></a>';
+                                return '<a class="text-secondary" target="blank" href="https://api.whatsapp.com/send?phone=91' + data.contact_no + '">' + data.contact_no + '<i class="auto-style-6 fab fa-whatsapp ms-1"></i></a>';
                             },
                         },
                         { data: 'job_title'},

@@ -5,21 +5,17 @@
 @section('webLayoutContent')
 
 <!-- 1. PREMIUM HERO SECTION -->
-<section class="hero-premium">
-    <!-- Background & Parallax -->
-    <div class="hero-bg-wrapper">
-        <img src="{{ asset('images/hero_banner_1783508250640.png') }}" class="hero-bg-image" alt="Michigan Explorer Background">
-        <div class="hero-overlay"></div>
-    </div>
+<section class="hero-premium position-relative overflow-hidden">
+    <img src="{{ asset('images/hero_banner_1783508250640.png') }}" class="hero-bg-img parallax-img" alt="Hero Background">
 
     <div class="container position-relative z-index-1 text-white py-5 my-5">
         
         <!-- Typography with Stagger Animation -->
         <div class="text-center mb-3">
-            <h1 class="display-3 fw-bold mb-4" style="font-family: var(--font-heading); text-shadow: 0 4px 15px rgba(0,0,0,0.5);" data-aos="fade-up" data-aos-duration="1000">
+            <h1 class="display-3 fw-bold mb-4 font-heading text-shadow-md" data-aos="fade-up" data-aos-duration="1000">
                 {{ $heroData->title ?? 'Discover the True Beauty of Michigan' }}
             </h1>
-            <p class="lead fs-5 mx-auto" style="max-width: 800px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); line-height: 1.8;" data-aos="fade-up" data-aos-delay="200" data-aos-duration="1000">
+            <p class="lead fs-5 mx-auto hero-subtitle text-shadow-sm lh-18 mx-auto" data-aos="fade-up" data-aos-delay="200" data-aos-duration="1000">
                 {{ $heroData->subtitle ?? 'Experience luxury stays, amazing restaurants, breathtaking attractions, exciting events, and unforgettable adventures across Michigan.' }}
             </p>
         </div>
@@ -29,7 +25,7 @@
             
             <form action="{{ route('web.search') }}" method="GET" class="smart-search-box" @submit="onSubmit">
                 <i class="fas fa-search smart-search-icon" x-show="!isLoading"></i>
-                <div class="search-loader" x-show="isLoading" style="display: none;"></div>
+                <div class="search-loader" x-show="isLoading" class="d-none"></div>
                 
                 <input 
                     type="text" 
@@ -47,7 +43,7 @@
                 >
                 
                 <button type="submit" class="smart-search-btn d-none d-sm-block">Search</button>
-                <button type="submit" class="smart-search-btn d-block d-sm-none px-3" style="border-radius: 50%; width: 50px; height: 50px; padding: 0;"><i class="fas fa-search"></i></button>
+                <button type="submit" class="smart-search-btn d-block d-sm-none px-3 rounded-circle btn-icon-50 p-0"><i class="fas fa-search"></i></button>
             </form>
 
             <!-- Autocomplete Dropdown -->
@@ -74,7 +70,7 @@
         
         <!-- Popular Searches (Chips) -->
         <div class="text-center pt-4" data-aos="fade-up" data-aos-delay="600">
-            <p class="small text-white mb-3 fw-bold text-uppercase tracking-wider" style="text-shadow: 0 2px 5px rgba(0,0,0,0.8);">Popular Searches</p>
+            <p class="small text-white mb-3 fw-bold text-uppercase tracking-wider text-shadow-dark">Popular Searches</p>
             <div class="popular-chips-wrapper justify-content-center">
                 <a href="{{ route('web.search', ['keyword' => 'Indiana Dunes']) }}" class="premium-chip"><i class="fas fa-fire text-warning"></i> Indiana Dunes</a>
                 <a href="{{ route('web.search', ['keyword' => 'Hotels']) }}" class="premium-chip"><i class="fas fa-hotel"></i> Hotels</a>
@@ -183,7 +179,7 @@
                 @foreach($attractions->take(2) as $attraction)
                 <div class="col-md-6">
                     <div class="card text-white border-0 overflow-hidden rounded-4 shadow-lg h-100">
-                        <img src="{{ $attraction->image ? asset('storage/'.$attraction->image) : asset('images/attraction_nature_1783508280642.png') }}" class="card-img h-100 object-fit-cover" alt="{{ $attraction->name }}" style="min-height: 400px; filter: brightness(0.7);">
+                        <img src="{{ $attraction->image ? asset('storage/'.$attraction->image) : asset('images/attraction_nature_1783508280642.png') }}" class="card-img h-100 object-fit-cover" alt="{{ $attraction->name }}" class="h-400px filter-dark">
                         <div class="card-img-overlay d-flex flex-column justify-content-end p-5">
                             <h3 class="card-title display-6 fw-bold mb-3">{{ $attraction->name }}</h3>
                             <p class="card-text fs-5 mb-4">{{ Str::limit($attraction->description, 100) }}</p>
@@ -198,7 +194,7 @@
                 <!-- Static Fallback Data -->
                 <div class="col-md-6">
                     <div class="card text-white border-0 overflow-hidden rounded-4 shadow-lg h-100">
-                        <img src="{{ asset('images/attraction_nature_1783508280642.png') }}" class="card-img h-100 object-fit-cover" alt="Attraction" style="min-height: 400px; filter: brightness(0.7);">
+                        <img src="{{ asset('images/attraction_nature_1783508280642.png') }}" class="card-img h-100 object-fit-cover" alt="Attraction" class="h-400px filter-dark">
                         <div class="card-img-overlay d-flex flex-column justify-content-end p-5">
                             <h3 class="card-title display-6 fw-bold mb-3">Pictured Rocks National Lakeshore</h3>
                             <p class="card-text fs-5 mb-4">Experience majestic sandstone cliffs, pristine waterfalls, and turquoise waters.</p>
@@ -210,7 +206,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="card text-white border-0 overflow-hidden rounded-4 shadow-lg h-100">
-                        <img src="{{ asset('images/attraction_nature_1783508280642.png') }}" class="card-img h-100 object-fit-cover" alt="Attraction" style="min-height: 400px; filter: brightness(0.7);">
+                        <img src="{{ asset('images/attraction_nature_1783508280642.png') }}" class="card-img h-100 object-fit-cover" alt="Attraction" class="h-400px filter-dark">
                         <div class="card-img-overlay d-flex flex-column justify-content-end p-5">
                             <h3 class="card-title display-6 fw-bold mb-3">Sleeping Bear Dunes</h3>
                             <p class="card-text fs-5 mb-4">Towering sand dunes offering panoramic views of Lake Michigan.</p>
@@ -282,13 +278,14 @@
 <!-- 7. Affiliate Promotions -->
 <section class="py-0">
     <div class="container-fluid px-0">
-        <div class="card border-0 rounded-0 text-white position-relative" style="background: url('{{ asset('images/promo_banner_1783508311655.png') }}') no-repeat center center/cover; padding: 120px 0;">
-            <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(90deg, rgba(0,59,149,0.9) 0%, rgba(0,59,149,0.4) 100%);"></div>
+        <div class="card border-0 rounded-0 text-white position-relative promo-banner-wrapper">
+    <img src="{{ asset('images/promo_banner_1783508311655.png') }}" class="promo-bg-img" alt="Promo Background">
+            <div class="position-absolute top-0 start-0 w-100 h-100 bg-gradient-primary"></div>
             <div class="container position-relative z-index-1">
                 <div class="row">
                     <div class="col-lg-6">
                         <span class="badge bg-secondary mb-3 fs-6 px-3 py-2 rounded-pill">Special Promotion</span>
-                        <h2 class="display-4 fw-bold mb-4 text-white" style="font-family: var(--font-heading);">Save 20% on Romantic Lakefront Escapes</h2>
+                        <h2 class="display-4 fw-bold mb-4 text-white font-heading">Save 20% on Romantic Lakefront Escapes</h2>
                         <p class="fs-4 mb-5 text-light">Book your next getaway through our exclusive affiliate partners and enjoy premium upgrades.</p>
                         <a href="#" class="btn btn-secondary btn-lg rounded-pill px-5">Claim Offer</a>
                     </div>
@@ -344,11 +341,11 @@
 </section>
 
 <!-- 9. Newsletter Strip -->
-<section class="py-5" style="background-color: var(--primary-color);">
+<section class="py-5 bg-primary-theme">
     <div class="container">
         <div class="row justify-content-center align-items-center">
             <div class="col-lg-6 text-white text-center text-lg-start mb-4 mb-lg-0">
-                <h3 class="fw-bold mb-2 text-white" style="font-family: var(--font-heading);">Join the Explorer Club</h3>
+                <h3 class="fw-bold mb-2 text-white font-heading">Join the Explorer Club</h3>
                 <p class="mb-0 text-light fs-5">Get the best travel secrets and exclusive deals delivered to your inbox.</p>
             </div>
             <div class="col-lg-5">

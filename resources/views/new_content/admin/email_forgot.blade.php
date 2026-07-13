@@ -2,11 +2,5 @@
 
 <p>{!! $body !!}</p>
 <br>
-<a href="{{ $action_link }}" style="background: #7367f0;
-  color: white;
-  padding: 10px 30px;
-  -webkit-border-radius: 18px;
-  border-radius: 18px;
-  margin-right: 8px; 
-  text-decoration: none">Reset Password</a>
+<a href="{{ $action_link }}" class="auto-style-4">Reset Password</a>
   &nbsp;&nbsp;

@@ -28,7 +28,7 @@
 
 @section('webLayoutContent')
 <!-- 1. Hero Banner -->
-<section class="hotel-listing-hero position-relative">
+<section class="hotel-listing-hero position-relative" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), url('{{ asset('images/luxury_hotel_1783508260160.png') }}');">
     <div class="content">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb" class="mb-4">
@@ -41,7 +41,7 @@
             </ol>
         </nav>
 
-        <h1 class="display-3 fw-bold text-white mb-3" style="font-family: var(--font-heading);">{{ $pageTitle }}</h1>
+        <h1 class="display-3 fw-bold text-white mb-3 font-heading">{{ $pageTitle }}</h1>
         <p class="lead text-white opacity-75 mb-4">{{ $metaDescription }}</p>
         
         <div class="d-flex justify-content-center gap-3 mt-4">
@@ -103,12 +103,12 @@
 </section>
 
 <!-- 3. Hotel Listing Grid -->
-<section class="py-5" style="background-color: #f8f9fa;">
+<section class="py-5 bg-light-gray">
     <div class="container py-4">
         
         <div class="d-flex justify-content-between align-items-end mb-5">
             <div>
-                <h2 class="fw-bold mb-0" style="color: #1A1D20;">{{ isset($currentCategory) ? 'Showing ' . $hotels->total() . ' ' . $currentCategory->name : 'Available Hotels' }}</h2>
+                <h2 class="fw-bold mb-0 text-heading">{{ isset($currentCategory) ? 'Showing ' . $hotels->total() . ' ' . $currentCategory->name : 'Available Hotels' }}</h2>
                 <p class="text-muted mt-2 mb-0">Showing {{ $hotels->count() }} of {{ $hotels->total() }} hotels found</p>
             </div>
         </div>
@@ -174,12 +174,12 @@
                                 @foreach($catGroup as $cat)
                                 <div class="col-md-4 col-sm-6 category-item" data-name="{{ strtolower($cat->name) }}">
                                     <a href="{{ route('web.hotels.category', $cat->slug) }}" class="text-decoration-none text-dark d-flex align-items-center p-2 rounded-3 hover-bg-light transition-all">
-                                        <div class="icon-box bg-light rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                        <div class="icon-box bg-light rounded-circle d-flex align-items-center justify-content-center me-3 icon-box-sm">
                                             <i class="fas {{ $cat->icon ?? 'fa-bed' }} text-secondary"></i>
                                         </div>
                                         <div>
                                             <div class="fw-bold small">{{ $cat->name }}</div>
-                                            <div class="text-muted" style="font-size: 0.75rem;">{{ $cat->hotels_count ?? 42 }} Hotels</div>
+                                            <div class="text-muted fs-xs">{{ $cat->hotels_count ?? 42 }} Hotels</div>
                                         </div>
                                     </a>
                                 </div>
