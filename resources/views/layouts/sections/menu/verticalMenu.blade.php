@@ -8,11 +8,7 @@ $configData = Helper::appClasses();
   @if(!isset($navbarFull))
   <div class="app-brand demo">
     <a href="{{url('/')}}" class="app-brand-link">
-      <span class="app-brand-logo demo" id="app-brand-logo">
-        <!-- @include('_partials.macros',["height"=>20]) -->
-        <img src="{!! asset('assets/img/QF-logo-main.webp') !!}" class="logoVertical"  alt="">
-      </span>
-      <!-- <span class="app-brand-text demo menu-text fw-bold" id="siteTitle">{{config('variables.templateName')}}</span> -->
+      <span class="app-brand-text demo menu-text fw-bold" id="siteTitle" style="font-family: 'Poppins', sans-serif; font-size: 1.25rem;">Michigan Explorer</span>
     </a>
 
     <!-- <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">

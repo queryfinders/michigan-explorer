@@ -8,5 +8,8 @@ class Seo extends Model
 {
     protected $guarded = [];
 
-    //
+    public function seoable()
+    {
+        return $this->morphTo();
+    }
 }

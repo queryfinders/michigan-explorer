@@ -95,7 +95,9 @@
 <!-- 1. Editorial Hero Section -->
 <section class="editorial-hero position-relative overflow-hidden">
     <!-- Parallax Zoom Background -->
-    <div class="hero-bg-zoom" style="background-image: url('{{ $heroImage }}');"></div>
+    <div class="hero-bg-parallax">
+        <div class="hero-bg-zoom" style="background-image: url('{{ $heroImage }}');"></div>
+    </div>
     <div class="hero-overlay-gradient"></div>
 
     <div class="container position-relative h-100 d-flex flex-column justify-content-center align-items-center text-center pb-5 pt-5 mt-5 z-index-2">
@@ -157,7 +159,7 @@
                         <span class="text-muted small fw-bold text-uppercase letter-spacing-1 mb-2 auto-style-36">Share</span>
                         <div class="bg-primary text-white w-100 h-1px mb-2"></div>
                         <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($canonicalUrl) }}" target="_blank" class="share-btn facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="https://twitter.com/intent/tweet?text={{ urlencode($blog->title) }}&url={{ urlencode($canonicalUrl) }}" target="_blank" class="share-btn twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="https://twitter.com/intent/tweet?text={{ urlencode($blog->title) }}&url={{ urlencode($canonicalUrl) }}" target="_blank" class="share-btn twitter"><i class="fab fa-x-twitter"></i></a>
                         <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ urlencode($canonicalUrl) }}&title={{ urlencode($blog->title) }}" target="_blank" class="share-btn linkedin"><i class="fab fa-linkedin-in"></i></a>
                         <a href="https://pinterest.com/pin/create/button/?url={{ urlencode($canonicalUrl) }}&media={{ urlencode($heroImage) }}&description={{ urlencode($blog->title) }}" target="_blank" class="share-btn pinterest"><i class="fab fa-pinterest-p"></i></a>
                         <a href="https://api.whatsapp.com/send?text={{ urlencode($blog->title . ' ' . $canonicalUrl) }}" target="_blank" class="share-btn whatsapp"><i class="fab fa-whatsapp"></i></a>
@@ -182,6 +184,49 @@
                     
                 </article>
 
+                <!-- FAQ Section -->
+                <div class="bg-white rounded-4 shadow-sm p-4 p-md-5 mb-5">
+                    <h3 class="fw-bold mb-4 font-heading text-heading">Frequently Asked Questions</h3>
+                    <div class="accordion accordion-flush" id="blogFaq">
+                        <div class="accordion-item border rounded-3 mb-2 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                    When is the best time to visit Michigan for this trip?
+                                </button>
+                            </h2>
+                            <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#blogFaq">
+                                <div class="accordion-body text-muted lh-18">
+                                    Late spring through early autumn (May to October) is ideal. Summer offers beach activities and warm weather, while autumn brings breathtaking fall colors and harvest season at local vineyards.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item border rounded-3 mb-2 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                    Are these recommendations family-friendly?
+                                </button>
+                            </h2>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#blogFaq">
+                                <div class="accordion-body text-muted lh-18">
+                                    Yes! Most locations, parks, and dining options mentioned in our guides offer options suitable for travelers of all ages.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item border rounded-3 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                    Do I need to book reservations in advance?
+                                </button>
+                            </h2>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#blogFaq">
+                                <div class="accordion-body text-muted lh-18">
+                                    For popular attractions, restaurants, and hotels, we highly recommend booking 2-4 weeks in advance, especially during the peak summer and fall color seasons.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Tags -->
                 <div class="d-flex flex-wrap align-items-center gap-2 mb-5 pb-4 border-bottom">
                     <span class="fw-bold text-muted me-2 text-uppercase small letter-spacing-1">Tags:</span>
@@ -196,7 +241,7 @@
                 <div class="d-flex d-lg-none flex-wrap align-items-center gap-2 mb-5">
                     <span class="fw-bold text-muted me-2 text-uppercase small letter-spacing-1">Share:</span>
                     <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($canonicalUrl) }}" target="_blank" class="share-btn-mobile facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="https://twitter.com/intent/tweet?text={{ urlencode($blog->title) }}&url={{ urlencode($canonicalUrl) }}" target="_blank" class="share-btn-mobile twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="https://twitter.com/intent/tweet?text={{ urlencode($blog->title) }}&url={{ urlencode($canonicalUrl) }}" target="_blank" class="share-btn-mobile twitter"><i class="fab fa-x-twitter"></i></a>
                     <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ urlencode($canonicalUrl) }}&title={{ urlencode($blog->title) }}" target="_blank" class="share-btn-mobile linkedin"><i class="fab fa-linkedin-in"></i></a>
                     <a href="https://api.whatsapp.com/send?text={{ urlencode($blog->title . ' ' . $canonicalUrl) }}" target="_blank" class="share-btn-mobile whatsapp"><i class="fab fa-whatsapp"></i></a>
                 </div>
@@ -219,7 +264,7 @@
                                 <a href="#" class="btn btn-outline-primary btn-sm rounded-pill px-4 fw-bold">View Profile</a>
                                 <div class="d-flex gap-2">
                                     <a href="#" class="text-muted hover-text-primary"><i class="fab fa-instagram fs-5"></i></a>
-                                    <a href="#" class="text-muted hover-text-primary"><i class="fab fa-twitter fs-5"></i></a>
+                                    <a href="#" class="text-muted hover-text-primary"><i class="fab fa-x-twitter fs-5"></i></a>
                                 </div>
                             </div>
                         </div>
@@ -264,7 +309,7 @@
                 </div>
 
                 <!-- Comments Placeholder -->
-                <div class="comments-section mb-5">
+                <!-- <div class="comments-section mb-5">
                     <h3 class="fw-bold mb-4 border-bottom pb-3">Comments <span class="text-muted fs-5 fw-normal">(1)</span></h3>
                     
                     <div class="comment-item d-flex mb-4">
@@ -297,7 +342,7 @@
                             <button type="button" class="btn btn-primary rounded-pill px-4 fw-bold">Post Comment</button>
                         </form>
                     </div>
-                </div>
+                </div> -->
 
             </div>
 
@@ -313,9 +358,33 @@
                         </nav>
                     </div>
 
+                    <!-- Related Articles Sidebar Widget -->
+                    @if(isset($relatedBlogs) && $relatedBlogs->count() > 0)
+                    <div class="card border-0 rounded-4 shadow-sm mt-4 bg-white border border-light p-4">
+                        <h6 class="text-uppercase fw-bold letter-spacing-1 mb-3 text-primary d-flex align-items-center">
+                            <i class="fas fa-bookmark me-2"></i> Related Articles
+                        </h6>
+                        <div class="d-flex flex-column gap-3">
+                            @foreach($relatedBlogs->take(3) as $related)
+                            <div class="d-flex align-items-center gap-3 pb-2 border-bottom border-light">
+                                <a href="{{ route('web.blogs.show', $related->slug) }}" class="flex-shrink-0" style="width: 70px; height: 70px;">
+                                    <img src="{{ $related->featured_image ? asset($related->featured_image) : 'https://placehold.co/100' }}" class="rounded-3 w-100 h-100 object-fit-cover shadow-sm" alt="{{ $related->title }}">
+                                </a>
+                                <div>
+                                    <h6 class="mb-1 fw-bold" style="font-size: 0.9rem; line-height: 1.3;">
+                                        <a href="{{ route('web.blogs.show', $related->slug) }}" class="text-dark text-decoration-none hover-text-primary transition-all">{{ Str::limit($related->title, 45) }}</a>
+                                    </h6>
+                                    <span class="text-muted small">{{ $related->published_at ? \Carbon\Carbon::parse($related->published_at)->format('M d, Y') : $related->created_at->format('M d, Y') }}</span>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+
                     <!-- Sidebar Ad / Promo Placeholder -->
                     <div class="mt-4 rounded-4 overflow-hidden position-relative shadow-sm group">
-                        <img src="https://images.unsplash.com/photo-1542314831-c6a4d27ce66f?auto=format&fit=crop&w=600" class="w-100 object-fit-cover auto-style-45" alt="Promo">
+                        <img src="{{ asset('images/michigan_explorer_ad.png') }}" class="w-100 object-fit-cover auto-style-45" alt="Promo">
                         <div class="position-absolute top-0 start-0 w-100 h-100 auto-style-46"></div>
                         <div class="position-absolute bottom-0 start-0 w-100 p-4 text-white">
                             <span class="badge bg-accent text-dark mb-2 rounded-pill fw-bold">Discover</span>

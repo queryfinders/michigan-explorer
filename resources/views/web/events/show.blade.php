@@ -9,7 +9,7 @@
 @endphp
 
 <!-- 1. Hero Banner -->
-<section class="hotel-detail-hero position-relative" style="height: 500px; background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.5)), url('{{ $heroImage }}'); background-size: cover; background-position: center;">
+<section class="hotel-detail-hero position-relative" style="height: 500px; background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.5)), url('{{ $heroImage }}'); background-size: cover; background-position: center; background-attachment: fixed;">
     <div class="container h-100 d-flex flex-column justify-content-center align-items-center text-center pt-5">
         <nav aria-label="breadcrumb" class="mb-3">
             <ol class="breadcrumb justify-content-center">

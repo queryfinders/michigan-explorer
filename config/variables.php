@@ -3,9 +3,9 @@
   return [
     "creatorName" => "Queryfinders",
     "creatorUrl" => "http://queryfinders.com/",
-    "templateName" => "QFS",
+    "templateName" => "Michigan Explorer",
     "templateVersion" => "1.0.0",
     "templateFree" => false,
-    "templateDescription" => "QFS",
-    "templateKeyword" => "QFS"
+    "templateDescription" => "Michigan Explorer",
+    "templateKeyword" => "Michigan Explorer"
   ];

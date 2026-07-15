@@ -29,4 +29,9 @@ class Blog extends Model
         $minutes = ceil($wordCount / 200);
         return $minutes;
     }
+
+    public function seo()
+    {
+        return $this->morphOne(\App\Models\Seo::class, 'seoable');
+    }
 }

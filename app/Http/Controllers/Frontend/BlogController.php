@@ -78,12 +78,14 @@ class BlogController extends Controller
             ->take(5)
             ->get();
 
-        return view('web.blogs.index', compact('blogs', 'featuredBlog', 'categories', 'tags', 'recentBlogs', 'mostViewedBlogs'));
+        $page = \App\Models\Page::with('seo')->where('slug', 'blogs')->first();
+
+        return view('web.blogs.index', compact('blogs', 'featuredBlog', 'categories', 'tags', 'recentBlogs', 'mostViewedBlogs', 'page'));
     }
 
     public function show($slug)
     {
-        $blog = Blog::with(['category', 'author', 'tags'])
+        $blog = Blog::with(['category', 'author', 'tags', 'seo'])
             ->where('slug', $slug)
             ->where('status', 'published')
             ->firstOrFail();

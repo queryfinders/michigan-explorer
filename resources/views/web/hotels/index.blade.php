@@ -27,8 +27,16 @@
 @endsection
 
 @section('webLayoutContent')
+@php
+    $bannerImage = ($page && $page->featured_image) ? asset($page->featured_image) : asset('images/luxury_hotel_1783508260160.png');
+    $bannerTitle = ($page && $page->banner_title) ? $page->banner_title : $pageTitle;
+    $bannerSubtitle = ($page && $page->banner_subtitle) ? $page->banner_subtitle : $metaDescription;
+    $bannerBtnText = ($page && $page->banner_button_text) ? $page->banner_button_text : ('Browse ' . (isset($currentCategory) ? $currentCategory->name : 'Featured Hotels'));
+    $bannerBtnLink = ($page && $page->banner_button_link) ? $page->banner_button_link : '#all-hotels';
+@endphp
+
 <!-- 1. Hero Banner -->
-<section class="hotel-listing-hero position-relative" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), url('{{ asset('images/luxury_hotel_1783508260160.png') }}');">
+<section class="hotel-listing-hero position-relative" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), url('{{ $bannerImage }}');">
     <div class="content">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb" class="mb-4">
@@ -41,11 +49,11 @@
             </ol>
         </nav>
 
-        <h1 class="display-3 fw-bold text-white mb-3 font-heading">{{ $pageTitle }}</h1>
-        <p class="lead text-white opacity-75 mb-4">{{ $metaDescription }}</p>
+        <h1 class="display-3 fw-bold text-white mb-3 font-heading">{{ $bannerTitle }}</h1>
+        <p class="lead text-white opacity-75 mb-4">{{ $bannerSubtitle }}</p>
         
         <div class="d-flex justify-content-center gap-3 mt-4">
-            <a href="#all-hotels" class="btn btn-secondary rounded-pill px-4 py-2 fw-bold shadow-sm">Browse {{ isset($currentCategory) ? $currentCategory->name : 'Featured Hotels' }}</a>
+            <a href="{{ $bannerBtnLink }}" class="btn btn-secondary rounded-pill px-4 py-2 fw-bold shadow-sm">{{ $bannerBtnText }}</a>
         </div>
     </div>
 </section>
@@ -59,7 +67,7 @@
             <a href="{{ route('web.hotels.index') }}" class="category-pill {{ !isset($currentCategory) ? 'active' : '' }}">
                 <i class="fas fa-th-large"></i>
                 <span class="cat-name">All Hotels</span>
-                <span class="cat-count">124</span>
+                <span class="cat-count">{{ $totalHotelsCount }}</span>
             </a>
 
             @php
@@ -87,7 +95,7 @@
                 <a href="{{ route('web.hotels.category', $catObj->slug) }}" class="category-pill {{ (isset($currentCategory) && $currentCategory->id === $catObj->id) ? 'active' : '' }}">
                     <i class="fas {{ $catObj->icon ?? 'fa-bed' }}"></i>
                     <span class="cat-name">{{ $catObj->name }}</span>
-                    <span class="cat-count">{{ $catObj->hotels_count ?? 42 }}</span>
+                    <span class="cat-count">{{ $catObj->hotels_count ?? 0 }}</span>
                 </a>
             @endforeach
 
@@ -179,7 +187,7 @@
                                         </div>
                                         <div>
                                             <div class="fw-bold small">{{ $cat->name }}</div>
-                                            <div class="text-muted fs-xs">{{ $cat->hotels_count ?? 42 }} Hotels</div>
+                                            <div class="text-muted fs-xs">{{ $cat->hotels_count ?? 0 }} {{ Str::plural('Hotel', $cat->hotels_count ?? 0) }}</div>
                                         </div>
                                     </a>
                                 </div>

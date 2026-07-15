@@ -21,7 +21,7 @@
       </div>
       <div class="mb-3">
         <label class="form-label" for="description">Description</label>
-        <textarea class="form-control" id="description" name="description">{{ $hotelCategory->description }}</textarea>
+        <textarea class="form-control tinymce" id="description" name="description">{{ $hotelCategory->description }}</textarea>
       </div>
       <div class="mb-3">
         <label class="form-label" for="status">Status</label>
@@ -35,4 +35,23 @@
     </form>
   </div>
 </div>
+@endsection
+
+@section('page-script')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+  $(document).ready(function() {
+    tinymce.init({
+      selector: 'textarea.tinymce',
+      plugins: 'advlist autolink lists link image charmap preview anchor pagebreak',
+      toolbar_mode: 'floating',
+      height: 300,
+      setup: function (editor) {
+        editor.on('change', function () {
+          editor.save();
+        });
+      }
+    });
+  });
+</script>
 @endsection

@@ -33,8 +33,9 @@ class EventController extends Controller
         $currentCategory = null;
         $featuredCategories = \App\Models\EventCategory::where('is_featured', 1)->take(10)->get();
         $allCategories = \App\Models\EventCategory::where('status', 1)->orderBy('name')->get();
+        $page = \App\Models\Page::with('seo')->where('slug', 'events')->first();
         
-        return view('web.events.index', compact('events', 'currentCategory', 'featuredCategories', 'allCategories', 'filter'));
+        return view('web.events.index', compact('events', 'currentCategory', 'featuredCategories', 'allCategories', 'filter', 'page'));
     }
 
     public function category(Request $request, $slug)
@@ -67,13 +68,14 @@ class EventController extends Controller
         $currentCategory = $category;
         $featuredCategories = \App\Models\EventCategory::where('is_featured', 1)->take(10)->get();
         $allCategories = \App\Models\EventCategory::where('status', 1)->orderBy('name')->get();
+        $page = \App\Models\Page::with('seo')->where('slug', 'events')->first();
         
-        return view('web.events.index', compact('events', 'currentCategory', 'featuredCategories', 'allCategories', 'filter'));
+        return view('web.events.index', compact('events', 'currentCategory', 'featuredCategories', 'allCategories', 'filter', 'page'));
     }
 
     public function show($slug)
     {
-        $event = \App\Models\Event::with('category')->where('slug', $slug)->where('status', 1)->first();
+        $event = \App\Models\Event::with(['category', 'seo'])->where('slug', $slug)->where('status', 1)->first();
         
         if (!$event) {
             // Static Fallback Data for UI Demonstration

@@ -10,10 +10,12 @@ class HotelController extends Controller
     public function index()
     {
         $hotels = \App\Models\Hotel::with('category')->where('status', 1)->paginate(12);
+        $totalHotelsCount = \App\Models\Hotel::where('status', 1)->count();
         $currentCategory = null;
-        $featuredCategories = \App\Models\HotelCategory::where('is_featured', 1)->take(10)->get();
-        $allCategories = \App\Models\HotelCategory::where('status', 1)->orderBy('name')->get();
-        return view('web.hotels.index', compact('hotels', 'currentCategory', 'featuredCategories', 'allCategories'));
+        $featuredCategories = \App\Models\HotelCategory::withCount('hotels')->where('is_featured', 1)->take(10)->get();
+        $allCategories = \App\Models\HotelCategory::withCount('hotels')->where('status', 1)->orderBy('name')->get();
+        $page = \App\Models\Page::with('seo')->where('slug', 'hotels')->first();
+        return view('web.hotels.index', compact('hotels', 'totalHotelsCount', 'currentCategory', 'featuredCategories', 'allCategories', 'page'));
     }
 
     public function category($slug)
@@ -22,16 +24,18 @@ class HotelController extends Controller
         if (!$category) {
             abort(404);
         }
-        $hotels = \App\Models\Hotel::with('category')->where('category_id', $category->id)->where('status', 1)->paginate(12);
+        $hotels = \App\Models\Hotel::with('category')->where('hotel_category_id', $category->id)->where('status', 1)->paginate(12);
+        $totalHotelsCount = \App\Models\Hotel::where('status', 1)->count();
         $currentCategory = $category;
-        $featuredCategories = \App\Models\HotelCategory::where('is_featured', 1)->take(10)->get();
-        $allCategories = \App\Models\HotelCategory::where('status', 1)->orderBy('name')->get();
-        return view('web.hotels.index', compact('hotels', 'currentCategory', 'featuredCategories', 'allCategories'));
+        $featuredCategories = \App\Models\HotelCategory::withCount('hotels')->where('is_featured', 1)->take(10)->get();
+        $allCategories = \App\Models\HotelCategory::withCount('hotels')->where('status', 1)->orderBy('name')->get();
+        $page = \App\Models\Page::with('seo')->where('slug', 'hotels')->first();
+        return view('web.hotels.index', compact('hotels', 'totalHotelsCount', 'currentCategory', 'featuredCategories', 'allCategories', 'page'));
     }
 
     public function show($slug)
     {
-        $hotel = \App\Models\Hotel::where('slug', $slug)->where('status', 1)->first();
+        $hotel = \App\Models\Hotel::with(['seo', 'category', 'amenities', 'images'])->where('slug', $slug)->where('status', 1)->first();
         
         if (!$hotel) {
             // Static Fallback Data for UI Demonstration
@@ -45,6 +49,7 @@ class HotelController extends Controller
                 'affiliate_url' => '#',
                 'featured_image' => 'storage/demo/michigan_resort_exterior_1783683587847.png',
                 'image' => null,
+                'images' => collect([]),
                 'category' => (object)['name' => 'Luxury Resort']
             ];
         }

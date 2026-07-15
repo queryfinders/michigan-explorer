@@ -52,4 +52,13 @@ class HotelCategoryController extends Controller
         $hotelCategory->delete();
         return redirect()->route('hotel-categories.index')->with('success', 'Category deleted successfully.');
     }
+
+    public function changeStatus($id, $status)
+    {
+        $category = \App\Models\HotelCategory::findOrFail($id);
+        $category->status = $status == 1 ? 0 : 1;
+        $category->save();
+
+        return response()->json(['success' => true, 'message' => 'Status updated successfully.', 'status' => $category->status]);
+    }
 }

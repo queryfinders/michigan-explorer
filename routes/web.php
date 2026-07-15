@@ -91,7 +91,9 @@ Route::group(['middleware' => 'admin_auth'], function () {
     })->name('logout');
     
     // Hotels Module
+    Route::get('/admin/hotel-categories/status/{id}/{status}', [\App\Http\Controllers\Admin\HotelCategoryController::class, 'changeStatus'])->name('hotel-categories.status');
     Route::resource('/admin/hotel-categories', \App\Http\Controllers\Admin\HotelCategoryController::class);
+    Route::get('/admin/hotels/status/{id}/{status}', [\App\Http\Controllers\Admin\HotelController::class, 'changeStatus'])->name('hotels.status');
     Route::resource('/admin/hotels', \App\Http\Controllers\Admin\HotelController::class);
 
     // Restaurants Module
@@ -113,6 +115,12 @@ Route::group(['middleware' => 'admin_auth'], function () {
     // Pages & Settings
     Route::resource('/admin/contact-messages', \App\Http\Controllers\Admin\ContactMessageController::class)->only(['index', 'show', 'destroy']);
     Route::resource('/admin/pages', \App\Http\Controllers\Admin\PageController::class);
+    Route::get('/admin/pages/status/{id}/{status}', [\App\Http\Controllers\Admin\PageController::class, 'changeStatus'])->name('pages.status');
+    
+    // Amenities
+    Route::resource('/admin/amenities', \App\Http\Controllers\Admin\AmenityController::class);
+    Route::get('/admin/amenities/status/{id}/{status}', [\App\Http\Controllers\Admin\AmenityController::class, 'changeStatus'])->name('amenities.status');
+
     Route::resource('/admin/settings', \App\Http\Controllers\Admin\SettingController::class);
 });
 

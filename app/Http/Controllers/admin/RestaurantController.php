@@ -28,12 +28,17 @@ class RestaurantController extends Controller
             'status' => 'boolean'
         ]);
 
-        \App\Models\Restaurant::create($request->all());
+        $restaurant = \App\Models\Restaurant::create($request->except('_token', '_method', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup'));
+        
+        $seoData = $request->only(['meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup']);
+        $restaurant->seo()->create($seoData);
+
         return redirect()->route('restaurants.index')->with('success', 'Restaurant created successfully.');
     }
 
     public function edit(\App\Models\Restaurant $restaurant)
     {
+        $restaurant->load('seo');
         $categories = \App\Models\RestaurantCategory::where('status', 1)->get();
         return view('new_content.admin.restaurants.edit', compact('restaurant', 'categories'));
     }
@@ -47,7 +52,15 @@ class RestaurantController extends Controller
             'status' => 'boolean'
         ]);
 
-        $restaurant->update($request->all());
+        $restaurant->update($request->except('_token', '_method', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup'));
+        
+        $seoData = $request->only(['meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup']);
+        if ($restaurant->seo) {
+            $restaurant->seo->update($seoData);
+        } else {
+            $restaurant->seo()->create($seoData);
+        }
+
         return redirect()->route('restaurants.index')->with('success', 'Restaurant updated successfully.');
     }
 

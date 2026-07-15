@@ -13,7 +13,8 @@ class AttractionController extends Controller
         $currentCategory = null;
         $featuredCategories = \App\Models\AttractionCategory::where('is_featured', 1)->take(10)->get();
         $allCategories = \App\Models\AttractionCategory::where('status', 1)->orderBy('name')->get();
-        return view('web.attractions.index', compact('attractions', 'currentCategory', 'featuredCategories', 'allCategories'));
+        $page = \App\Models\Page::with('seo')->where('slug', 'attractions')->first();
+        return view('web.attractions.index', compact('attractions', 'currentCategory', 'featuredCategories', 'allCategories', 'page'));
     }
 
     public function category($slug)
@@ -26,12 +27,13 @@ class AttractionController extends Controller
         $currentCategory = $category;
         $featuredCategories = \App\Models\AttractionCategory::where('is_featured', 1)->take(10)->get();
         $allCategories = \App\Models\AttractionCategory::where('status', 1)->orderBy('name')->get();
-        return view('web.attractions.index', compact('attractions', 'currentCategory', 'featuredCategories', 'allCategories'));
+        $page = \App\Models\Page::with('seo')->where('slug', 'attractions')->first();
+        return view('web.attractions.index', compact('attractions', 'currentCategory', 'featuredCategories', 'allCategories', 'page'));
     }
 
     public function show($slug)
     {
-        $attraction = \App\Models\Attraction::where('slug', $slug)->where('status', 1)->first();
+        $attraction = \App\Models\Attraction::with('seo')->where('slug', $slug)->where('status', 1)->first();
         if (!$attraction) {
             // Static Fallback Data for UI Demonstration
             $attraction = (object)[

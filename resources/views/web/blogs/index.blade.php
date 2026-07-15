@@ -19,7 +19,7 @@
 
 @section('webLayoutContent')
 <!-- 1. Premium Magazine Hero Section -->
-<section class="position-relative hero-magazine overflow-hidden" style="height: 500px; padding-top: 80px; background-image: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.85)), url('{{ asset('images/attraction_nature_1783508280642.png') }}'); background-size: cover; background-position: center;">
+<section class="position-relative hero-magazine overflow-hidden" style="height: 500px; padding-top: 80px; background-image: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.85)), url('{{ asset('images/attraction_nature_1783508280642.png') }}'); background-size: cover; background-position: center; background-attachment: fixed;">
     <div class="container h-100 d-flex flex-column justify-content-center align-items-center text-center">
         
         <nav aria-label="breadcrumb" class="mb-3 slide-up-anim auto-style-19">
@@ -128,7 +128,7 @@
                             </div>
 
                             @if($featuredBlog->category)
-                                <a href="?category={{ $featuredBlog->category->slug }}" class="badge bg-primary bg-opacity-10 text-primary text-uppercase px-3 py-2 rounded-pill fw-bold text-decoration-none align-self-start mb-3 transition-all hover-bg-primary hover-text-white d-flex align-items-center">
+                                <a href="?category={{ $featuredBlog->category->slug }}" class="badge bg-primary bg-opacity-10 text-white text-uppercase px-3 py-2 rounded-pill fw-bold text-decoration-none align-self-start mb-3 transition-all hover-bg-primary hover-text-white d-flex align-items-center">
                                     @if($featuredBlog->category->icon) <i class="{{ $featuredBlog->category->icon }} me-2"></i> @endif
                                     {{ $featuredBlog->category->name }}
                                 </a>
@@ -145,7 +145,7 @@
 
                             <div class="mt-auto d-flex align-items-center justify-content-between border-top pt-4">
                                 <div class="d-flex align-items-center">
-                                    <img src="{{ $featuredBlog->author && $featuredBlog->author->avatar ? asset($featuredBlog->author->avatar) : 'https://placehold.co/100' }}" class="rounded-circle me-3 shadow-sm border border-2 border-white object-fit-cover" class="w-45px h-45px" alt="Author">
+                                    <img src="{{ $featuredBlog->author && $featuredBlog->author->avatar ? asset($featuredBlog->author->avatar) : 'https://placehold.co/100' }}" class="rounded-circle me-3 shadow-sm border border-2 border-white object-fit-cover w-45px h-45px" alt="Author">
                                     <div>
                                         <div class="fw-bold text-dark">{{ $featuredBlog->author ? $featuredBlog->author->name : 'Admin' }}</div>
                                         <div class="text-muted small">{{ $featuredBlog->published_at ? \Carbon\Carbon::parse($featuredBlog->published_at)->format('M d, Y') : $featuredBlog->created_at->format('M d, Y') }}</div>
@@ -170,7 +170,7 @@
                             <div class="card h-100 border-0 rounded-4 shadow-sm hover-lift transition-all bg-white overflow-hidden">
                                 <div class="position-relative overflow-hidden">
                                     <a href="{{ route('web.blogs.show', $blog->slug) }}" class="d-block h-100">
-                                        <img src="{{ $blog->featured_image ? asset($blog->featured_image) : 'https://placehold.co/600x400/e9ecef/495057?text=No+Image' }}" loading="lazy" class="card-img-top blog-img object-fit-cover hover-zoom-img" alt="{{ $blog->title }}" class="auto-style-25">
+                                        <img src="{{ $blog->featured_image ? asset($blog->featured_image) : 'https://placehold.co/600x400/e9ecef/495057?text=No+Image' }}" loading="lazy" class="card-img-top blog-img object-fit-cover hover-zoom-img auto-style-25" alt="{{ $blog->title }}">
                                     </a>
                                     
                                     <!-- Badges -->
@@ -207,7 +207,7 @@
                                     <div class="mt-auto d-flex align-items-center justify-content-between border-top pt-3">
                                         <div class="d-flex align-items-center">
                                             @if($blog->author)
-                                            <img src="{{ $blog->author->avatar ? asset($blog->author->avatar) : 'https://placehold.co/100' }}" class="rounded-circle me-2 shadow-sm border border-2 border-white object-fit-cover" class="w-35px h-35px" alt="Author">
+                                            <img src="{{ $blog->author && $blog->author->avatar ? asset($blog->author->avatar) : 'https://placehold.co/100' }}" class="rounded-circle me-2 shadow-sm border border-2 border-white object-fit-cover w-35px h-35px" alt="Author">
                                             @endif
                                             <div>
                                                 <div class="fw-bold text-dark small lh-1 mb-1">{{ $blog->author ? $blog->author->name : 'Admin' }}</div>
@@ -291,18 +291,7 @@
             <div class="col-lg-4">
                 <div class="position-sticky auto-style-16">
                     
-                    <!-- Sidebar Search -->
-                    <div class="card border-0 rounded-4 shadow-sm mb-4 bg-white overflow-hidden sidebar-widget">
-                        <div class="card-body p-4">
-                            <h5 class="fw-bold mb-4 d-flex align-items-center"><i class="fas fa-search text-primary me-2"></i> Search Articles</h5>
-                            <form action="{{ route('web.blogs.index') }}" method="GET">
-                                <div class="input-group search-glass border rounded-pill p-1">
-                                    <input type="text" class="form-control border-0 shadow-none bg-transparent ps-3" name="q" placeholder="Type here..." value="{{ request('q') }}">
-                                    <button class="btn btn-primary rounded-pill px-4 text-white hover-lift" type="submit">Search</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+                  
 
                     <!-- Premium Categories -->
                     <div class="card border-0 rounded-4 shadow-sm mb-4 bg-white sidebar-widget">
@@ -382,35 +371,7 @@
                         </div>
                     </div>
 
-                    <!-- Premium Newsletter CTA -->
-                    <div class="card border-0 rounded-4 shadow-lg text-white text-center p-4 position-relative overflow-hidden hover-lift transition-all auto-style-29">
-                        <!-- Decorative bg -->
-                        <div class="position-absolute top-0 end-0 opacity-10 auto-style-30">
-                            <i class="far fa-paper-plane display-1"></i>
-                        </div>
-                        
-                        <div class="card-body position-relative z-index-1">
-                            <div class="bg-white text-primary rounded-circle d-inline-flex align-items-center justify-content-center shadow-lg mb-4 auto-style-31">
-                                <i class="far fa-envelope-open fs-1"></i>
-                            </div>
-                            <h4 class="fw-bold mb-3 auto-style-7">Subscribe for Michigan Travel Updates</h4>
-                            <p class="small mb-4 opacity-90 fw-light lh-lg">Receive weekly travel guides, seasonal recommendations, hidden destinations, and exclusive travel tips straight to your inbox.</p>
-                            
-                            <ul class="list-unstyled text-start small fw-bold mb-4 mx-auto auto-style-17">
-                                <li class="mb-2"><i class="fas fa-check-circle text-accent me-2"></i> Weekly Guides</li>
-                                <li class="mb-2"><i class="fas fa-check-circle text-accent me-2"></i> Hidden Gems</li>
-                                <li class="mb-2"><i class="fas fa-check-circle text-accent me-2"></i> Exclusive Tips</li>
-                            </ul>
-
-                            <form>
-                                <div class="input-group bg-white rounded-pill p-1 shadow-sm mb-2">
-                                    <input type="email" class="form-control border-0 bg-transparent ps-4 shadow-none" placeholder="Email Address" required>
-                                </div>
-                                <button type="submit" class="btn btn-accent text-white w-100 fw-bold rounded-pill shadow px-4 py-3 hover-lift transition-all mt-2">Subscribe Now</button>
-                            </form>
-                            <div class="small opacity-50 mt-3">We respect your privacy. No spam.</div>
-                        </div>
-                    </div>
+                 
 
                 </div>
             </div>

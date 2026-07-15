@@ -1,6 +1,7 @@
+@include('web.layout.sections.seo')
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>@yield('title')</title>
+<title>@hasSection('seo_title')@yield('seo_title')@else@yield('title')@endif</title>
 <link rel="icon" href="{!! asset('website/assets/images/favicon/favicon.png') !!}">
 <meta name="msapplication-TileColor" content="#79bde9">
 <meta name="msapplication-TileImage" content="/mstile-144x144.png">
@@ -8,11 +9,11 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 <script type="application/ld+json">
- @yield('structured_data')
+ @hasSection('seo_structured_data')@yield('seo_structured_data')@else@yield('structured_data')@endif
 </script>
-@yield('meta_description')
-@yield('og_tags')
-@yield('canonical')
+@hasSection('seo_description')@yield('seo_description')@else@yield('meta_description')@endif
+@hasSection('seo_og_tags')@yield('seo_og_tags')@else@yield('og_tags')@endif
+@hasSection('seo_canonical')@yield('seo_canonical')@else@yield('canonical')@endif
 
 <link rel="icon" href="{{ asset('website/assets/images/favicon/favicon-32x32.png') }}" sizes="32x32">
 <link rel="icon" href="{{ asset('website/assets/images/favicon/favicon-192x192.png') }}" sizes="192x192">
@@ -20,7 +21,7 @@
 
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <!-- AOS Animation Library -->
 <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="{{ asset('css/theme.css') }}">

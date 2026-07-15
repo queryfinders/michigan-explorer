@@ -6,7 +6,7 @@
                 <p class="text-white-50 lh-lg mb-4 footer-description">Your premium guide to discovering the best hotels, fine dining, hidden attractions, and vibrant events across the beautiful state of Michigan.</p>
                 <div class="social-icons d-flex gap-3">
                     <a href="#" class="d-flex align-items-center justify-content-center text-white text-decoration-none rounded-circle social-icon"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="d-flex align-items-center justify-content-center text-white text-decoration-none rounded-circle social-icon"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="d-flex align-items-center justify-content-center text-white text-decoration-none rounded-circle social-icon"><i class="fab fa-x-twitter"></i></a>
                     <a href="#" class="d-flex align-items-center justify-content-center text-white text-decoration-none rounded-circle social-icon"><i class="fab fa-instagram"></i></a>
                     <a href="#" class="d-flex align-items-center justify-content-center text-white text-decoration-none rounded-circle social-icon"><i class="fab fa-youtube"></i></a>
                 </div>

@@ -6,17 +6,19 @@
 
 <!-- 1. PREMIUM HERO SECTION -->
 <section class="hero-premium position-relative overflow-hidden">
-    <img src="{{ asset('images/hero_banner_1783508250640.png') }}" class="hero-bg-img parallax-img" alt="Hero Background">
+    <div class="hero-bg-parallax">
+        <div class="hero-bg-zoom" role="img" aria-label="{{ $page->featured_image_alt ?? 'Michigan Explorer Banner' }}" style="background-image: url('{{ $page && $page->featured_image ? asset($page->featured_image) : asset('images/hero_banner_1783508250640.png') }}');"></div>
+    </div>
 
     <div class="container position-relative z-index-1 text-white py-5 my-5">
         
         <!-- Typography with Stagger Animation -->
         <div class="text-center mb-3">
             <h1 class="display-3 fw-bold mb-4 font-heading text-shadow-md" data-aos="fade-up" data-aos-duration="1000">
-                {{ $heroData->title ?? 'Discover the True Beauty of Michigan' }}
+                {{ $page->banner_title ?? 'Discover the True Beauty of Michigan' }}
             </h1>
             <p class="lead fs-5 mx-auto hero-subtitle text-shadow-sm lh-18 mx-auto" data-aos="fade-up" data-aos-delay="200" data-aos-duration="1000">
-                {{ $heroData->subtitle ?? 'Experience luxury stays, amazing restaurants, breathtaking attractions, exciting events, and unforgettable adventures across Michigan.' }}
+                {{ $page->banner_subtitle ?? 'Experience luxury stays, amazing restaurants, breathtaking attractions, exciting events, and unforgettable adventures across Michigan.' }}
             </p>
         </div>
 
@@ -175,47 +177,27 @@
         <p class="section-subtitle">Discover the hidden gems and natural wonders of the Great Lakes state.</p>
         
         <div class="row g-4">
-            @if(isset($attractions) && $attractions->count() > 0)
-                @foreach($attractions->take(2) as $attraction)
-                <div class="col-md-6">
-                    <div class="card text-white border-0 overflow-hidden rounded-4 shadow-lg h-100">
-                        <img src="{{ $attraction->image ? asset('storage/'.$attraction->image) : asset('images/attraction_nature_1783508280642.png') }}" class="card-img h-100 object-fit-cover" alt="{{ $attraction->name }}" class="h-400px filter-dark">
-                        <div class="card-img-overlay d-flex flex-column justify-content-end p-5">
-                            <h3 class="card-title display-6 fw-bold mb-3">{{ $attraction->name }}</h3>
-                            <p class="card-text fs-5 mb-4">{{ Str::limit($attraction->description, 100) }}</p>
-                            <div>
-                                <a href="{{ route('web.attractions.show', $attraction->slug) }}" class="btn btn-primary rounded-pill px-4">Explore Now</a>
-                            </div>
-                        </div>
-                    </div>
+             @if(isset($attractions) && $attractions->count() > 0)
+                @foreach($attractions->take(3) as $index => $attraction)
+                <div class="col-lg-4 col-md-6">
+                    <x-attraction-card :attraction="$attraction" :featured="$index === 0" />
                 </div>
                 @endforeach
             @else
                 <!-- Static Fallback Data -->
-                <div class="col-md-6">
-                    <div class="card text-white border-0 overflow-hidden rounded-4 shadow-lg h-100">
-                        <img src="{{ asset('images/attraction_nature_1783508280642.png') }}" class="card-img h-100 object-fit-cover" alt="Attraction" class="h-400px filter-dark">
-                        <div class="card-img-overlay d-flex flex-column justify-content-end p-5">
-                            <h3 class="card-title display-6 fw-bold mb-3">Pictured Rocks National Lakeshore</h3>
-                            <p class="card-text fs-5 mb-4">Experience majestic sandstone cliffs, pristine waterfalls, and turquoise waters.</p>
-                            <div>
-                                <a href="#" class="btn btn-primary rounded-pill px-4">Explore Now</a>
-                            </div>
-                        </div>
-                    </div>
+                @for($i=1; $i<=3; $i++)
+                <div class="col-lg-4 col-md-6">
+                    <x-attraction-card :attraction="(object)[
+                        'name' => $i === 1 ? 'Pictured Rocks National Lakeshore' : 'Sleeping Bear Dunes',
+                        'slug' => 'demo',
+                        'city' => $i === 1 ? 'Munising' : 'Empire',
+                        'description' => $i === 1 ? 'Experience majestic sandstone cliffs, pristine waterfalls, and turquoise waters.' : 'Experience towering sand dunes and spectacular views of Lake Michigan at this national lakeshore.',
+                        'distance' => '2.5 miles away',
+                        'travel_time_car' => '10 min drive',
+                        'travel_time_walk' => '45 min walk',
+                    ]" :featured="$i === 1" />
                 </div>
-                <div class="col-md-6">
-                    <div class="card text-white border-0 overflow-hidden rounded-4 shadow-lg h-100">
-                        <img src="{{ asset('images/attraction_nature_1783508280642.png') }}" class="card-img h-100 object-fit-cover" alt="Attraction" class="h-400px filter-dark">
-                        <div class="card-img-overlay d-flex flex-column justify-content-end p-5">
-                            <h3 class="card-title display-6 fw-bold mb-3">Sleeping Bear Dunes</h3>
-                            <p class="card-text fs-5 mb-4">Towering sand dunes offering panoramic views of Lake Michigan.</p>
-                            <div>
-                                <a href="#" class="btn btn-primary rounded-pill px-4">Explore Now</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @endfor
             @endif
         </div>
     </div>
@@ -234,42 +216,52 @@
         
         <div class="row g-4">
             @if(isset($events) && $events->count() > 0)
-                @foreach($events->take(4) as $event)
-                <div class="col-lg-3 col-md-6">
-                    <div class="premium-card">
-                        <div class="img-wrapper position-relative">
-                            <img src="{{ $event->image ? asset('storage/'.$event->image) : asset('images/festival_event_1783508290846.png') }}" class="card-img-top" alt="{{ $event->title }}">
-                            <div class="position-absolute top-0 end-0 bg-primary text-white p-2 m-3 rounded text-center fw-bold lh-sm">
-                                <span class="d-block fs-4">{{ \Carbon\Carbon::parse($event->date)->format('d') }}</span>
-                                <span class="d-block small text-uppercase">{{ \Carbon\Carbon::parse($event->date)->format('M') }}</span>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <h4 class="card-title fs-5">{{ $event->title }}</h4>
-                            <div class="location-badge mb-0 mt-3"><i class="fas fa-map-marker-alt text-primary"></i> {{ $event->location ?? 'Michigan' }}</div>
-                        </div>
-                    </div>
+                @foreach($events->take(3) as $event)
+                <div class="col-lg-4 col-md-6">
+                    <x-event-card :event="$event" />
                 </div>
                 @endforeach
             @else
                 <!-- Static Fallback Data -->
-                @for($i=1; $i<=4; $i++)
-                <div class="col-lg-3 col-md-6">
-                    <div class="premium-card">
-                        <div class="img-wrapper position-relative">
-                            <img src="{{ asset('images/festival_event_1783508290846.png') }}" class="card-img-top" alt="Event">
-                            <div class="position-absolute top-0 end-0 bg-primary text-white p-2 m-3 rounded text-center fw-bold lh-sm">
-                                <span class="d-block fs-4">15</span>
-                                <span class="d-block small text-uppercase">AUG</span>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <h4 class="card-title fs-5">Summer Music & Food Festival</h4>
-                            <div class="location-badge mb-0 mt-3"><i class="fas fa-map-marker-alt text-primary"></i> Detroit, MI</div>
-                        </div>
-                    </div>
+                <div class="col-lg-4 col-md-6">
+                    <x-event-card :event="(object)[
+                        'name' => 'Summer Music & Food Festival',
+                        'slug' => 'demo',
+                        'description' => 'A lively summer celebration of local Michigan food trucks and live concerts on the waterfront.',
+                        'featured_image' => 'images/festival_event_1783508290846.png',
+                        'start_date' => now()->addDays(2),
+                        'venue_name' => 'Hart Plaza',
+                        'city' => 'Detroit',
+                        'price' => 0.00,
+                        'category' => (object)['name' => 'Music & Food', 'icon' => 'fas fa-music']
+                    ]" />
                 </div>
-                @endfor
+                <div class="col-lg-4 col-md-6">
+                    <x-event-card :event="(object)[
+                        'name' => 'Ann Arbor Art Fair',
+                        'slug' => 'demo',
+                        'description' => 'Browse beautiful paintings, sculptures, and crafts from hundreds of artists nationwide.',
+                        'featured_image' => 'images/event_art_fair.png',
+                        'start_date' => now()->addDays(14),
+                        'venue_name' => 'Downtown Ann Arbor',
+                        'city' => 'Ann Arbor',
+                        'price' => 0.00,
+                        'category' => (object)['name' => 'Arts & Culture', 'icon' => 'fas fa-palette']
+                    ]" />
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <x-event-card :event="(object)[
+                        'name' => 'Mackinac Fudge Festival',
+                        'slug' => 'demo',
+                        'description' => 'A sweet celebration of the world-famous fudge shops on historic Mackinac Island.',
+                        'featured_image' => 'images/event_fudge.png',
+                        'start_date' => now()->addDays(28),
+                        'venue_name' => 'Main Street',
+                        'city' => 'Mackinac Island',
+                        'price' => 15.00,
+                        'category' => (object)['name' => 'Festivals', 'icon' => 'fas fa-candy-cane']
+                    ]" />
+                </div>
             @endif
         </div>
     </div>
@@ -307,12 +299,12 @@
                 <div class="col-lg-4 col-md-6">
                     <div class="premium-card border-0">
                         <div class="img-wrapper">
-                            <img src="{{ $blog->image ? asset('storage/'.$blog->image) : asset('images/travel_guide_1783508300840.png') }}" class="card-img-top" alt="{{ $blog->title }}">
+                            <img src="{{ $blog->featured_image ? asset($blog->featured_image) : asset('images/travel_guide_1783508300840.png') }}" class="card-img-top" alt="{{ $blog->title }}">
                         </div>
                         <div class="card-body bg-white rounded-bottom-4">
                             <span class="text-primary fw-bold small text-uppercase mb-2 d-block">{{ $blog->category->name ?? 'Travel' }}</span>
                             <h3 class="card-title">{{ $blog->title }}</h3>
-                            <p class="text-muted small mb-4">By {{ $blog->author ?? 'Admin' }} | {{ \Carbon\Carbon::parse($blog->created_at)->format('F j, Y') }}</p>
+                            <p class="text-muted small mb-4">By {{ $blog->author ? $blog->author->name : 'Admin' }} | {{ \Carbon\Carbon::parse($blog->created_at)->format('F j, Y') }}</p>
                             <a href="{{ route('web.blogs.show', $blog->slug) }}" class="text-primary fw-bold text-decoration-none">Read Full Guide <i class="fas fa-arrow-right ms-2"></i></a>
                         </div>
                     </div>

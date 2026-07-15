@@ -16,7 +16,7 @@
     {
       "name": "Hotels",
       "icon": "menu-icon tf-icons ti ti-building",
-      "slug": ["hotels", "hotel-categories"],
+      "slug": ["hotels", "hotel-categories", "amenities"],
       "submenu": [
         {
           "name": "All Hotels",
@@ -27,6 +27,11 @@
           "name": "Categories",
           "url": "/admin/hotel-categories",
           "slug": "hotel-categories.index"
+        },
+        {
+          "name": "Amenities",
+          "url": "/admin/amenities",
+          "slug": "amenities.index"
         }
       ]
     },

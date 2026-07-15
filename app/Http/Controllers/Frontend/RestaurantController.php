@@ -13,7 +13,8 @@ class RestaurantController extends Controller
         $currentCategory = null;
         $featuredCategories = \App\Models\RestaurantCategory::where('is_featured', 1)->take(10)->get();
         $allCategories = \App\Models\RestaurantCategory::where('status', 1)->orderBy('name')->get();
-        return view('web.restaurants.index', compact('restaurants', 'currentCategory', 'featuredCategories', 'allCategories'));
+        $page = \App\Models\Page::with('seo')->where('slug', 'restaurants')->first();
+        return view('web.restaurants.index', compact('restaurants', 'currentCategory', 'featuredCategories', 'allCategories', 'page'));
     }
 
     public function category($slug)
@@ -26,12 +27,13 @@ class RestaurantController extends Controller
         $currentCategory = $category;
         $featuredCategories = \App\Models\RestaurantCategory::where('is_featured', 1)->take(10)->get();
         $allCategories = \App\Models\RestaurantCategory::where('status', 1)->orderBy('name')->get();
-        return view('web.restaurants.index', compact('restaurants', 'currentCategory', 'featuredCategories', 'allCategories'));
+        $page = \App\Models\Page::with('seo')->where('slug', 'restaurants')->first();
+        return view('web.restaurants.index', compact('restaurants', 'currentCategory', 'featuredCategories', 'allCategories', 'page'));
     }
 
     public function show($slug)
     {
-        $restaurant = \App\Models\Restaurant::where('slug', $slug)->where('status', 1)->first();
+        $restaurant = \App\Models\Restaurant::with('seo')->where('slug', $slug)->where('status', 1)->first();
         
         if (!$restaurant) {
             // Static Fallback Data for UI Demonstration

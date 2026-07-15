@@ -51,6 +51,31 @@
         <label class="form-label" for="price">Price</label>
         <input type="number" step="0.01" class="form-control" id="price" name="price" />
       </div>
+      <h6 class="mt-4 fw-bold border-bottom pb-2">SEO & Schema Settings</h6>
+      <div class="mb-3">
+         <label class="form-label" for="meta_title">Meta Title</label>
+         <input type="text" class="form-control" id="meta_title" name="meta_title" />
+      </div>
+      <div class="mb-3">
+         <label class="form-label" for="meta_description">Meta Description</label>
+         <textarea class="form-control" id="meta_description" name="meta_description" rows="2"></textarea>
+      </div>
+      <div class="mb-3">
+         <label class="form-label" for="canonical_url">Canonical URL</label>
+         <input type="url" class="form-control" id="canonical_url" name="canonical_url" />
+      </div>
+      <div class="mb-3">
+         <label class="form-label" for="og_title">OG Title</label>
+         <input type="text" class="form-control" id="og_title" name="og_title" />
+      </div>
+      <div class="mb-3">
+         <label class="form-label" for="og_description">OG Description</label>
+         <textarea class="form-control" id="og_description" name="og_description" rows="2"></textarea>
+      </div>
+      <div class="mb-3">
+         <label class="form-label" for="schema_markup">Schema Markup (JSON-LD)</label>
+         <textarea class="form-control" id="schema_markup" name="schema_markup" rows="8" placeholder="Enter JSON-LD Schema markup here"></textarea>
+      </div>
       <div class="mb-3">
         <label class="form-label" for="status">Status</label>
         <select class="form-select" id="status" name="status">

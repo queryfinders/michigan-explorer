@@ -8,5 +8,8 @@ class Amenity extends Model
 {
     protected $guarded = [];
 
-    //
+    public function hotels()
+    {
+        return $this->belongsToMany(\App\Models\Hotel::class, 'hotel_amenity');
+    }
 }

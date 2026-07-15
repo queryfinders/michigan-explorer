@@ -38,7 +38,7 @@ class BlogController extends Controller
             'featured_image_file' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048'
         ]);
 
-        $data = $request->except('_token', '_method', 'featured_image_file', 'tags');
+        $data = $request->except('_token', '_method', 'featured_image_file', 'tags', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup');
 
         if ($request->hasFile('featured_image_file')) {
             $path = $request->file('featured_image_file')->store('blogs', 'public');
@@ -46,6 +46,9 @@ class BlogController extends Controller
         }
 
         $blog = Blog::create($data);
+
+        $seoData = $request->only(['meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup']);
+        $blog->seo()->create($seoData);
 
         if ($request->has('tags')) {
             foreach ($request->tags as $tagId) {
@@ -58,6 +61,7 @@ class BlogController extends Controller
 
     public function edit(Blog $blog)
     {
+        $blog->load('seo');
         $categories = BlogCategory::where('status', 1)->get();
         $authors = Author::all();
         $tags = BlogTag::all();
@@ -76,7 +80,7 @@ class BlogController extends Controller
             'featured_image_file' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048'
         ]);
 
-        $data = $request->except('_token', '_method', 'featured_image_file', 'tags');
+        $data = $request->except('_token', '_method', 'featured_image_file', 'tags', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup');
 
         if ($request->hasFile('featured_image_file')) {
             $path = $request->file('featured_image_file')->store('blogs', 'public');
@@ -84,6 +88,13 @@ class BlogController extends Controller
         }
 
         $blog->update($data);
+
+        $seoData = $request->only(['meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup']);
+        if ($blog->seo) {
+            $blog->seo->update($seoData);
+        } else {
+            $blog->seo()->create($seoData);
+        }
 
         // Sync tags
         BlogTagMap::where('blog_id', $blog->id)->delete();

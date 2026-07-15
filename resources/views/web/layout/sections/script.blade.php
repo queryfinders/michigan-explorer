@@ -169,6 +169,19 @@
             }
         });
         
+        // Smooth Parallax Scroll Effect for Hero Backgrounds
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset || document.documentElement.scrollTop;
+            document.querySelectorAll('.hero-bg-parallax').forEach(el => {
+                const parent = el.parentElement;
+                const parentRect = parent.getBoundingClientRect();
+                if (parentRect.bottom >= 0 && parentRect.top <= window.innerHeight) {
+                    const relativeOffset = scrolled * 0.15;
+                    el.style.transform = `translate3d(0px, ${relativeOffset}px, 0px)`;
+                }
+            });
+        });
+        
         console.log("Michigan Explorer Theme Initialized.");
     });
 </script>

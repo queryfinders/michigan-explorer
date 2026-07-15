@@ -41,15 +41,30 @@
                 <textarea class="form-control" id="excerpt" name="excerpt" rows="3">{{ $blog->excerpt }}</textarea>
               </div>
 
-              <h6 class="mt-4 border-bottom pb-2">SEO Settings</h6>
+              <h6 class="mt-4 border-bottom pb-2">SEO & Schema Settings</h6>
               <div class="mb-3">
                 <label class="form-label" for="meta_title">Meta Title</label>
-                <input type="text" class="form-control" id="meta_title" name="meta_title" value="{{ $blog->meta_title }}" />
+                <input type="text" class="form-control" id="meta_title" name="meta_title" value="{{ $blog->seo->meta_title ?? '' }}" />
               </div>
-              
               <div class="mb-3">
                 <label class="form-label" for="meta_description">Meta Description</label>
-                <textarea class="form-control" id="meta_description" name="meta_description" rows="2">{{ $blog->meta_description }}</textarea>
+                <textarea class="form-control" id="meta_description" name="meta_description" rows="2">{{ $blog->seo->meta_description ?? '' }}</textarea>
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="canonical_url">Canonical URL</label>
+                <input type="url" class="form-control" id="canonical_url" name="canonical_url" value="{{ $blog->seo->canonical_url ?? '' }}" />
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="og_title">OG Title</label>
+                <input type="text" class="form-control" id="og_title" name="og_title" value="{{ $blog->seo->og_title ?? '' }}" />
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="og_description">OG Description</label>
+                <textarea class="form-control" id="og_description" name="og_description" rows="2">{{ $blog->seo->og_description ?? '' }}</textarea>
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="schema_markup">Schema Markup (JSON-LD)</label>
+                <textarea class="form-control" id="schema_markup" name="schema_markup" rows="8" placeholder="Enter JSON-LD Schema markup here">{{ $blog->seo->schema_markup ?? '' }}</textarea>
               </div>
           </div>
 

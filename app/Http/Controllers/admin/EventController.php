@@ -28,12 +28,17 @@ class EventController extends Controller
             'status' => 'boolean'
         ]);
 
-        \App\Models\Event::create($request->except('_token', '_method'));
+        $event = \App\Models\Event::create($request->except('_token', '_method', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup'));
+        
+        $seoData = $request->only(['meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup']);
+        $event->seo()->create($seoData);
+
         return redirect()->route('events.index')->with('success', 'Event created successfully.');
     }
 
     public function edit(\App\Models\Event $event)
     {
+        $event->load('seo');
         $categories = \App\Models\EventCategory::where('status', 1)->get();
         return view('new_content.admin.events.edit', compact('event', 'categories'));
     }
@@ -47,7 +52,15 @@ class EventController extends Controller
             'status' => 'boolean'
         ]);
 
-        $event->update($request->except('_token', '_method'));
+        $event->update($request->except('_token', '_method', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup'));
+        
+        $seoData = $request->only(['meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup']);
+        if ($event->seo) {
+            $event->seo->update($seoData);
+        } else {
+            $event->seo()->create($seoData);
+        }
+
         return redirect()->route('events.index')->with('success', 'Event updated successfully.');
     }
 

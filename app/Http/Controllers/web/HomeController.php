@@ -31,6 +31,8 @@ class HomeController extends Controller
             return \App\Models\Blog::where('status', 'published')->orderBy('published_at', 'desc')->take(3)->get();
         });
 
-        return view('web.pages.index', compact('hotels', 'restaurants', 'attractions', 'events', 'blogs'));
+        $page = \App\Models\Page::with('seo')->where('slug', 'home')->first();
+
+        return view('web.pages.index', compact('hotels', 'restaurants', 'attractions', 'events', 'blogs', 'page'));
     }
 }

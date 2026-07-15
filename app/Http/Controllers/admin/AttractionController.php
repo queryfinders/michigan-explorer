@@ -28,12 +28,17 @@ class AttractionController extends Controller
             'status' => 'boolean'
         ]);
 
-        \App\Models\Attraction::create($request->all());
+        $attraction = \App\Models\Attraction::create($request->except('_token', '_method', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup'));
+        
+        $seoData = $request->only(['meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup']);
+        $attraction->seo()->create($seoData);
+
         return redirect()->route('attractions.index')->with('success', 'Attraction created successfully.');
     }
 
     public function edit(\App\Models\Attraction $attraction)
     {
+        $attraction->load('seo');
         $categories = \App\Models\AttractionCategory::where('status', 1)->get();
         return view('new_content.admin.attractions.edit', compact('attraction', 'categories'));
     }
@@ -47,7 +52,15 @@ class AttractionController extends Controller
             'status' => 'boolean'
         ]);
 
-        $attraction->update($request->all());
+        $attraction->update($request->except('_token', '_method', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup'));
+        
+        $seoData = $request->only(['meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup']);
+        if ($attraction->seo) {
+            $attraction->seo->update($seoData);
+        } else {
+            $attraction->seo()->create($seoData);
+        }
+
         return redirect()->route('attractions.index')->with('success', 'Attraction updated successfully.');
     }
 

@@ -28,7 +28,12 @@
           <td>{{ $hotel->name }}</td>
           <td>{{ $hotel->category ? $hotel->category->name : 'N/A' }}</td>
           <td>{{ $hotel->city }}</td>
-          <td>{{ $hotel->status ? 'Active' : 'Inactive' }}</td>
+          <td>
+            <label class="switch">
+              <input type="checkbox" class="switch-input hotel-status-switch" data-id="{{ $hotel->id }}" data-status="{{ $hotel->status }}" {{ $hotel->status == 1 ? 'checked' : '' }}>
+              <span class="switch-toggle-slider"></span>
+            </label>
+          </td>
           <td>
             <a href="{{ route('hotels.edit', $hotel->id) }}" class="btn btn-sm btn-primary"><i class="fa fa-edit"></i></a>
             <form action="{{ route('hotels.destroy', $hotel->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure?');">
@@ -46,4 +51,30 @@
     </div>
   </div>
 </div>
+@endsection
+
+@section('page-script')
+<script>
+  $(document).ready(function() {
+      $(document).on('change', '.hotel-status-switch', function (e) {
+          e.preventDefault();
+          var id = $(this).data('id');
+          var status = $(this).data('status');
+          var $switch = $(this);
+
+          $.ajax({
+              url: '{{ url("admin/hotels/status") }}/' + id + '/' + status,
+              type: 'GET',
+              success: function (response) {
+                  if (response.success) {
+                      $switch.data('status', response.status);
+                  }
+              },
+              error: function (xhr, status, error) {
+                  console.error(error);
+              }
+          });
+      });
+  });
+</script>
 @endsection
