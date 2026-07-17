@@ -38,22 +38,27 @@
         
         <!-- Tab 1: Basic Info -->
         <div class="tab-pane fade show active" id="basic-pane" role="tabpanel" aria-labelledby="basic-tab">
-          <div class="mb-3">
-            <label class="form-label" for="hotel_category_id">Category</label>
-            <select class="form-select" id="hotel_category_id" name="hotel_category_id" required>
-                <option value="">Select Category</option>
-                @foreach($categories as $category)
-                <option value="{{ $category->id }}">{{ $category->name }}</option>
-                @endforeach
-            </select>
-          </div>
-          <div class="mb-3">
-            <label class="form-label" for="name">Name</label>
-            <input type="text" class="form-control" id="name" name="name" required />
-          </div>
-          <div class="mb-3">
-            <label class="form-label" for="slug">Slug</label>
-            <input type="text" class="form-control" id="slug" name="slug" required />
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="hotel_category_id">Category <span class="text-danger">*</span></label>
+              <select class="form-select @error('hotel_category_id') is-invalid @enderror" id="hotel_category_id" name="hotel_category_id" required>
+                  <option value="">Select Category</option>
+                  @foreach($categories as $category)
+                  <option value="{{ $category->id }}" {{ old('hotel_category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                  @endforeach
+              </select>
+              @error('hotel_category_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="name">Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required />
+              @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="slug">Slug <span class="text-danger">*</span></label>
+              <input type="text" class="form-control @error('slug') is-invalid @enderror" id="slug" name="slug" value="{{ old('slug') }}" required />
+              @error('slug') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
           </div>
           <div class="mb-3">
             <label class="form-label" for="short_description">Short Description</label>
@@ -62,13 +67,6 @@
           <div class="mb-3">
             <label class="form-label" for="description">Description</label>
             <textarea class="form-control tinymce" id="description" name="description" rows="6"></textarea>
-          </div>
-          <div class="mb-3">
-            <label class="form-label" for="status">Status</label>
-            <select class="form-select" id="status" name="status">
-              <option value="1">Active</option>
-              <option value="0">Inactive</option>
-            </select>
           </div>
           <div class="mb-3">
             <div class="form-check form-switch mt-2">
@@ -81,17 +79,15 @@
         <!-- Tab 2: Details & Pricing -->
         <div class="tab-pane fade" id="details-pane" role="tabpanel" aria-labelledby="details-tab">
           <div class="row">
-            <div class="col-md-12 mb-3">
+            <div class="col-md-4 mb-3">
               <label class="form-label" for="city">City</label>
               <input type="text" class="form-control" id="city" name="city" />
             </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6 mb-3">
+            <div class="col-md-4 mb-3">
               <label class="form-label" for="zip">Zip Code</label>
               <input type="text" class="form-control" id="zip" name="zip" />
             </div>
-            <div class="col-md-6 mb-3">
+            <div class="col-md-4 mb-3">
               <label class="form-label" for="address">Street Address</label>
               <input type="text" class="form-control" id="address" name="address" />
             </div>
@@ -189,8 +185,55 @@
             </div>
           </div>
 
-        </div>
+          <!-- Booking Features -->
+          <div class="row">
+            <div class="col-12 mt-4">
+              <h6 class="fw-semibold">Booking Features</h6>
+              <div class="card bg-light border-0 shadow-none">
+                <div class="card-body p-3">
+                  <div class="row g-3">
+                    @foreach($bookingFeatures as $feature)
+                    <div class="col-md-4 col-sm-6">
+                      <div class="form-check custom-checkbox">
+                        <input class="form-check-input" type="checkbox" name="booking_features[]" value="{{ $feature->id }}" id="bf_{{ $feature->id }}">
+                        <label class="form-check-label d-flex align-items-center" for="bf_{{ $feature->id }}">
+                          @if($feature->icon)
+                            <i class="{{ $feature->icon }} text-primary me-2"></i>
+                          @endif
+                          {{ $feature->name }}
+                        </label>
+                      </div>
+                    </div>
+                    @endforeach
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
+          <!-- Hotel Policies -->
+          <div class="row">
+            <div class="col-12 mt-4">
+              <h6 class="fw-semibold">Hotel Policies</h6>
+              <div class="card bg-light border-0 shadow-none">
+                <div class="card-body p-3">
+                  <div class="row g-3">
+                    @foreach($hotelPolicies as $policy)
+                    <div class="col-md-6">
+                      <label class="form-label" for="policy_{{ $policy->id }}">{{ $policy->name }}</label>
+                      @if($policy->input_type === 'textarea')
+                        <textarea class="form-control" name="hotel_policies[{{ $policy->id }}]" id="policy_{{ $policy->id }}" rows="2"></textarea>
+                      @else
+                        <input type="text" class="form-control" name="hotel_policies[{{ $policy->id }}]" id="policy_{{ $policy->id }}" />
+                      @endif
+                    </div>
+                    @endforeach
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <!-- Tab 3: Featured Image -->
         <div class="tab-pane fade" id="featured-pane" role="tabpanel" aria-labelledby="featured-tab">
           <div class="mb-3">
@@ -234,13 +277,15 @@
             <label class="form-label" for="meta_description">Meta Description</label>
             <textarea class="form-control" id="meta_description" name="meta_description" rows="2"></textarea>
           </div>
-          <div class="mb-3">
-            <label class="form-label" for="canonical_url">Canonical URL</label>
-            <input type="url" class="form-control" id="canonical_url" name="canonical_url" />
-          </div>
-          <div class="mb-3">
-            <label class="form-label" for="og_title">OG Title</label>
-            <input type="text" class="form-control" id="og_title" name="og_title" />
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label" for="canonical_url">Canonical URL</label>
+              <input type="url" class="form-control" id="canonical_url" name="canonical_url" />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label" for="og_title">OG Title</label>
+              <input type="text" class="form-control" id="og_title" name="og_title" />
+            </div>
           </div>
           <div class="mb-3">
             <label class="form-label" for="og_description">OG Description</label>
@@ -511,114 +556,6 @@
     </div>
   </div>
 </div>
-@endsection
-
-  // Icon preview for new amenity modal
-  function updateAmenityIconPreview(val) {
-    const icon = document.getElementById('amenity-icon-preview');
-    icon.className = 'fas ' + val.trim();
-  }
-
-  // Save new amenity via AJAX
-  function saveNewAmenity() {
-    const name = document.getElementById('new_amenity_name').value.trim();
-    const icon = document.getElementById('new_amenity_icon').value.trim();
-    const alertBox = document.getElementById('amenity-modal-alert');
-
-    if (!name) {
-      alertBox.className = 'alert alert-danger';
-      alertBox.textContent = 'Please enter an amenity name.';
-      return;
-    }
-
-    alertBox.className = 'd-none';
-    document.getElementById('saveAmenityBtnText').classList.add('d-none');
-    document.getElementById('saveAmenityBtnSpinner').classList.remove('d-none');
-
-    $.ajax({
-      url: '{{ route("amenities.store") }}',
-      type: 'POST',
-      data: {
-        _token: '{{ csrf_token() }}',
-        name: name,
-        icon: icon || 'fa-star',
-        status: 1
-      },
-      success: function(response) {
-        if (response.success) {
-          const select = document.getElementById('amenities_select');
-          const opt = new Option(response.amenity.name, response.amenity.id, true, true);
-          select.appendChild(opt);
-          document.getElementById('new_amenity_name').value = '';
-          document.getElementById('new_amenity_icon').value = 'fa-star';
-          updateAmenityIconPreview('fa-star');
-          bootstrap.Modal.getInstance(document.getElementById('addAmenityModal')).hide();
-          alertBox.className = 'd-none';
-        } else {
-          alertBox.className = 'alert alert-danger';
-          alertBox.textContent = response.message || 'Failed to add amenity.';
-        }
-      },
-      error: function(xhr) {
-        alertBox.className = 'alert alert-danger';
-        const errors = xhr.responseJSON?.errors;
-        alertBox.textContent = errors ? Object.values(errors).flat().join(' ') : 'An error occurred.';
-      },
-      complete: function() {
-        document.getElementById('saveAmenityBtnText').classList.remove('d-none');
-        document.getElementById('saveAmenityBtnSpinner').classList.add('d-none');
-      }
-    });
-  }
-
-  // New gallery image preview + alt inputs
-  function previewGalleryImages(event) {
-    const files = Array.from(event.target.files);
-    const previewGrid = document.getElementById('gallery-new-preview');
-    const altFields = document.getElementById('gallery-alt-fields');
-    previewGrid.innerHTML = '';
-    altFields.innerHTML = '';
-
-    files.forEach((file, index) => {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const col = document.createElement('div');
-        col.className = 'col-md-3 col-sm-4 col-6';
-        col.innerHTML = `
-          <div class="card border">
-            <img src="${e.target.result}" class="card-img-top" style="height:140px;object-fit:cover;" alt="New image ${index+1}" />
-            <div class="card-body p-2">
-              <small class="text-muted">Image ${index+1}</small>
-            </div>
-          </div>`;
-        previewGrid.appendChild(col);
-      };
-      reader.readAsDataURL(file);
-
-      const altWrap = document.createElement('div');
-      altWrap.className = 'mb-2';
-      altWrap.innerHTML = `
-        <label class="form-label small">Alt Text for Image ${index+1} (SEO)</label>
-        <input type="text" class="form-control form-control-sm" name="gallery_alts[${index}]" placeholder="e.g. Hotel lobby interior view" />`;
-      altFields.appendChild(altWrap);
-    });
-
-    if (files.length > 0) {
-      const heading = document.createElement('div');
-      heading.className = 'col-12 mb-2';
-      heading.innerHTML = `<label class="form-label fw-semibold">Preview (${files.length} images selected)</label>`;
-      previewGrid.insertBefore(heading, previewGrid.firstChild);
-
-      const altHeading = document.createElement('h6');
-      altHeading.className = 'mt-3 mb-2 fw-semibold';
-      altHeading.textContent = 'Add Alt Text for Gallery Images (SEO)';
-      altFields.insertBefore(altHeading, altFields.firstChild);
-    }
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', () => renderAmenityTags());
-</script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js" referrerpolicy="origin"></script>
 <script>
@@ -681,37 +618,5 @@
   }
 </script>
 
-{{-- ===== Add Amenity Modal ===== --}}
-<div class="modal fade" id="addAmenityModal" tabindex="-1" aria-labelledby="addAmenityModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="addAmenityModalLabel"><i class="fas fa-plus-circle me-2 text-primary"></i>Add New Amenity</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div id="amenity-modal-alert" class="d-none"></div>
-        <div class="mb-3">
-          <label class="form-label fw-semibold" for="new_amenity_name">Amenity Name <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" id="new_amenity_name" placeholder="e.g. Rooftop Pool" />
-        </div>
-        <div class="mb-3">
-          <label class="form-label fw-semibold" for="new_amenity_icon">FontAwesome Icon Class</label>
-          <div class="input-group">
-            <span class="input-group-text"><i id="amenity-icon-preview" class="fas fa-star"></i></span>
-            <input type="text" class="form-control" id="new_amenity_icon" placeholder="e.g. fa-swimming-pool" value="fa-star" oninput="updateAmenityIconPreview(this.value)" />
-          </div>
-          <div class="form-text">Enter any <a href="https://fontawesome.com/icons" target="_blank">FontAwesome 5</a> icon class. e.g. <code>fa-wifi</code>, <code>fa-dumbbell</code></div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" id="saveAmenityBtn" onclick="saveNewAmenity()">
-          <span id="saveAmenityBtnText"><i class="fas fa-plus me-1"></i>Add Amenity</span>
-          <span id="saveAmenityBtnSpinner" class="d-none"><span class="spinner-border spinner-border-sm me-1"></span>Saving...</span>
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
+
 @endsection

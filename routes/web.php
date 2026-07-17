@@ -49,6 +49,8 @@ Route::get('/admin/reset_password/{token}', $controller_path . '\admin\LoginCont
 Route::post('/admin/resetpass', $controller_path . '\admin\LoginController@reset')->name('resetpass');
 
 //middleware
+Route::get('/search-shortcuts/track/{id}', [\App\Http\Controllers\Frontend\SearchController::class, 'trackShortcut'])->name('web.search_shortcuts.track');
+
 Route::group(['middleware' => 'admin_auth'], function () {
 
     $controller_path = 'App\Http\Controllers';
@@ -95,6 +97,10 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::resource('/admin/hotel-categories', \App\Http\Controllers\Admin\HotelCategoryController::class);
     Route::get('/admin/hotels/status/{id}/{status}', [\App\Http\Controllers\Admin\HotelController::class, 'changeStatus'])->name('hotels.status');
     Route::resource('/admin/hotels', \App\Http\Controllers\Admin\HotelController::class);
+    Route::get('/admin/booking-features/status/{id}/{status}', [\App\Http\Controllers\Admin\BookingFeatureController::class, 'changeStatus'])->name('booking-features.status');
+    Route::resource('/admin/booking-features', \App\Http\Controllers\Admin\BookingFeatureController::class);
+    Route::get('/admin/hotel-policies/status/{id}/{status}', [\App\Http\Controllers\Admin\HotelPolicyController::class, 'changeStatus'])->name('hotel-policies.status');
+    Route::resource('/admin/hotel-policies', \App\Http\Controllers\Admin\HotelPolicyController::class);
 
     // Restaurants Module
     Route::resource('/admin/restaurant-categories', \App\Http\Controllers\Admin\RestaurantCategoryController::class);
@@ -122,11 +128,20 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::get('/admin/amenities/status/{id}/{status}', [\App\Http\Controllers\Admin\AmenityController::class, 'changeStatus'])->name('amenities.status');
 
     Route::resource('/admin/settings', \App\Http\Controllers\Admin\SettingController::class);
+
+    // Search Shortcuts
+    Route::post('/admin/search-shortcuts/reorder', [\App\Http\Controllers\Admin\SearchShortcutController::class, 'reorder'])->name('search-shortcuts.reorder');
+    Route::get('/admin/search-shortcuts/status/{searchShortcut}/{status}', [\App\Http\Controllers\Admin\SearchShortcutController::class, 'changeStatus'])->name('search-shortcuts.status');
+    Route::resource('/admin/search-shortcuts', \App\Http\Controllers\Admin\SearchShortcutController::class);
 });
 
 //web
 Route::get('/', [HomeController::class, 'index'])->name('web.home');
-Route::get('/search', [App\Http\Controllers\Frontend\SearchController::class, 'index'])->name('web.search');
+
+// Search Routes
+Route::get('/search', [\App\Http\Controllers\Frontend\SearchController::class, 'index'])->name('web.search');
+Route::get('/search/autocomplete', [\App\Http\Controllers\Frontend\SearchController::class, 'autocomplete'])->name('web.search.autocomplete');
+
 Route::get('/sitemap.xml', [App\Http\Controllers\Frontend\SitemapController::class, 'index'])->name('web.sitemap');
 Route::get('/contact', [App\Http\Controllers\Frontend\ContactController::class, 'index'])->name('web.contact');
 Route::post('/contact', [App\Http\Controllers\Frontend\ContactController::class, 'submit'])->name('web.contact.submit');

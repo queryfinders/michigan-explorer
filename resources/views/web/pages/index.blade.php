@@ -56,14 +56,22 @@
                     <p class="mb-0">No results found for "<span x-text="keyword" class="fw-bold"></span>"</p>
                 </div>
 
-                <template x-for="(items, category) in groupedResults" :key="category">
+                <template x-for="(group, category) in groupedResults" :key="category">
                     <div class="autocomplete-group">
                         <div class="autocomplete-group-title" x-text="category"></div>
-                        <template x-for="item in items" :key="item.id">
-                            <a :href="item.url" class="autocomplete-item" :class="{ 'active': activeIndex === item.index }" @mouseenter="activeIndex = item.index">
-                                <i :class="item.icon"></i>
-                                <span x-html="highlight(item.title)"></span>
+                        <template x-for="item in group.items" :key="item.id">
+                            <a :href="item.url" class="autocomplete-item d-flex align-items-center" :class="{ 'active': activeIndex === item.index }" @mouseenter="activeIndex = item.index">
+                                <img :src="item.image" alt="" class="rounded me-3 shadow-sm" style="width: 45px; height: 45px; object-fit: cover;">
+                                <div>
+                                    <div class="fw-bold text-dark lh-1 mb-1" x-html="highlight(item.title)"></div>
+                                    <div class="small text-muted lh-1"><i :class="group.icon" class="me-1"></i><span x-text="item.location"></span></div>
+                                </div>
                             </a>
+                        </template>
+                        <template x-if="group.has_more">
+                            <div class="text-center p-2 border-top bg-light">
+                                <a :href="group.view_all_url" class="small fw-bold text-primary text-decoration-none">View All <span x-text="category"></span> &rarr;</a>
+                            </div>
                         </template>
                     </div>
                 </template>
@@ -71,18 +79,21 @@
         </div>
         
         <!-- Popular Searches (Chips) -->
+        @if(isset($searchShortcuts) && $searchShortcuts->count() > 0)
         <div class="text-center pt-4" data-aos="fade-up" data-aos-delay="600">
             <p class="small text-white mb-3 fw-bold text-uppercase tracking-wider text-shadow-dark">Popular Searches</p>
             <div class="popular-chips-wrapper justify-content-center">
-                <a href="{{ route('web.search', ['keyword' => 'Indiana Dunes']) }}" class="premium-chip"><i class="fas fa-fire text-warning"></i> Indiana Dunes</a>
-                <a href="{{ route('web.search', ['keyword' => 'Hotels']) }}" class="premium-chip"><i class="fas fa-hotel"></i> Hotels</a>
-                <a href="{{ route('web.search', ['keyword' => 'Restaurants']) }}" class="premium-chip"><i class="fas fa-utensils"></i> Restaurants</a>
-                <a href="{{ route('web.search', ['keyword' => 'Casino']) }}" class="premium-chip"><i class="fas fa-dice"></i> Casino</a>
-                <a href="{{ route('web.search', ['keyword' => 'Exit 34']) }}" class="premium-chip"><i class="fas fa-map-pin"></i> Exit 34</a>
-                <a href="{{ route('web.search', ['keyword' => 'Washington Park']) }}" class="premium-chip"><i class="fas fa-water"></i> Washington Park</a>
-                <a href="{{ route('web.search', ['keyword' => 'Amazon Data Center']) }}" class="premium-chip"><i class="fas fa-cloud"></i> Amazon Data Center</a>
+                @foreach($searchShortcuts as $shortcut)
+                <a href="{{ route('web.search_shortcuts.track', $shortcut->id) }}" target="{{ $shortcut->open_in == 'new_tab' ? '_blank' : '_self' }}" class="premium-chip">
+                    @if($shortcut->icon)
+                        <i class="{{ $shortcut->icon }} {{ $shortcut->icon_color }}"></i> 
+                    @endif
+                    {{ $shortcut->title }}
+                </a>
+                @endforeach
             </div>
         </div>
+        @endif
 
     </div>
 
@@ -109,7 +120,7 @@
             @if(isset($hotels) && $hotels->count() > 0)
                 @foreach($hotels->take(3) as $hotel)
                 <div class="col-lg-4 col-md-6">
-                    <x-hotel-card :hotel="$hotel" :featured="$loop->first" :compact="true" />
+                    <x-hotel-card :hotel="$hotel" :featured="false" :compact="true" />
                 </div>
                 @endforeach
             @else
@@ -122,7 +133,7 @@
                         'description' => 'Experience the pinnacle of luxury with breathtaking views and world-class amenities.',
                         'starting_price' => '399',
                         'affiliate_url' => '#'
-                    ]" :featured="$i === 1" :compact="true" />
+                    ]" :featured="false" :compact="true" />
                 </div>
                 @endfor
             @endif
@@ -147,7 +158,7 @@
             @if(isset($restaurants) && $restaurants->count() > 0)
                 @foreach($restaurants->take(3) as $restaurant)
                 <div class="col-lg-4 col-md-6">
-                    <x-restaurant-card :restaurant="$restaurant" :featured="$loop->first" :compact="true" />
+                    <x-restaurant-card :restaurant="$restaurant" :featured="false" :compact="true" />
                 </div>
                 @endforeach
             @else
@@ -161,7 +172,7 @@
                         'starting_price' => '45',
                         'affiliate_url' => route('web.restaurants.show', 'demo'),
                         'category' => (object)['name' => $i === 1 ? 'Fine Dining' : 'Cafe']
-                    ]" :featured="$i === 1" :compact="true" />
+                    ]" :featured="false" :compact="true" />
                 </div>
                 @endfor
             @endif
@@ -180,7 +191,7 @@
              @if(isset($attractions) && $attractions->count() > 0)
                 @foreach($attractions->take(3) as $index => $attraction)
                 <div class="col-lg-4 col-md-6">
-                    <x-attraction-card :attraction="$attraction" :featured="$index === 0" />
+                    <x-attraction-card :attraction="$attraction" :featured="false" />
                 </div>
                 @endforeach
             @else
@@ -195,7 +206,7 @@
                         'distance' => '2.5 miles away',
                         'travel_time_car' => '10 min drive',
                         'travel_time_walk' => '45 min walk',
-                    ]" :featured="$i === 1" />
+                    ]" :featured="false" />
                 </div>
                 @endfor
             @endif
@@ -271,7 +282,7 @@
 <section class="py-0">
     <div class="container-fluid px-0">
         <div class="card border-0 rounded-0 text-white position-relative promo-banner-wrapper">
-    <img src="{{ asset('images/promo_banner_1783508311655.png') }}" class="promo-bg-img" alt="Promo Background">
+    <img src="{{ asset('images/promo_banner_1783508311655.png') }}" class="promo-bg-img" loading="lazy" alt="Promo Background">
             <div class="position-absolute top-0 start-0 w-100 h-100 bg-gradient-primary"></div>
             <div class="container position-relative z-index-1">
                 <div class="row">
@@ -333,12 +344,12 @@
 </section>
 
 <!-- 9. Newsletter Strip -->
-<section class="py-5 bg-primary-theme">
+<section class="py-5 bg-primary">
     <div class="container">
         <div class="row justify-content-center align-items-center">
             <div class="col-lg-6 text-white text-center text-lg-start mb-4 mb-lg-0">
                 <h3 class="fw-bold mb-2 text-white font-heading">Join the Explorer Club</h3>
-                <p class="mb-0 text-light fs-5">Get the best travel secrets and exclusive deals delivered to your inbox.</p>
+                <p class="mb-0 text-white fs-5">Get the best travel secrets and exclusive deals delivered to your inbox.</p>
             </div>
             <div class="col-lg-5">
                 <form action="#">

@@ -18,6 +18,7 @@
         @endphp
         <img src="{{ $imgUrl }}" 
              alt="{{ $restaurant->name ?? 'Restaurant Image' }}" 
+             loading="lazy"
              class="img-fluid object-fit-cover transition-transform-slow w-100 h-100">
              
         <!-- Badges -->
@@ -75,15 +76,17 @@
                 </div>
             </div>
             
-            <div class="d-flex gap-2 w-100">
+            <div class="d-flex gap-2 w-100 mt-1">
                 <a href="{{ route('web.restaurants.show', $restaurant->slug ?? 'demo') }}" 
-                   class="btn btn-outline-primary rounded-pill w-50 fw-bold shadow-sm d-flex align-items-center justify-content-center fs-sm"
+                   class="btn btn-outline-primary rounded-pill w-50 fw-bold shadow-sm d-flex align-items-center justify-content-center px-1 py-2"
+                   style="font-size: 0.8rem;"
                    onclick="event.stopPropagation();">
                     View Details
                 </a>
                 
                 <a href="{{ $restaurant->affiliate_url ?? '#' }}" 
-                   class="btn btn-secondary hotel-book-btn rounded-pill w-50 fw-bold shadow-sm d-flex align-items-center justify-content-center text-white fs-sm"
+                   class="btn btn-secondary hotel-book-btn rounded-pill w-50 fw-bold shadow-sm d-flex align-items-center justify-content-center text-white px-1 py-2"
+                   style="font-size: 0.8rem;"
                    onclick="event.stopPropagation();" 
                    target="_blank">
                     Reserve Table

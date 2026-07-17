@@ -39,22 +39,27 @@
         
         <!-- Tab 1: Basic Info -->
         <div class="tab-pane fade show active" id="basic-pane" role="tabpanel" aria-labelledby="basic-tab">
-          <div class="mb-3">
-            <label class="form-label" for="hotel_category_id">Category</label>
-            <select class="form-select" id="hotel_category_id" name="hotel_category_id" required>
-                <option value="">Select Category</option>
-                @foreach($categories as $category)
-                <option value="{{ $category->id }}" {{ $hotel->hotel_category_id == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
-                @endforeach
-            </select>
-          </div>
-          <div class="mb-3">
-            <label class="form-label" for="name">Name</label>
-            <input type="text" class="form-control" id="name" name="name" value="{{ $hotel->name }}" required />
-          </div>
-          <div class="mb-3">
-            <label class="form-label" for="slug">Slug</label>
-            <input type="text" class="form-control" id="slug" name="slug" value="{{ $hotel->slug }}" required />
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="hotel_category_id">Category <span class="text-danger">*</span></label>
+              <select class="form-select @error('hotel_category_id') is-invalid @enderror" id="hotel_category_id" name="hotel_category_id" required>
+                  <option value="">Select Category</option>
+                  @foreach($categories as $category)
+                  <option value="{{ $category->id }}" {{ (old('hotel_category_id') ?? $hotel->hotel_category_id) == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                  @endforeach
+              </select>
+              @error('hotel_category_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="name">Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') ?? $hotel->name }}" required />
+              @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="slug">Slug <span class="text-danger">*</span></label>
+              <input type="text" class="form-control @error('slug') is-invalid @enderror" id="slug" name="slug" value="{{ old('slug') ?? $hotel->slug }}" required />
+              @error('slug') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
           </div>
           <div class="mb-3">
             <label class="form-label" for="short_description">Short Description</label>
@@ -64,13 +69,7 @@
             <label class="form-label" for="description">Description</label>
             <textarea class="form-control tinymce" id="description" name="description" rows="6">{{ $hotel->description }}</textarea>
           </div>
-          <div class="mb-3">
-            <label class="form-label" for="status">Status</label>
-            <select class="form-select" id="status" name="status">
-              <option value="1" {{ $hotel->status == 1 ? 'selected' : '' }}>Active</option>
-              <option value="0" {{ $hotel->status == 0 ? 'selected' : '' }}>Inactive</option>
-            </select>
-          </div>
+
           <div class="mb-3">
             <div class="form-check form-switch mt-2">
               <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" value="1" {{ $hotel->is_featured == 1 ? 'checked' : '' }}>
@@ -82,17 +81,15 @@
         <!-- Tab 2: Details & Pricing -->
         <div class="tab-pane fade" id="details-pane" role="tabpanel" aria-labelledby="details-tab">
           <div class="row">
-            <div class="col-md-12 mb-3">
+            <div class="col-md-4 mb-3">
               <label class="form-label" for="city">City</label>
               <input type="text" class="form-control" id="city" name="city" value="{{ $hotel->city }}" />
             </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6 mb-3">
+            <div class="col-md-4 mb-3">
               <label class="form-label" for="zip">Zip Code</label>
               <input type="text" class="form-control" id="zip" name="zip" value="{{ $hotel->zip }}" />
             </div>
-            <div class="col-md-6 mb-3">
+            <div class="col-md-4 mb-3">
               <label class="form-label" for="address">Street Address</label>
               <input type="text" class="form-control" id="address" name="address" value="{{ $hotel->address }}" />
             </div>
@@ -195,6 +192,65 @@
             </div>
           </div>
 
+          <!-- Booking Features -->
+          <div class="row">
+            <div class="col-12 mt-4">
+              <h6 class="fw-semibold">Booking Features</h6>
+              <div class="card bg-light border-0 shadow-none">
+                <div class="card-body p-3">
+                  <div class="row g-3">
+                    @php
+                      $hotelBookingFeatureIds = $hotel->bookingFeatures->pluck('id')->toArray();
+                    @endphp
+                    @foreach($bookingFeatures as $feature)
+                    @php
+                      $bfChecked = in_array($feature->id, $hotelBookingFeatureIds);
+                    @endphp
+                    <div class="col-md-4 col-sm-6">
+                      <div class="form-check custom-checkbox">
+                        <input class="form-check-input" type="checkbox" name="booking_features[]" value="{{ $feature->id }}" id="bf_{{ $feature->id }}" {{ $bfChecked ? 'checked' : '' }}>
+                        <label class="form-check-label d-flex align-items-center" for="bf_{{ $feature->id }}">
+                          @if($feature->icon)
+                            <i class="{{ $feature->icon }} text-primary me-2"></i>
+                          @endif
+                          {{ $feature->name }}
+                        </label>
+                      </div>
+                    </div>
+                    @endforeach
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hotel Policies -->
+          <div class="row">
+            <div class="col-12 mt-4">
+              <h6 class="fw-semibold">Hotel Policies</h6>
+              <div class="card bg-light border-0 shadow-none">
+                <div class="card-body p-3">
+                  <div class="row g-3">
+                    @foreach($hotelPolicies as $policy)
+                    @php 
+                      $policyValue = $hotel->policyValues->where('hotel_policy_id', $policy->id)->first();
+                      $currentValue = $policyValue ? $policyValue->value : '';
+                    @endphp
+                    <div class="col-md-6">
+                      <label class="form-label" for="policy_{{ $policy->id }}">{{ $policy->name }}</label>
+                      @if($policy->input_type === 'textarea')
+                        <textarea class="form-control" name="hotel_policies[{{ $policy->id }}]" id="policy_{{ $policy->id }}" rows="2">{{ $currentValue }}</textarea>
+                      @else
+                        <input type="text" class="form-control" name="hotel_policies[{{ $policy->id }}]" id="policy_{{ $policy->id }}" value="{{ $currentValue }}" />
+                      @endif
+                    </div>
+                    @endforeach
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
 
         <!-- Tab 3: Featured Image -->
@@ -279,13 +335,15 @@
             <label class="form-label" for="meta_description">Meta Description</label>
             <textarea class="form-control" id="meta_description" name="meta_description" rows="2">{{ $hotel->seo->meta_description ?? '' }}</textarea>
           </div>
-          <div class="mb-3">
-            <label class="form-label" for="canonical_url">Canonical URL</label>
-            <input type="url" class="form-control" id="canonical_url" name="canonical_url" value="{{ $hotel->seo->canonical_url ?? '' }}" />
-          </div>
-          <div class="mb-3">
-            <label class="form-label" for="og_title">OG Title</label>
-            <input type="text" class="form-control" id="og_title" name="og_title" value="{{ $hotel->seo->og_title ?? '' }}" />
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label" for="canonical_url">Canonical URL</label>
+              <input type="url" class="form-control" id="canonical_url" name="canonical_url" value="{{ $hotel->seo->canonical_url ?? '' }}" />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label" for="og_title">OG Title</label>
+              <input type="text" class="form-control" id="og_title" name="og_title" value="{{ $hotel->seo->og_title ?? '' }}" />
+            </div>
           </div>
           <div class="mb-3">
             <label class="form-label" for="og_description">OG Description</label>

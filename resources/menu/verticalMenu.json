@@ -16,7 +16,7 @@
     {
       "name": "Hotels",
       "icon": "menu-icon tf-icons ti ti-building",
-      "slug": ["hotels", "hotel-categories", "amenities"],
+      "slug": ["hotels", "hotel-categories", "amenities", "booking-features", "hotel-policies"],
       "submenu": [
         {
           "name": "All Hotels",
@@ -32,6 +32,16 @@
           "name": "Amenities",
           "url": "/admin/amenities",
           "slug": "amenities.index"
+        },
+        {
+          "name": "Booking Features",
+          "url": "/admin/booking-features",
+          "slug": "booking-features.index"
+        },
+        {
+          "name": "Hotel Policies",
+          "url": "/admin/hotel-policies",
+          "slug": "hotel-policies.index"
         }
       ]
     },
@@ -111,9 +121,25 @@
     },
     {
       "name": "Settings",
-      "url": "/admin/settings",
       "icon": "menu-icon tf-icons ti ti-settings",
-      "slug": "settings.index"
+      "slug": ["settings", "social-links", "search-shortcuts"],
+      "submenu": [
+        {
+          "name": "Settings",
+          "url": "/admin/settings",
+          "slug": "settings.index"
+        },
+        {
+          "name": "Social Links",
+          "url": "/admin/social-links",
+          "slug": "social-links.index"
+        },
+        {
+          "name": "Search Shortcuts",
+          "url": "/admin/search-shortcuts",
+          "slug": "search-shortcuts.index"
+        }
+      ]
     },
     {
       "name": "Contact Messages",

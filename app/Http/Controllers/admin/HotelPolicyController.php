@@ -1,0 +1,80 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\HotelPolicy;
+
+class HotelPolicyController extends Controller
+{
+    public function index()
+    {
+        $policies = HotelPolicy::orderBy('sort_order')->paginate(20);
+        return view('new_content.admin.hotel_policies.index', compact('policies'));
+    }
+
+    public function create()
+    {
+        return view('new_content.admin.hotel_policies.create');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name'       => 'required|string|max:255',
+            'input_type' => 'required|in:text,textarea',
+            'sort_order' => 'required|integer',
+            'is_active'  => 'boolean'
+        ]);
+
+        $data = $request->except('_token');
+        $data['is_active'] = $request->has('is_active') ? 1 : 0;
+
+        HotelPolicy::create($data);
+
+        return redirect()->route('hotel-policies.index')->with('success', 'Hotel Policy created successfully.');
+    }
+
+    public function edit(string $id)
+    {
+        $policy = HotelPolicy::findOrFail($id);
+        return view('new_content.admin.hotel_policies.edit', compact('policy'));
+    }
+
+    public function update(Request $request, string $id)
+    {
+        $request->validate([
+            'name'       => 'required|string|max:255',
+            'input_type' => 'required|in:text,textarea',
+            'sort_order' => 'required|integer',
+            'is_active'  => 'boolean'
+        ]);
+
+        $policy = HotelPolicy::findOrFail($id);
+        
+        $data = $request->except('_token', '_method');
+        $data['is_active'] = $request->has('is_active') ? 1 : 0;
+
+        $policy->update($data);
+
+        return redirect()->route('hotel-policies.index')->with('success', 'Hotel Policy updated successfully.');
+    }
+
+    public function destroy(string $id)
+    {
+        $policy = HotelPolicy::findOrFail($id);
+        $policy->delete();
+
+        return redirect()->route('hotel-policies.index')->with('success', 'Hotel Policy deleted successfully.');
+    }
+
+    public function changeStatus($id, $status)
+    {
+        $policy = HotelPolicy::findOrFail($id);
+        $policy->is_active = $status;
+        $policy->save();
+
+        return redirect()->back()->with('success', 'Status updated successfully.');
+    }
+}

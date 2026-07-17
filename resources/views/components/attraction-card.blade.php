@@ -18,6 +18,7 @@
         @endphp
         <img src="{{ $imgUrl }}" 
              alt="{{ $attraction->name ?? 'Attraction Image' }}" 
+             loading="lazy"
              class="img-fluid object-fit-cover transition-transform-slow w-100 h-100">
              
         <!-- Badges -->

@@ -9,7 +9,9 @@
         <div class="reading-progress-bar" id="readingProgressBar"></div>
     </div>
     @include('web.layout.sections.header')
-    @yield('webLayoutContent')
+    <main id="main-content">
+        @yield('webLayoutContent')
+    </main>
     @include('web.layout.sections.footer')
     @include('web.layout.sections.script')
     @yield('webLayoutScript')

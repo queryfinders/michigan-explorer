@@ -17,7 +17,9 @@ class HotelController extends Controller
     {
         $categories = \App\Models\HotelCategory::where('status', 1)->get();
         $amenities = \App\Models\Amenity::where('status', 1)->orderBy('name')->get();
-        return view('new_content.admin.hotels.create', compact('categories', 'amenities'));
+        $bookingFeatures = \App\Models\BookingFeature::where('is_active', 1)->orderBy('sort_order')->get();
+        $hotelPolicies = \App\Models\HotelPolicy::where('is_active', 1)->orderBy('sort_order')->get();
+        return view('new_content.admin.hotels.create', compact('categories', 'amenities', 'bookingFeatures', 'hotelPolicies'));
     }
 
     public function store(\Illuminate\Http\Request $request)
@@ -37,11 +39,13 @@ class HotelController extends Controller
             'latitude'              => 'nullable|numeric',
             'longitude'             => 'nullable|numeric',
             'amenities'             => 'nullable|array',
+            'booking_features'      => 'nullable|array',
+            'hotel_policies'        => 'nullable|array',
             'gallery_images.*'      => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
             'gallery_alts.*'        => 'nullable|string|max:255',
         ]);
 
-        $data = $request->except('_token', '_method', 'featured_image_file', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'amenities', 'gallery_images', 'gallery_alts', 'faqs');
+        $data = $request->except('_token', '_method', 'featured_image_file', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'amenities', 'booking_features', 'hotel_policies', 'gallery_images', 'gallery_alts', 'faqs');
         $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
 
         if ($request->hasFile('featured_image_file')) {
@@ -52,6 +56,19 @@ class HotelController extends Controller
         $hotel = \App\Models\Hotel::create($data);
 
         $hotel->amenities()->sync($request->input('amenities', []));
+        $hotel->bookingFeatures()->sync($request->input('booking_features', []));
+
+        // Handle hotel policies
+        if ($request->has('hotel_policies')) {
+            foreach ($request->input('hotel_policies') as $policyId => $value) {
+                if (!empty($value)) {
+                    $hotel->policyValues()->create([
+                        'hotel_policy_id' => $policyId,
+                        'value' => $value
+                    ]);
+                }
+            }
+        }
 
         // Handle gallery images
         if ($request->hasFile('gallery_images')) {
@@ -117,10 +134,12 @@ class HotelController extends Controller
 
     public function edit(\App\Models\Hotel $hotel)
     {
-        $hotel->load(['seo', 'amenities', 'images']);
+        $hotel->load(['seo', 'amenities', 'images', 'bookingFeatures', 'policyValues']);
         $categories = \App\Models\HotelCategory::where('status', 1)->get();
         $amenities = \App\Models\Amenity::where('status', 1)->orderBy('name')->get();
-        return view('new_content.admin.hotels.edit', compact('hotel', 'categories', 'amenities'));
+        $bookingFeatures = \App\Models\BookingFeature::where('is_active', 1)->orderBy('sort_order')->get();
+        $hotelPolicies = \App\Models\HotelPolicy::where('is_active', 1)->orderBy('sort_order')->get();
+        return view('new_content.admin.hotels.edit', compact('hotel', 'categories', 'amenities', 'bookingFeatures', 'hotelPolicies'));
     }
 
     public function update(\Illuminate\Http\Request $request, \App\Models\Hotel $hotel)
@@ -140,12 +159,14 @@ class HotelController extends Controller
             'latitude'              => 'nullable|numeric',
             'longitude'             => 'nullable|numeric',
             'amenities'             => 'nullable|array',
+            'booking_features'      => 'nullable|array',
+            'hotel_policies'        => 'nullable|array',
             'gallery_images.*'      => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
             'gallery_alts.*'        => 'nullable|string|max:255',
             'delete_gallery_ids'    => 'nullable|array',
         ]);
 
-        $data = $request->except('_token', '_method', 'featured_image_file', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'amenities', 'gallery_images', 'gallery_alts', 'delete_gallery_ids', 'faqs');
+        $data = $request->except('_token', '_method', 'featured_image_file', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'amenities', 'booking_features', 'hotel_policies', 'gallery_images', 'gallery_alts', 'delete_gallery_ids', 'faqs');
         $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
 
         if ($request->hasFile('featured_image_file')) {
@@ -156,6 +177,20 @@ class HotelController extends Controller
         $hotel->update($data);
 
         $hotel->amenities()->sync($request->input('amenities', []));
+        $hotel->bookingFeatures()->sync($request->input('booking_features', []));
+
+        // Handle hotel policies
+        $hotel->policyValues()->delete(); // Clear existing to prevent duplicates
+        if ($request->has('hotel_policies')) {
+            foreach ($request->input('hotel_policies') as $policyId => $value) {
+                if (!empty($value)) {
+                    $hotel->policyValues()->create([
+                        'hotel_policy_id' => $policyId,
+                        'value' => $value
+                    ]);
+                }
+            }
+        }
 
         // Delete selected gallery images
         if ($request->filled('delete_gallery_ids')) {

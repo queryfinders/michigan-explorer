@@ -37,8 +37,7 @@
             </div>
         </div>
         <div class="hotel-actions mt-3 mt-md-0 d-flex gap-2">
-            <button class="btn btn-outline-secondary bg-white"><i class="fas fa-share-alt"></i> Share</button>
-            <button class="btn btn-outline-secondary bg-white"><i class="far fa-heart"></i> Save</button>
+            <button class="btn btn-outline-secondary bg-white" onclick="shareCurrentPage('{{ addslashes($restaurant->name) }}')"><i class="fas fa-share-alt"></i> Share</button>
         </div>
     </div>
 

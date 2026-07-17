@@ -11,10 +11,10 @@
     // AlpineJS Components
     document.addEventListener('alpine:init', () => {
         
-        Alpine.data('smartSearch', () => ({
+        Alpine.data('smartSearch', (initialKeyword = '') => ({
             isOpen: false,
             isLoading: false,
-            keyword: '',
+            keyword: initialKeyword,
             activeIndex: -1,
             groupedResults: {},
             
@@ -27,7 +27,7 @@
             },
 
             fetchSuggestions() {
-                if (this.keyword.trim() === '') {
+                if (this.keyword.trim() === '' || this.keyword.length < 2) {
                     this.groupedResults = {};
                     this.isOpen = false;
                     return;
@@ -36,52 +36,41 @@
                 this.isLoading = true;
                 this.isOpen = true;
                 
-                // Simulate API call for premium UI experience
-                setTimeout(() => {
-                    this.isLoading = false;
-                    
-                    // Basic client-side mock filtering
-                    let term = this.keyword.toLowerCase();
-                    let mockData = {
-                        'Hotels': [
-                            { id: 1, title: 'Blue Chip Casino Hotel', url: '/search?keyword=Blue+Chip' },
-                            { id: 2, title: 'Four Winds Resort', url: '/search?keyword=Four+Winds' }
-                        ],
-                        'Restaurants': [
-                            { id: 3, title: 'Shoreline Brewery', url: '/search?keyword=Shoreline' },
-                            { id: 4, title: 'Patricks Grille', url: '/search?keyword=Patricks' }
-                        ],
-                        'Attractions': [
-                            { id: 5, title: 'Indiana Dunes', url: '/search?keyword=Indiana+Dunes' },
-                            { id: 6, title: 'Washington Park', url: '/search?keyword=Washington+Park' }
-                        ],
-                        'Events': [
-                            { id: 7, title: 'Summer Festival', url: '/search?keyword=Festival' }
-                        ]
-                    };
+                if (this.debounceTimer) clearTimeout(this.debounceTimer);
 
-                    let results = {};
-                    let globalIndex = 0;
-                    
-                    for (let [cat, items] of Object.entries(mockData)) {
-                        let filtered = items.filter(item => item.title.toLowerCase().includes(term) || term.includes(cat.toLowerCase().substring(0,4)));
-                        if (filtered.length > 0) {
-                            results[cat] = filtered.map(item => {
-                                item.index = globalIndex++;
-                                item.icon = this.categories[cat].icon;
-                                return item;
-                            });
-                        }
-                    }
-                    
-                    this.groupedResults = results;
-                    this.activeIndex = -1;
-                }, 500);
+                this.debounceTimer = setTimeout(() => {
+                    fetch('/search/autocomplete?q=' + encodeURIComponent(this.keyword))
+                        .then(res => res.json())
+                        .then(data => {
+                            let results = {};
+                            let globalIndex = 0;
+                            
+                            for (let [cat, groupData] of Object.entries(data)) {
+                                if (groupData.items && groupData.items.length > 0) {
+                                    results[cat] = { ...groupData };
+                                    results[cat].items = groupData.items.map(item => {
+                                        item.index = globalIndex++;
+                                        return item;
+                                    });
+                                }
+                            }
+                            
+                            this.groupedResults = results;
+                            this.activeIndex = -1;
+                            this.isLoading = false;
+                        })
+                        .catch(err => {
+                            console.error('Error fetching suggestions:', err);
+                            this.isLoading = false;
+                        });
+                }, 300);
             },
 
             navigate(direction) {
                 let totalItems = 0;
-                Object.values(this.groupedResults).forEach(group => totalItems += group.length);
+                Object.values(this.groupedResults).forEach(group => {
+                    if(group.items) totalItems += group.items.length;
+                });
                 
                 if (totalItems === 0) return;
                 
@@ -93,7 +82,7 @@
             selectCurrent() {
                 if (this.activeIndex >= 0) {
                     for (let group of Object.values(this.groupedResults)) {
-                        for (let item of group) {
+                        for (let item of group.items || []) {
                             if (item.index === this.activeIndex) {
                                 window.location.href = item.url;
                                 return;
@@ -103,7 +92,7 @@
                 }
                 // If nothing is selected, submit form normally
                 if (this.keyword.trim() !== '') {
-                    window.location.href = '/search?keyword=' + encodeURIComponent(this.keyword);
+                    window.location.href = '/search?q=' + encodeURIComponent(this.keyword);
                 }
             },
 
@@ -184,4 +173,17 @@
         
         console.log("Michigan Explorer Theme Initialized.");
     });
+</script>
+
+<script>
+function shareCurrentPage(title) {
+    if (navigator.share) {
+        navigator.share({
+            title: title,
+            url: window.location.href
+        }).catch(console.error);
+    } else {
+        navigator.clipboard.writeText(window.location.href).then(() => alert('Link copied to clipboard!'));
+    }
+}
 </script>

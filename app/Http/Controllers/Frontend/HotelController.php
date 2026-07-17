@@ -35,7 +35,7 @@ class HotelController extends Controller
 
     public function show($slug)
     {
-        $hotel = \App\Models\Hotel::with(['seo', 'category', 'amenities', 'images'])->where('slug', $slug)->where('status', 1)->first();
+        $hotel = \App\Models\Hotel::with(['seo', 'category', 'amenities', 'images', 'bookingFeatures', 'policyValues.policy'])->where('slug', $slug)->where('status', 1)->first();
         
         if (!$hotel) {
             // Static Fallback Data for UI Demonstration
@@ -54,6 +54,15 @@ class HotelController extends Controller
             ];
         }
 
-        return view('web.hotels.show', compact('hotel'));
+        // Fetch related hotels in the same category
+        $relatedHotels = \App\Models\Hotel::with(['category'])
+            ->where('hotel_category_id', $hotel->hotel_category_id ?? ($hotel->category->id ?? null))
+            ->where('id', '!=', $hotel->id ?? 0)
+            ->where('status', 1)
+            ->inRandomOrder()
+            ->take(3)
+            ->get();
+
+        return view('web.hotels.show', compact('hotel', 'relatedHotels'));
     }
 }

@@ -6,6 +6,7 @@
     <div class="position-relative overflow-hidden h-220px">
         <img src="{{ $event->featured_image ? asset($event->featured_image) : 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&auto=format&fit=crop' }}" 
              class="card-img-top w-100 h-100 object-fit-cover transition-hover" 
+             loading="lazy"
              alt="{{ $event->name }}">
              
         <!-- Date Badge overlaid on top right -->
@@ -33,7 +34,7 @@
     
     <!-- Content Section -->
     <div class="card-body p-4 d-flex flex-column">
-        <h4 class="card-title fw-bold mb-2 text-dark font-heading">{{ $event->name }}</h4>
+        <h3 class="card-title fw-bold mb-2 text-dark font-heading fs-5">{{ $event->name }}</h3>
         
         <div class="d-flex align-items-center text-muted mb-3 small">
             <i class="fas fa-map-marker-alt text-primary me-2"></i>

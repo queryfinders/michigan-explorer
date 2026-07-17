@@ -29,22 +29,22 @@
 <section class="py-4 border-bottom bg-white shadow-sm position-relative z-index-1">
     <div class="container">
         <h6 class="text-uppercase text-muted fw-bold small mb-3 tracking-wider">Browse by Category</h6>
-        <div class="category-filter-wrapper d-flex align-items-center">
+        <div class="category-filter-wrapper d-flex align-items-center flex-wrap gap-2 pb-2">
             
             <a href="{{ route('web.events.index') }}" class="category-pill {{ !isset($currentCategory) ? 'active' : '' }}">
-                <i class="fas fa-th-large"></i>
                 <span class="cat-name">All Events</span>
                 <span class="cat-count">48</span>
             </a>
             
             @php
                 $displayCategories = isset($featuredCategories) ? $featuredCategories->toArray() : [];
+                // Limit to 6 categories to ensure it fills reasonable space without wrapping on desktop
+                $displayCategories = array_slice($displayCategories, 0, 6);
             @endphp
 
             @foreach($displayCategories as $cat)
                 @php $catObj = (object)$cat; @endphp
                 <a href="{{ route('web.events.category', $catObj->slug) }}" class="category-pill {{ (isset($currentCategory) && $currentCategory->id === $catObj->id) ? 'active' : '' }}">
-                    <i class="fas {{ $catObj->icon ?? 'fa-calendar-alt' }}"></i>
                     <span class="cat-name">{{ $catObj->name }}</span>
                     <span class="cat-count">{{ $catObj->events_count ?? rand(5, 20) }}</span>
                 </a>
@@ -52,9 +52,7 @@
 
             <!-- More Categories Button -->
             <a href="#" class="category-pill bg-light" data-bs-toggle="modal" data-bs-target="#categoriesModal">
-                <i class="fas fa-ellipsis-h"></i>
-                <span class="cat-name">More</span>
-                <span class="cat-count">Explore All</span>
+                <span class="cat-name">More...</span>
             </a>
         </div>
     </div>
@@ -151,6 +149,30 @@
         </div>
     </div>
 </section>
+
+<!-- Modal: Categories -->
+<div class="modal fade" id="categoriesModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">All Categories</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="horizontal-scroll-wrapper d-flex flex-column gap-1 p-3">
+                    @foreach($allCategories as $cat)
+                                    <a href="{{ route('web.events.category', $cat->slug) }}" class="text-decoration-none text-dark d-flex align-items-center p-2 rounded-3 hover-bg-light transition-all">
+                                        <div>
+                                            <div class="fw-bold small">{{ $cat->name }}</div>
+                                            <div class="text-muted fs-xs">{{ $cat->events_count ?? 0 }} {{ Str::plural('Event', $cat->events_count ?? 0) }}</div>
+                                        </div>
+                                    </a>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 @endsection
 

@@ -1,31 +1,33 @@
 @extends('web.layout.app_layout')
 
-@if(isset($hotel->seo))
-    @section('seo_title', $hotel->seo->meta_title ?? $hotel->name . ' - Michigan Explorer')
-    @section('seo_description', $hotel->seo->meta_description ?? '')
-    @section('canonical', $hotel->seo->canonical_url ?? '')
-    @section('og_tags')
-        <meta property="og:title" content="{{ $hotel->seo->og_title ?? $hotel->name }}">
-        <meta property="og:description" content="{{ $hotel->seo->og_description ?? '' }}">
-        <meta property="og:type" content="website">
-        <meta property="og:url" content="{{ $hotel->seo->canonical_url ?? request()->url() }}">
-        <meta property="og:image" content="{{ asset($hotel->featured_image) }}">
-    @endsection
-    @section('schema_markup')
-        {!! $hotel->seo->schema_markup ?? '' !!}
-    @endsection
-@else
-    @section('title', $hotel->name . ' - Michigan Explorer')
-@endif
+@section('title', $hotel->name . ' - Michigan Explorer')
 
 @section('webLayoutContent')
 <div class="container detail-container">
     
     <!-- 1. Breadcrumb -->
+    @php
+        $prevUrl = url()->previous();
+        $prevPath = parse_url($prevUrl, PHP_URL_PATH);
+        
+        $middleLabel = null;
+        $middleUrl = null;
+        
+        if (Str::contains($prevPath, '/hotels/category/')) {
+            $slug = basename($prevPath);
+            $cat = \App\Models\HotelCategory::where('slug', $slug)->first();
+            if ($cat) {
+                $middleLabel = $cat->name;
+                $middleUrl = $prevUrl;
+            }
+        }
+    @endphp
     <nav class="breadcrumb-custom">
         <a href="{{ route('web.home') }}">Home</a> <i class="fas fa-chevron-right mx-2 text-muted fs-7"></i>
         <a href="{{ route('web.hotels.index') }}">Hotels</a> <i class="fas fa-chevron-right mx-2 text-muted fs-7"></i>
-        <a href="{{ route('web.hotels.index', ['city' => $hotel->city]) }}">{{ $hotel->city ?? 'Michigan' }}</a> <i class="fas fa-chevron-right mx-2 text-muted fs-7"></i>
+        @if($middleLabel && $middleUrl)
+            <a href="{{ $middleUrl }}">{{ $middleLabel }}</a> <i class="fas fa-chevron-right mx-2 text-muted fs-7"></i>
+        @endif
         <span class="text-muted">{{ $hotel->name }}</span>
     </nav>
 
@@ -37,15 +39,6 @@
                 <span class="badge bg-warning text-dark rounded-pill fw-bold px-3 py-2"><i class="fas fa-crown me-1"></i> Featured Partner</span>
                 @endif
                 <span class="badge bg-primary text-white rounded-pill fw-bold px-3 py-2">{{ $hotel->category->name ?? 'Luxury Resort' }}</span>
-                <div class="hotel-stars d-flex align-items-center bg-light rounded-pill px-3 py-1 ms-2 border">
-                    <span class="fw-bold me-2 text-dark">4.8</span>
-                    <i class="fas fa-star text-warning"></i>
-                    <i class="fas fa-star text-warning"></i>
-                    <i class="fas fa-star text-warning"></i>
-                    <i class="fas fa-star text-warning"></i>
-                    <i class="fas fa-star text-warning"></i>
-                    <a href="#reviews" class="text-muted ms-2 small text-decoration-underline">(1,245 Reviews)</a>
-                </div>
             </div>
             <h1 class="hotel-header-title">{{ $hotel->name }}</h1>
             <div class="hotel-header-location">
@@ -55,8 +48,7 @@
             </div>
         </div>
         <div class="hotel-actions mt-3 mt-md-0 d-flex gap-2">
-            <button class="btn btn-outline-secondary bg-white"><i class="fas fa-share-alt"></i> Share</button>
-            <button class="btn btn-outline-secondary bg-white"><i class="far fa-heart"></i> Save</button>
+            <button class="btn btn-outline-secondary bg-white" onclick="shareCurrentPage('{{ addslashes($hotel->name) }}')"><i class="fas fa-share-alt"></i> Share</button>
         </div>
     </div>
 
@@ -103,12 +95,20 @@
     
     <!-- Quick Facts -->
     <div class="quick-facts-row">
-        <div class="quick-fact-item"><i class="fas fa-star text-warning"></i> 4.8 (1,245 Reviews)</div>
-        <div class="quick-fact-item"><i class="fas fa-building"></i> {{ $hotel->category->name ?? 'Luxury Resort' }}</div>
-        <div class="quick-fact-item"><i class="fas fa-bed"></i> 128 Rooms</div>
-        <div class="quick-fact-item"><i class="fas fa-parking"></i> Free Parking</div>
-        <div class="quick-fact-item"><i class="fas fa-paw"></i> Pet Friendly</div>
-        <div class="quick-fact-item"><i class="fas fa-swimmer"></i> Indoor Pool</div>
+        @if(isset($hotel->category))
+        <div class="quick-fact-item"><i class="fas fa-building"></i> {{ $hotel->category->name }}</div>
+        @endif
+        
+        @if(isset($hotel->amenities) && $hotel->amenities->count() > 0)
+            @foreach($hotel->amenities->take(4) as $amenity)
+                <div class="quick-fact-item"><i class="fas {{ $amenity->icon ?? 'fa-check' }}"></i> {{ $amenity->name }}</div>
+            @endforeach
+        @else
+            <div class="quick-fact-item"><i class="fas fa-bed"></i> 128 Rooms</div>
+            <div class="quick-fact-item"><i class="fas fa-parking"></i> Free Parking</div>
+            <div class="quick-fact-item"><i class="fas fa-paw"></i> Pet Friendly</div>
+            <div class="quick-fact-item"><i class="fas fa-swimmer"></i> Indoor Pool</div>
+        @endif
     </div>
 
     <!-- 4. Main Layout -->
@@ -119,7 +119,7 @@
             
             <!-- Overview -->
             <div class="content-card">
-                <h3>About {{ $hotel->name }}</h3>
+                <h2 class="mb-5">About {{ $hotel->name }}</h2>
                 <div class="text-muted lh-18">
                     @if($hotel->description)
                         {!! $hotel->description !!}
@@ -146,32 +146,21 @@
             </div>
 
             <!-- Hotel Information -->
+            @if(isset($hotel->policyValues) && $hotel->policyValues->count() > 0)
             <div class="content-card">
                 <h3 class="mb-4">Hotel Policies & Info</h3>
                 <div class="policy-list">
+                    @foreach($hotel->policyValues->sortBy('policy.sort_order') as $policyValue)
                     <div class="policy-item">
-                        <div class="icon-wrapper"><i class="fas fa-clock"></i></div>
                         <div>
-                            <h6>Check-in & Check-out</h6>
-                            <p>Check-in from 3:00 PM to 11:30 PM. Check-out until 11:00 AM.</p>
+                            <h6>{{ $policyValue->policy->name }}</h6>
+                            <p>{!! nl2br(e($policyValue->value)) !!}</p>
                         </div>
                     </div>
-                    <div class="policy-item">
-                        <div class="icon-wrapper"><i class="fas fa-language"></i></div>
-                        <div>
-                            <h6>Languages Spoken</h6>
-                            <p>English, Spanish</p>
-                        </div>
-                    </div>
-                    <div class="policy-item">
-                        <div class="icon-wrapper"><i class="fas fa-paw"></i></div>
-                        <div>
-                            <h6>Pets</h6>
-                            <p>Allowed on request. Additional charges may apply.</p>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
             </div>
+            @endif
 
             <!-- Location & Map removed from here -->
 
@@ -233,11 +222,11 @@
                 <div class="d-flex justify-content-between align-items-end mb-4">
                     <div>
                         <div class="text-muted small fw-bold text-uppercase mb-1">Starting from</div>
-                        <div class="sidebar-price">${{ $hotel->starting_price ?? '399' }} <span>/night</span></div>
-                    </div>
-                    <div class="text-end">
-                        <div class="badge bg-primary fs-6 mb-1 rounded-pill px-3 py-2"><i class="fas fa-star text-warning me-1"></i> 4.8</div>
-                        <div class="text-muted small fw-bold">1,245 reviews</div>
+                        @if($hotel->starting_price)
+                        <div class="sidebar-price">${{ $hotel->starting_price }} <span>/night</span></div>
+                        @else
+                        <div class="sidebar-price" style="font-size: 1.5rem;">Check Rates</div>
+                        @endif
                     </div>
                 </div>
                 
@@ -247,21 +236,28 @@
                     <p class="text-muted small mb-0">Check availability and book securely through our official affiliate partner for the best guaranteed rate.</p>
                 </div>
 
-                <a href="{{ $hotel->affiliate_url ?? '#' }}" class="btn-affiliate-book" target="_blank">
+                @if($hotel->affiliate_url)
+                <a href="{{ $hotel->affiliate_url }}" class="btn-affiliate-book" target="_blank">
                     Check Availability & Book <i class="fas fa-external-link-alt ms-2"></i>
                 </a>
+                @else
+                <button class="btn-affiliate-book disabled" disabled style="opacity: 0.6; cursor: not-allowed;">
+                    Currently Unavailable Online
+                </button>
+                @endif
 
+                @if($hotel->bookingFeatures && $hotel->bookingFeatures->count() > 0)
                 <div class="trust-badges">
+                    @foreach($hotel->bookingFeatures as $feature)
                     <div class="trust-badge">
-                        <i class="fas fa-check-circle"></i> Best Price Guarantee
+                        @if($feature->icon)
+                            <i class="{{ $feature->icon }}"></i>
+                        @endif
+                        {{ $feature->name }}
                     </div>
-                    <div class="trust-badge">
-                        <i class="fas fa-lock"></i> Secure & Trusted Booking
-                    </div>
-                    <div class="trust-badge">
-                        <i class="fas fa-calendar-check"></i> Free Cancellation on most rooms
-                    </div>
+                    @endforeach
                 </div>
+                @endif
             </div>
         </div>
         
@@ -287,6 +283,7 @@
 </div>
 
 <!-- Related Hotels Section -->
+@if(isset($relatedHotels) && $relatedHotels->count() > 0)
 <section class="section-padding-related-hotel bg-light">
     <div class="container">
         <div class="d-flex justify-content-between align-items-end mb-4">
@@ -298,22 +295,15 @@
         </div>
         
         <div class="row g-4">
-            <!-- Static Fallback Related Hotels -->
-            @for($i=1; $i<=3; $i++)
+            @foreach($relatedHotels as $relatedHotel)
             <div class="col-lg-4 col-md-6">
-                <x-hotel-card :hotel="(object)[
-                    'name' => $i === 1 ? 'The Grand Resort & Spa' : ($i === 2 ? 'Lakeside Boutique Hotel' : 'Harbor View Inn'),
-                    'city' => $hotel->city ?? 'Mackinac Island',
-                    'description' => 'Experience true comfort and luxury in this beautifully appointed property in the heart of Michigan.',
-                    'starting_price' => $i === 1 ? '349' : ($i === 2 ? '289' : '199'),
-                    'affiliate_url' => '#',
-                    'slug' => 'demo'
-                ]" :compact="true" />
+                <x-hotel-card :hotel="$relatedHotel" :compact="true" />
             </div>
-            @endfor
+            @endforeach
         </div>
     </div>
 </section>
+@endif
 
 <!-- Bottom CTA using reusable component -->
 <!-- <x-cta-block 

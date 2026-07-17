@@ -1,4 +1,4 @@
-@props([
+    @props([
     'hotel',
     'featured' => false,
     'compact' => false
@@ -18,6 +18,7 @@
         @endphp
         <img src="{{ $imgUrl }}" 
              alt="{{ $hotel->name ?? 'Hotel Image' }}" 
+             loading="lazy"
              class="img-fluid object-fit-cover transition-transform-slow w-100 h-100">
              
         <!-- Badges -->
@@ -45,33 +46,49 @@
         </h3>
         
         <p class="listing-desc text-muted mb-4 text-truncate-2 lh-16 transition-base fs-095rem">
-            {{ Str::limit($hotel->description ?? 'Experience true comfort and luxury in this beautifully appointed property in the heart of Michigan.', 150) }}
+            {{ Str::limit(strip_tags($hotel->description ?? 'Experience true comfort and luxury in this beautifully appointed property in the heart of Michigan.'), 150) }}
         </p>
         
         <!-- Premium Amenities Row -->
         <div class="listing-amenities d-flex align-items-center gap-3 mb-4 mt-auto text-secondary fs-sm">
-            <span data-bs-toggle="tooltip" title="Free WiFi"><i class="fas fa-wifi text-primary opacity-75"></i></span>
-            <span data-bs-toggle="tooltip" title="Swimming Pool"><i class="fas fa-swimming-pool text-primary opacity-75"></i></span>
-            <span data-bs-toggle="tooltip" title="Free Parking"><i class="fas fa-parking text-primary opacity-75"></i></span>
-            <span data-bs-toggle="tooltip" title="Restaurant"><i class="fas fa-utensils text-primary opacity-75"></i></span>
-            <span class="ms-auto fw-bold text-primary fs-xs">+3 MORE</span>
+            @php
+                $amenitiesList = isset($hotel->amenities) && $hotel->amenities->count() > 0 ? $hotel->amenities : null;
+            @endphp
+            
+            @if($amenitiesList)
+                @foreach($amenitiesList->take(4) as $amenity)
+                    <span data-bs-toggle="tooltip" title="{{ $amenity->name }}"><i class="fas {{ $amenity->icon ?? 'fa-check' }} text-primary opacity-75"></i></span>
+                @endforeach
+                
+                @if($amenitiesList->count() > 4)
+                    <span class="ms-auto fw-bold text-primary fs-xs">+{{ $amenitiesList->count() - 4 }} MORE</span>
+                @endif
+            @else
+                <span data-bs-toggle="tooltip" title="Free WiFi"><i class="fas fa-wifi text-primary opacity-75"></i></span>
+                <span data-bs-toggle="tooltip" title="Swimming Pool"><i class="fas fa-swimming-pool text-primary opacity-75"></i></span>
+                <span data-bs-toggle="tooltip" title="Free Parking"><i class="fas fa-parking text-primary opacity-75"></i></span>
+                <span data-bs-toggle="tooltip" title="Restaurant"><i class="fas fa-utensils text-primary opacity-75"></i></span>
+                <span class="ms-auto fw-bold text-primary fs-xs">+2 MORE</span>
+            @endif
         </div>
         
         <!-- Footer -->
-        <div class="hotel-card-footer pt-3 border-top d-flex flex-column gap-3">
-            <div class="hotel-price text-primary fw-bold fs-5">
+        <div class="hotel-card-footer pt-3 border-top d-flex flex-column gap-3 mt-auto">
+            <div class="hotel-price text-primary fw-bold fs-5 text-center">
                 ${{ $hotel->starting_price ?? '249' }}<span class="text-muted fw-normal fs-085rem">/night</span>
             </div>
             
-            <div class="d-flex gap-2 w-100">
+            <div class="d-flex gap-2 w-100 mt-1">
                 <a href="{{ route('web.hotels.show', $hotel->slug ?? 'demo') }}" 
-                   class="btn btn-outline-primary rounded-pill w-50 fw-bold shadow-sm d-flex align-items-center justify-content-center fs-sm"
+                   class="btn btn-outline-primary rounded-pill w-50 fw-bold shadow-sm d-flex align-items-center justify-content-center px-1 py-2"
+                   style="font-size: 0.8rem;"
                    onclick="event.stopPropagation();">
                     View Details
                 </a>
                 
                 <a href="{{ $hotel->affiliate_url ?? '#' }}" 
-                   class="btn btn-secondary hotel-book-btn rounded-pill w-50 fw-bold shadow-sm d-flex align-items-center justify-content-center text-white fs-sm"
+                   class="btn btn-secondary hotel-book-btn rounded-pill w-50 fw-bold shadow-sm d-flex align-items-center justify-content-center text-white px-1 py-2"
+                   style="font-size: 0.8rem;"
                    onclick="event.stopPropagation();" 
                    target="_blank">
                     Book Now

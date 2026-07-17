@@ -1,12 +1,12 @@
 
-<nav class="navbar navbar-expand-lg fixed-top main-navbar {{ request()->routeIs('web.home') ? '' : 'scrolled inner-nav' }}" id="mainNav">
+<nav class="navbar navbar-expand-xl fixed-top main-navbar {{ request()->routeIs('web.home') ? '' : 'scrolled inner-nav' }}" id="mainNav">
     <div class="container">
         <a class="navbar-brand" href="{{ route('web.home') }}">Michigan Explorer</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
-            <ul class="navbar-nav ms-auto align-items-lg-center">
+            <ul class="navbar-nav ms-auto align-items-xl-center">
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('web.home') ? 'active' : '' }}" href="{{ route('web.home') }}">Home</a>
                 </li>
@@ -25,10 +25,10 @@
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('web.blogs.*') ? 'active' : '' }}" href="{{ route('web.blogs.index') }}">Travel Guides</a>
                 </li>
-                <li class="nav-item ms-lg-3">
-                    <a href="{{ route('web.search') }}" class="nav-link {{ request()->routeIs('web.search') ? 'active' : '' }}"><i class="fa fa-search"></i></a>
+                <li class="nav-item ms-xl-3">
+                    <a href="{{ route('web.search') }}" class="nav-link {{ request()->routeIs('web.search') ? 'active' : '' }}" aria-label="Search"><i class="fa fa-search"></i></a>
                 </li>
-                <li class="nav-item ms-lg-3">
+                <li class="nav-item ms-xl-3 mt-2 mt-xl-0">
                     <a href="{{ route('web.contact') }}" class="btn btn-primary btn-sm rounded-pill px-4 py-2">Contact Us</a>
                 </li>
             </ul>

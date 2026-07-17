@@ -182,7 +182,7 @@
                         @endif
 
                         <hr class="my-4 text-muted opacity-25">
-                        <button class="btn btn-primary w-100 rounded-pill fw-bold py-2 shadow-sm d-flex justify-content-center align-items-center">
+                        <button class="btn btn-primary w-100 rounded-pill fw-bold py-2 shadow-sm d-flex justify-content-center align-items-center" onclick="shareCurrentPage('{{ addslashes($attraction->name) }}')">
                             <i class="fas fa-share-alt me-2"></i> Share Attraction
                         </button>
                     </div>

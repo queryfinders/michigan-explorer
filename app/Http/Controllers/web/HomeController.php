@@ -33,6 +33,10 @@ class HomeController extends Controller
 
         $page = \App\Models\Page::with('seo')->where('slug', 'home')->first();
 
-        return view('web.pages.index', compact('hotels', 'restaurants', 'attractions', 'events', 'blogs', 'page'));
+        $searchShortcuts = \Illuminate\Support\Facades\Cache::rememberForever('search_shortcuts', function () {
+            return \App\Models\SearchShortcut::where('status', 1)->orderBy('sort_order', 'asc')->get();
+        });
+
+        return view('web.pages.index', compact('hotels', 'restaurants', 'attractions', 'events', 'blogs', 'page', 'searchShortcuts'));
     }
 }

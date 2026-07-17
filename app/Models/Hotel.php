@@ -32,4 +32,14 @@ class Hotel extends Model
     {
         return $this->hasMany(\App\Models\HotelFaq::class)->orderBy('sort_order');
     }
+
+    public function bookingFeatures()
+    {
+        return $this->belongsToMany(\App\Models\BookingFeature::class, 'hotel_booking_feature');
+    }
+
+    public function policyValues()
+    {
+        return $this->hasMany(HotelPolicyValue::class);
+    }
 }

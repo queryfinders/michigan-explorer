@@ -62,10 +62,9 @@
 <section class="py-4 border-bottom bg-white shadow-sm position-relative z-index-1">
     <div class="container">
         <h6 class="text-uppercase text-muted fw-bold small mb-3 tracking-wider">Browse by Category</h6>
-        <div class="category-filter-wrapper d-flex align-items-center">
+        <div class="category-filter-wrapper d-flex align-items-center flex-wrap gap-2 pb-2">
             
             <a href="{{ route('web.hotels.index') }}" class="category-pill {{ !isset($currentCategory) ? 'active' : '' }}">
-                <i class="fas fa-th-large"></i>
                 <span class="cat-name">All Hotels</span>
                 <span class="cat-count">{{ $totalHotelsCount }}</span>
             </a>
@@ -88,12 +87,14 @@
                 if(isset($currentCategory) && !$isCurrentFeatured && count($displayCategories) > 0) {
                     $displayCategories[count($displayCategories) - 1] = $currentCategory->toArray();
                 }
+                
+                // Limit to 6 categories to ensure it fills reasonable space without wrapping on desktop
+                $displayCategories = array_slice($displayCategories, 0, 6);
             @endphp
 
             @foreach($displayCategories as $cat)
                 @php $catObj = (object)$cat; @endphp
                 <a href="{{ route('web.hotels.category', $catObj->slug) }}" class="category-pill {{ (isset($currentCategory) && $currentCategory->id === $catObj->id) ? 'active' : '' }}">
-                    <i class="fas {{ $catObj->icon ?? 'fa-bed' }}"></i>
                     <span class="cat-name">{{ $catObj->name }}</span>
                     <span class="cat-count">{{ $catObj->hotels_count ?? 0 }}</span>
                 </a>
@@ -101,9 +102,7 @@
 
             <!-- More Categories Button -->
             <a href="#" class="category-pill bg-light" data-bs-toggle="modal" data-bs-target="#categoriesModal">
-                <i class="fas fa-ellipsis-h"></i>
-                <span class="cat-name">More</span>
-                <span class="cat-count">Explore All</span>
+                <span class="cat-name">More...</span>
             </a>
 
         </div>
@@ -125,7 +124,7 @@
             @forelse($hotels as $index => $hotel)
             <!-- Hotel Card -->
             <div class="col-lg-4 col-md-6">
-                <x-hotel-card :hotel="$hotel" :featured="$index % 4 == 0" />
+                <x-hotel-card :hotel="$hotel" :featured="$hotel->is_featured == 1" />
             </div>
             @empty
             <!-- Static Fallback Data for Empty State -->
@@ -137,7 +136,7 @@
                     'description' => 'Experience true comfort and luxury in this beautifully appointed property in the heart of Michigan.',
                     'starting_price' => '249',
                     'affiliate_url' => '#'
-                ]" :featured="$i === 1 || $i === 4" />
+                ]" :featured="$i === 1" />
             </div>
             @endfor
             @endforelse
@@ -182,9 +181,6 @@
                                 @foreach($catGroup as $cat)
                                 <div class="col-md-4 col-sm-6 category-item" data-name="{{ strtolower($cat->name) }}">
                                     <a href="{{ route('web.hotels.category', $cat->slug) }}" class="text-decoration-none text-dark d-flex align-items-center p-2 rounded-3 hover-bg-light transition-all">
-                                        <div class="icon-box bg-light rounded-circle d-flex align-items-center justify-content-center me-3 icon-box-sm">
-                                            <i class="fas {{ $cat->icon ?? 'fa-bed' }} text-secondary"></i>
-                                        </div>
                                         <div>
                                             <div class="fw-bold small">{{ $cat->name }}</div>
                                             <div class="text-muted fs-xs">{{ $cat->hotels_count ?? 0 }} {{ Str::plural('Hotel', $cat->hotels_count ?? 0) }}</div>

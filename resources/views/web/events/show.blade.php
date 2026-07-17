@@ -138,7 +138,7 @@
                             <i class="fas fa-ticket-alt me-2"></i> Get Tickets
                         </a>
                         
-                        <button class="btn btn-outline-secondary w-100 rounded-pill fw-bold py-2 d-flex justify-content-center align-items-center">
+                        <button class="btn btn-outline-secondary w-100 rounded-pill fw-bold py-2 d-flex justify-content-center align-items-center" onclick="shareCurrentPage('{{ addslashes($event->name) }}')">
                             <i class="fas fa-share-alt me-2"></i> Share Event
                         </button>
                         
