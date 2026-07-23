@@ -68,9 +68,6 @@
                 <div class="hotel-price text-heading fw-bold fs-6">
                     <span class="text-success">$$$</span> <span class="text-muted fw-normal fs-xs ms-1">Average $25-50</span>
                 </div>
-                <div class="fw-bold fs-sm">
-                    <i class="fas fa-star text-warning me-1"></i>4.8
-                </div>
             </div>
             
             <div class="d-flex gap-2 w-100 mt-1">

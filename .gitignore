@@ -7,7 +7,7 @@
 /public/build/
 /public/hot
 /public/storage
-/public/assets/vendor/
+# /public/assets/vendor/
 /resources/assets/vendor/
 vendor.zip
 laravel_12.sql

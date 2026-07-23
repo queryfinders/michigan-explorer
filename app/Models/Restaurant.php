@@ -12,4 +12,19 @@ class Restaurant extends Model
     {
         return $this->morphOne(\App\Models\Seo::class, 'seoable');
     }
+
+    public function category()
+    {
+        return $this->belongsTo(RestaurantCategory::class, 'restaurant_category_id');
+    }
+
+    public function images()
+    {
+        return $this->hasMany(RestaurantImage::class)->orderBy('sort_order');
+    }
+
+    public function faqs()
+    {
+        return $this->hasMany(RestaurantFaq::class)->orderBy('sort_order');
+    }
 }

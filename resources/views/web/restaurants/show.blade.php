@@ -19,15 +19,6 @@
             <div class="d-flex align-items-center mb-2 flex-wrap gap-2">
                 <span class="badge bg-warning text-dark rounded-pill fw-bold px-3 py-2"><i class="fas fa-crown me-1"></i> Featured Partner</span>
                 <span class="badge bg-primary text-white rounded-pill fw-bold px-3 py-2">{{ $hotel->category->name ?? 'Luxury Resort' }}</span>
-                <div class="hotel-stars d-flex align-items-center bg-light rounded-pill px-3 py-1 ms-2 border">
-                    <span class="fw-bold me-2 text-dark">4.8</span>
-                    <i class="fas fa-star text-warning"></i>
-                    <i class="fas fa-star text-warning"></i>
-                    <i class="fas fa-star text-warning"></i>
-                    <i class="fas fa-star text-warning"></i>
-                    <i class="fas fa-star text-warning"></i>
-                    <a href="#reviews" class="text-muted ms-2 small text-decoration-underline">(1,245 Reviews)</a>
-                </div>
             </div>
             <h1 class="hotel-header-title">{{ $restaurant->name }}</h1>
             <div class="hotel-header-location">
@@ -42,23 +33,48 @@
     </div>
 
     <!-- 3. Image Gallery -->
+    @php
+        $galleryItems = isset($restaurant->images) && $restaurant->images instanceof \Illuminate\Support\Collection
+            ? $restaurant->images
+            : (isset($restaurant->images) ? collect($restaurant->images) : collect([]));
+        $hasDynamicGallery = $galleryItems->count() > 0;
+        $featuredSrc = !empty($restaurant->featured_image) && (is_object($restaurant) && property_exists($restaurant, 'slug') ? $restaurant->slug !== 'demo' : true)
+            ? asset($restaurant->featured_image)
+            : asset('images/fine_dining_1783508270763.png');
+        
+        $allGalleryImages = [];
+        $allGalleryImages[] = ['src' => $featuredSrc, 'alt' => $restaurant->featured_image_alt ?? $restaurant->name ?? 'Restaurant'];
+        if ($hasDynamicGallery) {
+            foreach ($galleryItems as $img) {
+                $allGalleryImages[] = ['src' => asset($img->image), 'alt' => $img->alt_text ?? $restaurant->name ?? 'Restaurant Gallery'];
+            }
+        } else {
+            // Static demo thumbnails as fallback
+            $allGalleryImages[] = ['src' => asset('storage/demo/michigan_hotel_room_1_1783683598842.png'), 'alt' => 'Dining Area'];
+            $allGalleryImages[] = ['src' => asset('storage/demo/michigan_hotel_room_2_1783683609409.png'), 'alt' => 'Food Item'];
+            $allGalleryImages[] = ['src' => asset('storage/demo/michigan_hotel_lobby_1783683621508.png'), 'alt' => 'Interior'];
+            $allGalleryImages[] = ['src' => asset('storage/demo/michigan_hotel_pool_1783683632041.png'), 'alt' => 'Entrance'];
+        }
+        $extraCount = count($allGalleryImages) - 5;
+    @endphp
     <div class="gallery-grid mb-4" onclick="openCustomGallery()">
+        {{-- Main featured image --}}
         <div class="gallery-item main-img">
-            <img src="{{ !empty($restaurant->featured_image) && $restaurant->slug !== 'demo' ? asset($restaurant->featured_image) : asset('storage/demo/michigan_hotel_lobby_1783683621508.png') }}" alt="{{ $restaurant->name ?? 'Restaurant' }}">
+            <img src="{{ $allGalleryImages[0]['src'] }}" alt="{{ $allGalleryImages[0]['alt'] }}">
         </div>
-        <!-- Thumbnails -->
-        <div class="gallery-item"><img src="{{ asset('storage/demo/michigan_hotel_room_1_1783683598842.png') }}" alt="Dining 1"></div>
-        <div class="gallery-item"><img src="{{ asset('storage/demo/michigan_hotel_room_2_1783683609409.png') }}" alt="Dining 2"></div>
-        <div class="gallery-item"><img src="{{ asset('storage/demo/michigan_hotel_pool_1783683632041.png') }}" alt="Exterior"></div>
+        {{-- Thumbnails: show up to 4 --}}
+        @for($gi = 1; $gi <= min(4, count($allGalleryImages) - 1); $gi++)
         <div class="gallery-item">
-            <img src="{{ asset('storage/demo/michigan_resort_exterior_1783683587847.png') }}" alt="Food">
-            <div class="gallery-overlay-count">+12</div>
+            <img src="{{ $allGalleryImages[$gi]['src'] }}" alt="{{ $allGalleryImages[$gi]['alt'] }}">
+            @if($gi === 4 && $extraCount > 0)
+                <div class="gallery-overlay-count">+{{ $extraCount }}</div>
+            @endif
         </div>
+        @endfor
     </div>
     
     <!-- Quick Facts -->
     <div class="quick-facts-row">
-        <div class="quick-fact-item"><i class="fas fa-star text-warning"></i> 4.8 (890 Reviews)</div>
         <div class="quick-fact-item"><i class="fas fa-utensils"></i> {{ $restaurant->category->name ?? 'Fine Dining' }}</div>
         <div class="quick-fact-item"><i class="fas fa-door-open"></i> Open Now</div>
         <div class="quick-fact-item"><i class="fas fa-dollar-sign"></i>$$$</div>
@@ -149,42 +165,26 @@
                 </div>
             </div>
 
+            @if($restaurant->faqs && $restaurant->faqs->count() > 0)
             <!-- FAQ Section -->
             <div class="content-card">
                 <h3>Frequently Asked Questions</h3>
-                <div class="accordion accordion-flush mt-3" id="hotelFaq">
+                <div class="accordion accordion-flush mt-3" id="restaurantFaq">
+                    @foreach($restaurant->faqs as $index => $faq)
                     <div class="accordion-item border rounded-3 mb-2 overflow-hidden">
                         <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-                                Is breakfast included in the room rate?
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq{{ $index }}">
+                                {{ $faq->question }}
                             </button>
                         </h2>
-                        <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#hotelFaq">
-                            <div class="accordion-body text-muted">Yes, a complimentary hot breakfast buffet is included for all guests booking directly or through our premium partners.</div>
+                        <div id="faq{{ $index }}" class="accordion-collapse collapse" data-bs-parent="#restaurantFaq">
+                            <div class="accordion-body text-muted">{!! $faq->answer !!}</div>
                         </div>
                     </div>
-                    <div class="accordion-item border rounded-3 mb-2 overflow-hidden">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
-                                Do you offer airport shuttle service?
-                            </button>
-                        </h2>
-                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#hotelFaq">
-                            <div class="accordion-body text-muted">We offer a paid shuttle service to the local airport. Please contact the front desk 24 hours in advance to arrange transportation.</div>
-                        </div>
-                    </div>
-                    <div class="accordion-item border rounded-3 overflow-hidden">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
-                                Is there a pool on-site?
-                            </button>
-                        </h2>
-                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#hotelFaq">
-                            <div class="accordion-body text-muted">Yes, we have a heated indoor swimming pool and a hot tub available for guests from 7:00 AM to 10:00 PM daily.</div>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
             </div>
+            @endif
             
         </div>
 
@@ -195,9 +195,6 @@
                     <div>
                         <div class="text-muted small fw-bold text-uppercase mb-1">Average Cost</div>
                         <div class="sidebar-price">${{ $restaurant->starting_price ?? '45' }} <span>/person</span></div>
-                    </div>
-                    <div class="text-end">
-                        <div class="text-muted small fw-bold">890 reviews</div>
                     </div>
                 </div>
                 
@@ -221,17 +218,24 @@
         <!-- Full-Width Location & Map -->
         <div class="content-card mt-4" id="location-map">
             <h3>Location</h3>
-            <p class="text-muted mb-3"><i class="fas fa-map-marker-alt text-primary me-2"></i> {{ $hotel->address ?? 'Main Street' }}, {{ $hotel->city ?? 'Mackinac Island' }}, {{ $hotel->state ?? 'MI' }}</p>
+            <p class="text-muted mb-3"><i class="fas fa-map-marker-alt text-primary me-2"></i> {{ $restaurant->address ?? 'Main Street' }}, {{ $restaurant->city ?? 'Mackinac Island' }}, {{ $restaurant->state ?? 'MI' }}</p>
             <div class="map-container bg-light h-500px">
-                <!-- Google Maps Iframe Placeholder -->
-                <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q={{ urlencode(($hotel->address ?? 'Main Street') . ' ' . ($hotel->city ?? 'Mackinac Island')) }}&t=&z=13&ie=UTF8&iwloc=&output=embed"></iframe>
+                @if(!empty($restaurant->map_iframe))
+                    @if(str_contains($restaurant->map_iframe, '<iframe'))
+                        {!! $restaurant->map_iframe !!}
+                    @else
+                        <iframe width="100%" height="100%" frameborder="0" style="border:0;" src="{{ $restaurant->map_iframe }}"></iframe>
+                    @endif
+                @else
+                    <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q={{ urlencode(($restaurant->address ?? 'Main Street') . ' ' . ($restaurant->city ?? 'Mackinac Island')) }}&t=&z=13&ie=UTF8&iwloc=&output=embed"></iframe>
+                @endif
             </div>
             <div class="d-flex justify-content-between align-items-center mt-3">
                 <div>
                     <h6 class="fw-bold mb-1">Contact Info</h6>
-                    <p class="mb-0 text-muted small"><i class="fas fa-phone-alt me-2"></i> {{ $hotel->phone ?? '(555) 123-4567' }}</p>
+                    <p class="mb-0 text-muted small"><i class="fas fa-phone-alt me-2"></i> {{ $restaurant->phone ?? '(555) 123-4567' }}</p>
                 </div>
-                <a href="https://maps.google.com/?q={{ urlencode(($hotel->address ?? 'Main Street') . ' ' . ($hotel->city ?? 'Mackinac Island')) }}" target="_blank" class="btn btn-outline-primary rounded-pill px-4">Get Directions</a>
+                <a href="https://maps.google.com/?q={{ urlencode(($restaurant->address ?? 'Main Street') . ' ' . ($restaurant->city ?? 'Mackinac Island')) }}" target="_blank" class="btn btn-outline-primary rounded-pill px-4">Get Directions</a>
             </div>
         </div>
 
@@ -267,11 +271,9 @@
 
 <script>
     const galleryImages = [
-        "{{ !empty($restaurant->featured_image) && $restaurant->slug !== 'demo' ? asset($restaurant->featured_image) : asset('storage/demo/michigan_hotel_lobby_1783683621508.png') }}",
-        "{{ asset('storage/demo/michigan_hotel_room_1_1783683598842.png') }}",
-        "{{ asset('storage/demo/michigan_hotel_room_2_1783683609409.png') }}",
-        "{{ asset('storage/demo/michigan_hotel_pool_1783683632041.png') }}",
-        "{{ asset('storage/demo/michigan_resort_exterior_1783683587847.png') }}"
+        @foreach($allGalleryImages as $imgItem)
+        "{{ $imgItem['src'] }}",
+        @endforeach
     ];
     let currentGalleryIndex = 0;
 
@@ -331,8 +333,15 @@
             if (e.key === 'Escape') closeCustomGallery();
             if (e.key === 'ArrowRight') changeLightboxImage(1);
             if (e.key === 'ArrowLeft') changeLightboxImage(-1);
-        }
     });
 </script>
+
+<style>
+  .map-container iframe {
+    width: 100% !important;
+    height: 100% !important;
+    border: 0 !important;
+  }
+</style>
 
 @endsection
