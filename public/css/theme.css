@@ -1739,9 +1739,13 @@ padding-bottom: 80px;
     padding-bottom: 15px;
     margin-bottom: -15px;
     scrollbar-width: none; /* Firefox */
+    flex-wrap: nowrap !important;
 }
 .category-filter-wrapper::-webkit-scrollbar {
     display: none; /* Chrome/Safari */
+}
+.category-pill {
+    flex-shrink: 0;
 }
 
 .category-pill {

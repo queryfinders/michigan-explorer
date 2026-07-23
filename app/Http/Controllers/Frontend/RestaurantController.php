@@ -9,12 +9,13 @@ class RestaurantController extends Controller
 {
     public function index()
     {
-        $restaurants = \App\Models\Restaurant::with('category')->where('status', 1)->paginate(12);
+        $restaurants = \App\Models\Restaurant::with(['category', 'features', 'cuisines'])->where('status', 1)->paginate(12);
         $currentCategory = null;
-        $featuredCategories = \App\Models\RestaurantCategory::where('is_featured', 1)->take(10)->get();
-        $allCategories = \App\Models\RestaurantCategory::where('status', 1)->orderBy('name')->get();
+        $featuredCategories = \App\Models\RestaurantCategory::withCount(['restaurants' => fn($q) => $q->where('status', 1)])->where('is_featured', 1)->take(8)->get();
+        $allCategories    = \App\Models\RestaurantCategory::withCount(['restaurants' => fn($q) => $q->where('status', 1)])->where('status', 1)->orderBy('name')->get();
+        $totalRestaurants = \App\Models\Restaurant::where('status', 1)->count();
         $page = \App\Models\Page::with('seo')->where('slug', 'restaurants')->first();
-        return view('web.restaurants.index', compact('restaurants', 'currentCategory', 'featuredCategories', 'allCategories', 'page'));
+        return view('web.restaurants.index', compact('restaurants', 'currentCategory', 'featuredCategories', 'allCategories', 'totalRestaurants', 'page'));
     }
 
     public function category($slug)
@@ -23,17 +24,18 @@ class RestaurantController extends Controller
         if (!$category) {
             abort(404);
         }
-        $restaurants = \App\Models\Restaurant::with('category')->where('category_id', $category->id)->where('status', 1)->paginate(12);
+        $restaurants = \App\Models\Restaurant::with(['category', 'features', 'cuisines'])->where('restaurant_category_id', $category->id)->where('status', 1)->paginate(12);
         $currentCategory = $category;
-        $featuredCategories = \App\Models\RestaurantCategory::where('is_featured', 1)->take(10)->get();
-        $allCategories = \App\Models\RestaurantCategory::where('status', 1)->orderBy('name')->get();
+        $featuredCategories = \App\Models\RestaurantCategory::withCount(['restaurants' => fn($q) => $q->where('status', 1)])->where('is_featured', 1)->take(8)->get();
+        $allCategories    = \App\Models\RestaurantCategory::withCount(['restaurants' => fn($q) => $q->where('status', 1)])->where('status', 1)->orderBy('name')->get();
+        $totalRestaurants = \App\Models\Restaurant::where('status', 1)->count();
         $page = \App\Models\Page::with('seo')->where('slug', 'restaurants')->first();
-        return view('web.restaurants.index', compact('restaurants', 'currentCategory', 'featuredCategories', 'allCategories', 'page'));
+        return view('web.restaurants.index', compact('restaurants', 'currentCategory', 'featuredCategories', 'allCategories', 'totalRestaurants', 'page'));
     }
 
     public function show($slug)
     {
-        $restaurant = \App\Models\Restaurant::with('seo')->where('slug', $slug)->where('status', 1)->first();
+        $restaurant = \App\Models\Restaurant::with(['seo', 'features', 'cuisines', 'images', 'faqs'])->where('slug', $slug)->where('status', 1)->first();
         
         if (!$restaurant) {
             // Static Fallback Data for UI Demonstration
