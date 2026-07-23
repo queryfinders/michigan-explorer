@@ -77,14 +77,32 @@
         }
         $extraCount = count($allGalleryImages) - 5;
     @endphp
-    <div class="gallery-grid mb-4" onclick="openCustomGallery()">
-        {{-- Main featured image --}}
+    <div class="gallery-grid mb-4">
+        {{-- Main featured image or video --}}
         <div class="gallery-item main-img">
-            <img src="{{ $allGalleryImages[0]['src'] }}" alt="{{ $allGalleryImages[0]['alt'] }}">
+            @if(!empty($hotel->video))
+                <div class="video-wrapper-premium w-100 h-100">
+                    <div class="video-loading-spinner" id="videoSpinnerHotels">
+                        <div class="spinner-border text-white" role="status" style="width: 1.5rem; height: 1.5rem;">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <video class="w-100 h-100 object-fit-cover rounded-3 shadow-sm" controls autoplay muted loop playsinline style="object-fit: cover;"
+                           onplay="document.getElementById('videoSpinnerHotels').style.display='none'"
+                           onplaying="document.getElementById('videoSpinnerHotels').style.display='none'"
+                           onwaiting="document.getElementById('videoSpinnerHotels').style.display='flex'"
+                           oncanplay="document.getElementById('videoSpinnerHotels').style.display='none'">
+                        <source src="{{ asset($hotel->video) }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            @else
+                <img src="{{ $allGalleryImages[0]['src'] }}" alt="{{ $allGalleryImages[0]['alt'] }}" onclick="openCustomGallery(0)" class="cursor-pointer">
+            @endif
         </div>
         {{-- Thumbnails: show up to 4 --}}
         @for($gi = 1; $gi <= min(4, count($allGalleryImages) - 1); $gi++)
-        <div class="gallery-item">
+        <div class="gallery-item cursor-pointer" onclick="openCustomGallery({{ $gi }})">
             <img src="{{ $allGalleryImages[$gi]['src'] }}" alt="{{ $allGalleryImages[$gi]['alt'] }}">
             @if($gi === 4 && $extraCount > 0)
                 <div class="gallery-overlay-count">+{{ $extraCount }}</div>
@@ -321,7 +339,8 @@
     <button class="lightbox-nav lightbox-prev" onclick="changeLightboxImage(-1)"><i class="fas fa-chevron-left"></i></button>
     
     <div class="lightbox-image-container">
-        <img id="lightbox-main-img" src="" alt="Gallery Image">
+        <img id="lightbox-main-img" src="" alt="Gallery Image" style="display: block;">
+        <video id="lightbox-main-video" controls autoplay muted style="display: none; max-width: 90%; max-height: 80vh;" class="rounded"></video>
     </div>
     
     <button class="lightbox-nav lightbox-next" onclick="changeLightboxImage(1)"><i class="fas fa-chevron-right"></i></button>
@@ -332,15 +351,24 @@
 </div>
 
 <script>
-    const galleryImages = [
+    const galleryItemsList = [
+        @if(!empty($hotel->video))
+        { type: 'video', src: "{{ asset($hotel->video) }}" },
+        @endif
         @foreach($allGalleryImages as $gImg)
-        "{{ $gImg['src'] }}",
+        { type: 'image', src: "{{ $gImg['src'] }}" },
         @endforeach
     ];
     let currentGalleryIndex = 0;
 
     function openCustomGallery(index = 0) {
-        currentGalleryIndex = index;
+        // Adjust index if video is present (since video is placed first at index 0)
+        @if(!empty($hotel->video))
+            currentGalleryIndex = index + 1;
+        @else
+            currentGalleryIndex = index;
+        @endif
+        
         document.getElementById('customGalleryLightbox').style.display = 'flex';
         document.body.style.overflow = 'hidden'; // Disable scroll
         updateLightbox();
@@ -348,29 +376,56 @@
     }
 
     function closeCustomGallery() {
+        // Pause any playing lightbox video
+        const videoEl = document.getElementById('lightbox-main-video');
+        if (videoEl) videoEl.pause();
+        
         document.getElementById('customGalleryLightbox').style.display = 'none';
         document.body.style.overflow = 'auto'; // Re-enable scroll
     }
 
     function changeLightboxImage(direction) {
         currentGalleryIndex += direction;
-        if (currentGalleryIndex < 0) currentGalleryIndex = galleryImages.length - 1;
-        if (currentGalleryIndex >= galleryImages.length) currentGalleryIndex = 0;
+        if (currentGalleryIndex < 0) currentGalleryIndex = galleryItemsList.length - 1;
+        if (currentGalleryIndex >= galleryItemsList.length) currentGalleryIndex = 0;
         updateLightbox();
     }
 
     function updateLightbox() {
+        const item = galleryItemsList[currentGalleryIndex];
         const imgEl = document.getElementById('lightbox-main-img');
-        imgEl.style.opacity = 0;
-        setTimeout(() => {
-            imgEl.src = galleryImages[currentGalleryIndex];
-            imgEl.style.opacity = 1;
-        }, 200);
+        const videoEl = document.getElementById('lightbox-main-video');
+        
+        if (videoEl) {
+            videoEl.pause();
+            videoEl.style.display = 'none';
+        }
+        if (imgEl) {
+            imgEl.style.display = 'none';
+        }
+        
+        if (item.type === 'video') {
+            if (videoEl) {
+                videoEl.src = item.src;
+                videoEl.style.display = 'block';
+                videoEl.load();
+                videoEl.play();
+            }
+        } else {
+            if (imgEl) {
+                imgEl.style.opacity = 0;
+                imgEl.style.display = 'block';
+                setTimeout(() => {
+                    imgEl.src = item.src;
+                    imgEl.style.opacity = 1;
+                }, 200);
+            }
+        }
         
         document.getElementById('lightbox-current-idx').innerText = currentGalleryIndex + 1;
-        document.getElementById('lightbox-total-idx').innerText = galleryImages.length;
+        document.getElementById('lightbox-total-idx').innerText = galleryItemsList.length;
         
-        const thumbs = document.querySelectorAll('.lightbox-thumb');
+        const thumbs = document.querySelectorAll('.lightbox-thumb-container');
         thumbs.forEach((t, i) => {
             if (i === currentGalleryIndex) t.classList.add('active');
             else t.classList.remove('active');
@@ -380,12 +435,21 @@
     function renderThumbnails() {
         const strip = document.getElementById('lightbox-thumbnails');
         strip.innerHTML = '';
-        galleryImages.forEach((src, index) => {
-            const img = document.createElement('img');
-            img.src = src;
-            img.className = 'lightbox-thumb ' + (index === currentGalleryIndex ? 'active' : '');
-            img.onclick = () => { currentGalleryIndex = index; updateLightbox(); };
-            strip.appendChild(img);
+        galleryItemsList.forEach((item, index) => {
+            const thumbContainer = document.createElement('div');
+            thumbContainer.className = 'lightbox-thumb-container ' + (index === currentGalleryIndex ? 'active' : '');
+            
+            if (item.type === 'video') {
+                thumbContainer.innerHTML = `<div class="lightbox-thumb-video-placeholder"><i class="fas fa-play"></i></div>`;
+            } else {
+                const img = document.createElement('img');
+                img.src = item.src;
+                img.className = 'lightbox-thumb';
+                thumbContainer.appendChild(img);
+            }
+            
+            thumbContainer.onclick = () => { currentGalleryIndex = index; updateLightbox(); };
+            strip.appendChild(thumbContainer);
         });
     }
 

@@ -2799,3 +2799,56 @@ font-size: 0.85rem;
     margin-top: 10px;
 }
 
+/* Video Loading Spinner styles */
+.video-wrapper-premium {
+    position: relative;
+    background: #000;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.video-loading-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.65);
+    padding: 14px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+/* Lightbox Video Thumbnail Styles */
+.lightbox-thumb-video-placeholder {
+    width: 60px;
+    height: 45px;
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    color: #ff9f1c;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.lightbox-thumb-container {
+    opacity: 0.5;
+    transition: opacity 0.2s ease;
+    cursor: pointer;
+}
+.lightbox-thumb-container.active {
+    opacity: 1;
+}
+.lightbox-thumb-container.active .lightbox-thumb-video-placeholder {
+    border-color: #ff9f1c;
+    box-shadow: 0 0 0 2px #ff9f1c;
+}
+

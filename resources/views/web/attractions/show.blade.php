@@ -71,15 +71,35 @@
                 <div class="bg-white rounded-4 shadow-sm p-4 p-md-5 mb-4">
                     <h3 class="fw-bold mb-4 auto-style-7">Gallery</h3>
                     <div class="row g-2">
-                        <div class="col-md-8" onclick="openCustomGallery(0)" class="auto-style-13">
-                            <img src="{{ $heroImage }}" class="img-fluid rounded-3 w-100 h-100 object-fit-cover shadow-sm transition-hover" alt="Gallery 1" class="auto-style-14">
+                        <div class="col-md-8">
+                            @if(!empty($attraction->video))
+                                <div class="video-wrapper-premium w-100 h-100" style="min-height: 350px;">
+                                    <div class="video-loading-spinner" id="videoSpinnerAttractions">
+                                        <div class="spinner-border text-white" role="status" style="width: 1.5rem; height: 1.5rem;">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                    <video class="w-100 h-100 object-fit-cover rounded-3 shadow-sm" controls autoplay muted loop playsinline style="object-fit: cover; min-height: 350px;"
+                                           onplay="document.getElementById('videoSpinnerAttractions').style.display='none'"
+                                           onplaying="document.getElementById('videoSpinnerAttractions').style.display='none'"
+                                           onwaiting="document.getElementById('videoSpinnerAttractions').style.display='flex'"
+                                           oncanplay="document.getElementById('videoSpinnerAttractions').style.display='none'">
+                                        <source src="{{ asset($attraction->video) }}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                            @else
+                                <div onclick="openCustomGallery(0)" class="auto-style-13 cursor-pointer h-100">
+                                    <img src="{{ $heroImage }}" class="img-fluid rounded-3 w-100 h-100 object-fit-cover shadow-sm transition-hover" alt="Gallery 1" class="auto-style-14">
+                                </div>
+                            @endif
                         </div>
                         <div class="col-md-4">
                             <div class="row g-2 h-100">
-                                <div class="col-12 h-50" onclick="openCustomGallery(1)" class="auto-style-13">
+                                <div class="col-12 h-50 cursor-pointer" onclick="openCustomGallery(1)" class="auto-style-13">
                                     <img src="{{ asset('images/attraction_nature_1783508280642.png') }}" class="img-fluid rounded-3 w-100 h-100 object-fit-cover shadow-sm transition-hover" alt="Gallery 2">
                                 </div>
-                                <div class="col-12 h-50" onclick="openCustomGallery(2)" class="auto-style-15">
+                                <div class="col-12 h-50 cursor-pointer" onclick="openCustomGallery(2)" class="auto-style-15">
                                     <img src="{{ asset('storage/demo/michigan_lighthouse_1783683652511.png') }}" class="img-fluid rounded-3 w-100 h-100 object-fit-cover shadow-sm transition-hover" alt="Gallery 3">
                                     <div class="position-absolute top-0 start-0 w-100 rounded-3 d-flex justify-content-center align-items-center text-white fw-bold fs-4 transition-hover">
                                         +3
@@ -280,7 +300,8 @@
     <button class="lightbox-nav lightbox-prev" onclick="changeLightboxImage(-1)"><i class="fas fa-chevron-left"></i></button>
     
     <div class="lightbox-image-container">
-        <img id="lightbox-main-img" src="" alt="Gallery Image">
+        <img id="lightbox-main-img" src="" alt="Gallery Image" style="display: block;">
+        <video id="lightbox-main-video" controls autoplay muted style="display: none; max-width: 90%; max-height: 80vh;" class="rounded"></video>
     </div>
     
     <button class="lightbox-nav lightbox-next" onclick="changeLightboxImage(1)"><i class="fas fa-chevron-right"></i></button>
@@ -294,17 +315,26 @@
 
 @section('webLayoutScript')
 <script>
-    const galleryImages = [
-        "{{ $heroImage }}",
-        "{{ asset('images/attraction_nature_1783508280642.png') }}",
-        "{{ asset('storage/demo/michigan_lighthouse_1783683652511.png') }}",
-        "{{ asset('storage/demo/michigan_sleeping_bear_1783683642640.png') }}",
-        "{{ asset('storage/demo/michigan_hotel_pool_1783683632041.png') }}"
+    const galleryItemsList = [
+        @if(!empty($attraction->video))
+        { type: 'video', src: "{{ asset($attraction->video) }}" },
+        @endif
+        { type: 'image', src: "{{ $heroImage }}" },
+        { type: 'image', src: "{{ asset('images/attraction_nature_1783508280642.png') }}" },
+        { type: 'image', src: "{{ asset('storage/demo/michigan_lighthouse_1783683652511.png') }}" },
+        { type: 'image', src: "{{ asset('storage/demo/michigan_sleeping_bear_1783683642640.png') }}" },
+        { type: 'image', src: "{{ asset('storage/demo/michigan_hotel_pool_1783683632041.png') }}" }
     ];
     let currentGalleryIndex = 0;
 
     function openCustomGallery(index = 0) {
-        currentGalleryIndex = index;
+        // Adjust index if video is present (since video is placed first at index 0)
+        @if(!empty($attraction->video))
+            currentGalleryIndex = index + 1;
+        @else
+            currentGalleryIndex = index;
+        @endif
+        
         const lightbox = document.getElementById('customGalleryLightbox');
         if(lightbox) {
             lightbox.style.display = 'flex';
@@ -315,34 +345,59 @@
     }
 
     function closeCustomGallery() {
+        // Pause any playing lightbox video
+        const videoEl = document.getElementById('lightbox-main-video');
+        if (videoEl) videoEl.pause();
+        
         document.getElementById('customGalleryLightbox').style.display = 'none';
         document.body.style.overflow = 'auto'; // Re-enable scroll
     }
 
     function changeLightboxImage(direction) {
         currentGalleryIndex += direction;
-        if (currentGalleryIndex < 0) currentGalleryIndex = galleryImages.length - 1;
-        if (currentGalleryIndex >= galleryImages.length) currentGalleryIndex = 0;
+        if (currentGalleryIndex < 0) currentGalleryIndex = galleryItemsList.length - 1;
+        if (currentGalleryIndex >= galleryItemsList.length) currentGalleryIndex = 0;
         updateLightbox();
     }
 
     function updateLightbox() {
+        const item = galleryItemsList[currentGalleryIndex];
         const imgEl = document.getElementById('lightbox-main-img');
-        if(imgEl) {
-            imgEl.style.opacity = 0;
-            setTimeout(() => {
-                imgEl.src = galleryImages[currentGalleryIndex];
-                imgEl.style.opacity = 1;
-            }, 200);
+        const videoEl = document.getElementById('lightbox-main-video');
+        
+        if (videoEl) {
+            videoEl.pause();
+            videoEl.style.display = 'none';
+        }
+        if (imgEl) {
+            imgEl.style.display = 'none';
+        }
+        
+        if (item.type === 'video') {
+            if (videoEl) {
+                videoEl.src = item.src;
+                videoEl.style.display = 'block';
+                videoEl.load();
+                videoEl.play();
+            }
+        } else {
+            if (imgEl) {
+                imgEl.style.opacity = 0;
+                imgEl.style.display = 'block';
+                setTimeout(() => {
+                    imgEl.src = item.src;
+                    imgEl.style.opacity = 1;
+                }, 200);
+            }
         }
         
         const currentIdxEl = document.getElementById('lightbox-current-idx');
         const totalIdxEl = document.getElementById('lightbox-total-idx');
         
         if(currentIdxEl) currentIdxEl.innerText = currentGalleryIndex + 1;
-        if(totalIdxEl) totalIdxEl.innerText = galleryImages.length;
+        if(totalIdxEl) totalIdxEl.innerText = galleryItemsList.length;
         
-        const thumbs = document.querySelectorAll('.lightbox-thumb');
+        const thumbs = document.querySelectorAll('.lightbox-thumb-container');
         thumbs.forEach((t, i) => {
             if (i === currentGalleryIndex) t.classList.add('active');
             else t.classList.remove('active');
@@ -353,12 +408,21 @@
         const strip = document.getElementById('lightbox-thumbnails');
         if(strip) {
             strip.innerHTML = '';
-            galleryImages.forEach((src, index) => {
-                const img = document.createElement('img');
-                img.src = src;
-                img.className = 'lightbox-thumb ' + (index === currentGalleryIndex ? 'active' : '');
-                img.onclick = () => { currentGalleryIndex = index; updateLightbox(); };
-                strip.appendChild(img);
+            galleryItemsList.forEach((item, index) => {
+                const thumbContainer = document.createElement('div');
+                thumbContainer.className = 'lightbox-thumb-container ' + (index === currentGalleryIndex ? 'active' : '');
+                
+                if (item.type === 'video') {
+                    thumbContainer.innerHTML = `<div class="lightbox-thumb-video-placeholder"><i class="fas fa-play"></i></div>`;
+                } else {
+                    const img = document.createElement('img');
+                    img.src = item.src;
+                    img.className = 'lightbox-thumb';
+                    thumbContainer.appendChild(img);
+                }
+                
+                thumbContainer.onclick = () => { currentGalleryIndex = index; updateLightbox(); };
+                strip.appendChild(thumbContainer);
             });
         }
     }

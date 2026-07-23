@@ -25,10 +25,17 @@ class EventController extends Controller
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:events',
             'event_category_id' => 'required|exists:event_categories,id',
-            'status' => 'boolean'
+            'status' => 'boolean',
+            'video_file' => 'nullable|mimes:mp4,mov,ogg,qt|max:30000',
         ]);
 
-        $event = \App\Models\Event::create($request->except('_token', '_method', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup'));
+        $data = $request->except('_token', '_method', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'video_file');
+        if ($request->hasFile('video_file')) {
+            $path = $request->file('video_file')->store('events/videos', 'public');
+            $data['video'] = 'storage/' . $path;
+        }
+
+        $event = \App\Models\Event::create($data);
         
         $seoData = $request->only(['meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup']);
         $event->seo()->create($seoData);
@@ -49,10 +56,17 @@ class EventController extends Controller
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:events,slug,' . $event->id,
             'event_category_id' => 'required|exists:event_categories,id',
-            'status' => 'boolean'
+            'status' => 'boolean',
+            'video_file' => 'nullable|mimes:mp4,mov,ogg,qt|max:30000',
         ]);
 
-        $event->update($request->except('_token', '_method', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup'));
+        $data = $request->except('_token', '_method', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'video_file');
+        if ($request->hasFile('video_file')) {
+            $path = $request->file('video_file')->store('events/videos', 'public');
+            $data['video'] = 'storage/' . $path;
+        }
+
+        $event->update($data);
         
         $seoData = $request->only(['meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup']);
         if ($event->seo) {

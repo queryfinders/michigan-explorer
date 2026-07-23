@@ -8,7 +8,7 @@
     <h5 class="mb-0">Add Attraction</h5>
   </div>
   <div class="card-body">
-    <form action="{{ route('attractions.store') }}" method="POST">
+    <form action="{{ route('attractions.store') }}" method="POST" enctype="multipart/form-data">
       @csrf
       <div class="mb-3">
         <label class="form-label" for="attraction_category_id">Category</label>
@@ -59,6 +59,11 @@
       <div class="mb-3">
          <label class="form-label" for="schema_markup">Schema Markup (JSON-LD)</label>
          <textarea class="form-control" id="schema_markup" name="schema_markup" rows="8" placeholder="Enter JSON-LD Schema markup here"></textarea>
+      </div>
+      <div class="mb-3 border-top pt-3">
+        <label class="form-label fw-semibold" for="video_file">Promo Video</label>
+        <input type="file" class="form-control" id="video_file" name="video_file" accept="video/mp4,video/x-m4v,video/*" />
+        <div class="form-text">Supported: MP4, MOV, WebM. Max 30MB. This video will play on the attraction's detail page.</div>
       </div>
       <div class="mb-3">
         <label class="form-label" for="status">Status</label>

@@ -32,6 +32,7 @@ class HotelController extends Controller
             'is_featured'           => 'boolean',
             'starting_price'        => 'nullable|integer',
             'featured_image_file'   => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'video_file'            => 'nullable|mimes:mp4,mov,ogg,qt|max:30000',
             'featured_image_alt'    => 'nullable|string|max:255',
             'email'                 => 'nullable|email',
             'website'               => 'nullable|url',
@@ -45,12 +46,17 @@ class HotelController extends Controller
             'gallery_alts.*'        => 'nullable|string|max:255',
         ]);
 
-        $data = $request->except('_token', '_method', 'featured_image_file', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'amenities', 'booking_features', 'hotel_policies', 'gallery_images', 'gallery_alts', 'faqs');
+        $data = $request->except('_token', '_method', 'featured_image_file', 'video_file', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'amenities', 'booking_features', 'hotel_policies', 'gallery_images', 'gallery_alts', 'faqs');
         $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
 
         if ($request->hasFile('featured_image_file')) {
             $path = $request->file('featured_image_file')->store('hotels', 'public');
             $data['featured_image'] = 'storage/' . $path;
+        }
+
+        if ($request->hasFile('video_file')) {
+            $path = $request->file('video_file')->store('hotels/videos', 'public');
+            $data['video'] = 'storage/' . $path;
         }
 
         $hotel = \App\Models\Hotel::create($data);
@@ -152,6 +158,7 @@ class HotelController extends Controller
             'is_featured'           => 'boolean',
             'starting_price'        => 'nullable|integer',
             'featured_image_file'   => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'video_file'            => 'nullable|mimes:mp4,mov,ogg,qt|max:30000',
             'featured_image_alt'    => 'nullable|string|max:255',
             'email'                 => 'nullable|email',
             'website'               => 'nullable|url',
@@ -166,12 +173,22 @@ class HotelController extends Controller
             'delete_gallery_ids'    => 'nullable|array',
         ]);
 
-        $data = $request->except('_token', '_method', 'featured_image_file', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'amenities', 'booking_features', 'hotel_policies', 'gallery_images', 'gallery_alts', 'delete_gallery_ids', 'faqs');
+        $data = $request->except('_token', '_method', 'featured_image_file', 'video_file', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'amenities', 'booking_features', 'hotel_policies', 'gallery_images', 'gallery_alts', 'delete_gallery_ids', 'faqs');
         $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
 
         if ($request->hasFile('featured_image_file')) {
             $path = $request->file('featured_image_file')->store('hotels', 'public');
             $data['featured_image'] = 'storage/' . $path;
+        }
+
+        if ($request->hasFile('video_file')) {
+            $path = $request->file('video_file')->store('hotels/videos', 'public');
+            $data['video'] = 'storage/' . $path;
+        } elseif ($request->input('delete_video') == '1') {
+            if ($hotel->video) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete(str_replace('storage/', '', $hotel->video));
+            }
+            $data['video'] = null;
         }
 
         $hotel->update($data);

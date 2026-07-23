@@ -25,10 +25,17 @@ class AttractionController extends Controller
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:attractions',
             'attraction_category_id' => 'required|exists:attraction_categories,id',
-            'status' => 'boolean'
+            'status' => 'boolean',
+            'video_file' => 'nullable|mimes:mp4,mov,ogg,qt|max:30000',
         ]);
 
-        $attraction = \App\Models\Attraction::create($request->except('_token', '_method', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup'));
+        $data = $request->except('_token', '_method', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'video_file');
+        if ($request->hasFile('video_file')) {
+            $path = $request->file('video_file')->store('attractions/videos', 'public');
+            $data['video'] = 'storage/' . $path;
+        }
+
+        $attraction = \App\Models\Attraction::create($data);
         
         $seoData = $request->only(['meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup']);
         $attraction->seo()->create($seoData);
@@ -49,10 +56,17 @@ class AttractionController extends Controller
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:attractions,slug,' . $attraction->id,
             'attraction_category_id' => 'required|exists:attraction_categories,id',
-            'status' => 'boolean'
+            'status' => 'boolean',
+            'video_file' => 'nullable|mimes:mp4,mov,ogg,qt|max:30000',
         ]);
 
-        $attraction->update($request->except('_token', '_method', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup'));
+        $data = $request->except('_token', '_method', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'video_file');
+        if ($request->hasFile('video_file')) {
+            $path = $request->file('video_file')->store('attractions/videos', 'public');
+            $data['video'] = 'storage/' . $path;
+        }
+
+        $attraction->update($data);
         
         $seoData = $request->only(['meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup']);
         if ($attraction->seo) {

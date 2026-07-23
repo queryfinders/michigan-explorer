@@ -8,7 +8,7 @@
     <h5 class="mb-0">Edit Attraction</h5>
   </div>
   <div class="card-body">
-    <form action="{{ route('attractions.update', $attraction->id) }}" method="POST">
+    <form action="{{ route('attractions.update', $attraction->id) }}" method="POST" enctype="multipart/form-data">
       @csrf
       @method('PUT')
       <div class="mb-3">
@@ -60,6 +60,17 @@
       <div class="mb-3">
         <label class="form-label" for="schema_markup">Schema Markup (JSON-LD)</label>
         <textarea class="form-control" id="schema_markup" name="schema_markup" rows="8" placeholder="Enter JSON-LD Schema markup here">{{ $attraction->seo->schema_markup ?? '' }}</textarea>
+      </div>
+      <div class="mb-3 border-top pt-3">
+        <label class="form-label fw-semibold" for="video_file">Promo Video</label>
+        <input type="file" class="form-control" id="video_file" name="video_file" accept="video/mp4,video/x-m4v,video/*" />
+        <div class="form-text">Supported: MP4, MOV, WebM. Max 30MB. This video will play on the attraction's detail page.</div>
+        @if($attraction->video)
+          <div class="mt-2">
+            <span class="text-success small"><i class="fas fa-video me-1"></i> Current video uploaded: </span>
+            <a href="{{ asset($attraction->video) }}" target="_blank" class="small fw-bold">{{ basename($attraction->video) }}</a>
+          </div>
+        @endif
       </div>
       <div class="mb-3">
         <label class="form-label" for="status">Status</label>

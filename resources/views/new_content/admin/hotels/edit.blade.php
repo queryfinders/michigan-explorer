@@ -253,7 +253,7 @@
 
         </div>
 
-        <!-- Tab 3: Featured Image -->
+        <!-- Tab 3: Featured Image & Video -->
         <div class="tab-pane fade" id="featured-pane" role="tabpanel" aria-labelledby="featured-tab">
           <div class="mb-3">
             <label class="form-label fw-semibold" for="featured_image_file">Featured Image</label>
@@ -277,16 +277,53 @@
             <input type="text" class="form-control" id="featured_image_alt" name="featured_image_alt" value="{{ $hotel->featured_image_alt }}" placeholder="e.g. Exterior view of Grand Hotel Resort in Mackinac Island" />
             <div class="form-text">Describe the image clearly for search engines and accessibility.</div>
           </div>
+          <div class="mb-3 border-top pt-3">
+            <label class="form-label fw-semibold" for="video_file">Promo Video</label>
+            <input type="file" class="form-control" id="video_file" name="video_file" accept="video/mp4,video/x-m4v,video/*" />
+            <div class="form-text">Supported: MP4, MOV, WebM. Max 30MB. This video will play on the hotel's detail page.</div>
+            @if($hotel->video)
+              <div class="mt-2">
+                <span class="text-success small"><i class="fas fa-video me-1"></i> Current video uploaded: </span>
+                <a href="{{ asset($hotel->video) }}" target="_blank" class="small fw-bold">{{ basename($hotel->video) }}</a>
+              </div>
+            @endif
+          </div>
         </div>
 
         <!-- Tab 4: Gallery -->
         <div class="tab-pane fade" id="gallery-pane" role="tabpanel" aria-labelledby="gallery-tab">
           
           <!-- Existing Gallery Images -->
-          @if($hotel->images->count() > 0)
+          @if($hotel->images->count() > 0 || !empty($hotel->video))
           <div class="mb-4">
-            <label class="form-label fw-semibold">Current Gallery ({{ $hotel->images->count() }} images)</label>
+            <label class="form-label fw-semibold">Current Gallery & Video</label>
             <div class="row g-3" id="existing-gallery-grid">
+              @if(!empty($hotel->video))
+              <div class="col-md-3 col-sm-4 col-6" id="gallery-video-container">
+                <div class="card border position-relative bg-light">
+                  <div class="card-img-top d-flex align-items-center justify-content-center bg-dark text-white position-relative" style="height:140px;overflow:hidden;">
+                    <video class="w-100 h-100 object-fit-cover" muted style="object-fit: cover;">
+                      <source src="{{ asset($hotel->video) }}" type="video/mp4">
+                    </video>
+                    <div class="position-absolute d-flex align-items-center justify-content-center text-white bg-dark bg-opacity-50 rounded-circle" style="width: 40px; height: 40px; pointer-events: none; top:50%; left:50%; transform:translate(-50%, -50%);">
+                      <i class="fas fa-play"></i>
+                    </div>
+                  </div>
+                  <div class="card-body p-2 text-center">
+                    <small class="fw-bold text-success"><i class="fas fa-video me-1"></i> Hotel Video</small>
+                  </div>
+                  <div class="position-absolute top-0 end-0 m-1">
+                    <input type="checkbox" name="delete_video" value="1" id="del_video" class="form-check-input gallery-delete-cb" onchange="toggleVideoDeleteOverlay(this)" />
+                    <label for="del_video" class="btn btn-danger btn-sm py-0 px-1" title="Mark for deletion">
+                      <i class="fa fa-trash"></i>
+                    </label>
+                  </div>
+                  <div id="overlay-video" class="position-absolute top-0 start-0 w-100 h-100 bg-danger bg-opacity-50 d-none align-items-center justify-content-center rounded">
+                    <span class="text-white fw-bold small">Will be deleted</span>
+                  </div>
+                </div>
+              </div>
+              @endif
               @foreach($hotel->images as $img)
               <div class="col-md-3 col-sm-4 col-6" id="gallery-item-{{ $img->id }}">
                 <div class="card border position-relative">
@@ -714,6 +751,12 @@
   // ===== Gallery delete overlay =====
   function toggleDeleteOverlay(cb, id) {
     const overlay = document.getElementById('overlay-' + id);
+    if (cb.checked) { overlay.classList.remove('d-none'); overlay.classList.add('d-flex'); }
+    else { overlay.classList.remove('d-flex'); overlay.classList.add('d-none'); }
+  }
+
+  function toggleVideoDeleteOverlay(cb) {
+    const overlay = document.getElementById('overlay-video');
     if (cb.checked) { overlay.classList.remove('d-none'); overlay.classList.add('d-flex'); }
     else { overlay.classList.remove('d-flex'); overlay.classList.add('d-none'); }
   }

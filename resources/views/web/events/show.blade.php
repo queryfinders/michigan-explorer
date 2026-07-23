@@ -74,6 +74,28 @@
                     </div>
                 </div>
                 
+                @if(!empty($event->video))
+                <!-- Event Video Preview -->
+                <div class="bg-white rounded-4 shadow-sm p-4 p-md-5 mb-4">
+                    <h3 class="fw-bold mb-4 auto-style-7">Event Preview Video</h3>
+                    <div class="video-wrapper-premium w-100 h-100">
+                        <div class="video-loading-spinner" id="videoSpinnerEvents">
+                            <div class="spinner-border text-white" role="status" style="width: 1.5rem; height: 1.5rem;">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        <video class="w-100 h-100 object-fit-cover rounded-3 shadow-sm" controls autoplay muted loop playsinline style="object-fit: cover;"
+                               onplay="document.getElementById('videoSpinnerEvents').style.display='none'"
+                               onplaying="document.getElementById('videoSpinnerEvents').style.display='none'"
+                               onwaiting="document.getElementById('videoSpinnerEvents').style.display='flex'"
+                               oncanplay="document.getElementById('videoSpinnerEvents').style.display='none'">
+                            <source src="{{ asset($event->video) }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                </div>
+                @endif
+                
                 <!-- About Description -->
                 <div class="bg-white rounded-4 shadow-sm p-4 p-md-5 mb-4">
                     <h3 class="fw-bold mb-4 auto-style-7">About this Event</h3>

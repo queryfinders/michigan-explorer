@@ -234,7 +234,7 @@
             </div>
           </div>
         </div>
-        <!-- Tab 3: Featured Image -->
+        <!-- Tab 3: Featured Image & Video -->
         <div class="tab-pane fade" id="featured-pane" role="tabpanel" aria-labelledby="featured-tab">
           <div class="mb-3">
             <label class="form-label fw-semibold" for="featured_image_file">Featured Image</label>
@@ -249,6 +249,11 @@
             <label class="form-label" for="featured_image_alt">Image Alt Text (SEO)</label>
             <input type="text" class="form-control" id="featured_image_alt" name="featured_image_alt" placeholder="e.g. Exterior view of Grand Hotel Resort in Mackinac Island" />
             <div class="form-text">Describe the image clearly for search engines and accessibility.</div>
+          </div>
+          <div class="mb-3 border-top pt-3">
+            <label class="form-label fw-semibold" for="video_file">Promo Video</label>
+            <input type="file" class="form-control" id="video_file" name="video_file" accept="video/mp4,video/x-m4v,video/*" />
+            <div class="form-text">Supported: MP4, MOV, WebM. Max 30MB. This video will play on the hotel's detail page.</div>
           </div>
         </div>
 
