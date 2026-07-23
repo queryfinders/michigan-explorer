@@ -54,11 +54,11 @@
 <section class="py-4 border-bottom bg-white shadow-sm position-relative z-index-1">
     <div class="container">
         <h6 class="text-uppercase text-muted fw-bold small mb-3 tracking-wider">Browse by Category</h6>
-        <div class="category-filter-wrapper d-flex align-items-center flex-wrap gap-2 pb-2">
+        <div class="category-filter-wrapper d-flex align-items-center gap-2 pb-2">
             
             <a href="{{ route('web.restaurants.index') }}" class="category-pill {{ !isset($currentCategory) ? 'active' : '' }}">
-                <span class="cat-name">All Places</span>
-                <span class="cat-count">86</span>
+                <span class="cat-name">All</span>
+                <span class="cat-count">{{ $totalRestaurants ?? 0 }}</span>
             </a>
 
             @php
@@ -80,15 +80,15 @@
                     $displayCategories[count($displayCategories) - 1] = $currentCategory->toArray();
                 }
                 
-                // Limit to 6 categories to ensure it fills reasonable space without wrapping on desktop
-                $displayCategories = array_slice($displayCategories, 0, 6);
+                // Show up to 8 categories
+                $displayCategories = array_slice($displayCategories, 0, 8);
             @endphp
 
             @foreach($displayCategories as $cat)
                 @php $catObj = (object)$cat; @endphp
                 <a href="{{ route('web.restaurants.category', $catObj->slug) }}" class="category-pill {{ (isset($currentCategory) && $currentCategory->id === $catObj->id) ? 'active' : '' }}">
                     <span class="cat-name">{{ $catObj->name }}</span>
-                    <span class="cat-count">{{ $catObj->restaurants_count ?? 24 }}</span>
+                    <span class="cat-count">{{ $catObj->restaurants_count ?? 0 }}</span>
                 </a>
             @endforeach
 
@@ -102,10 +102,10 @@
 </section>
 
 <!-- 3. Restaurant Listing Grid -->
-<section class="py-5 auto-style-8">
-    <div class="container py-4">
+<section class="py-4 auto-style-8">
+    <div class="container pt-3 pb-4">
         
-        <div class="d-flex justify-content-between align-items-end mb-5">
+        <div class="d-flex justify-content-between align-items-end mb-4">
             <div>
                 <h2 class="fw-bold mb-0 auto-style-9">{{ isset($currentCategory) ? 'Showing ' . $restaurants->total() . ' ' . $currentCategory->name : 'Available Restaurants' }}</h2>
                 <p class="text-muted mt-2 mb-0">Showing {{ $restaurants->count() }} of {{ $restaurants->total() }} restaurants found</p>
