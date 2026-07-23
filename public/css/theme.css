@@ -2852,3 +2852,19 @@ font-size: 0.85rem;
     box-shadow: 0 0 0 2px #ff9f1c;
 }
 
+/* ===== Sticky Category Filter Bar ===== */
+.category-filter-bar-sticky {
+    position: sticky;
+    top: 75px;
+    z-index: 999;
+    transition: box-shadow 0.2s ease;
+}
+
+.category-filter-bar-sticky.pills-collapsed {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+}
+
+/* Smooth hide/show of pills during collapse */
+.category-filter-bar-sticky .category-filter-wrapper .category-pill {
+    transition: opacity 0.2s ease;
+}

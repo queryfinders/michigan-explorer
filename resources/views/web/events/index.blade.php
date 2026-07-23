@@ -40,7 +40,7 @@
                 @php
                     $displayCategories = isset($featuredCategories) ? $featuredCategories->toArray() : [];
                     // Limit to 5 categories to ensure it fills reasonable space without wrapping on desktop
-                    $displayCategories = array_slice($displayCategories, 0, 5);
+                    $displayCategories = array_slice($displayCategories, 0, 8);
                 @endphp
 
                 @foreach($displayCategories as $cat)

@@ -207,3 +207,42 @@ function shareCurrentPage(title) {
     }
 }
 </script>
+
+<script>
+// Collapse category pills when sticky bar touches navbar
+(function() {
+    const categoryBar = document.querySelector('.category-filter-bar-sticky');
+    if (!categoryBar) return;
+
+    const navbar = document.getElementById('mainNav');
+    const pills = categoryBar.querySelectorAll('.category-filter-wrapper .category-pill');
+
+    function updatePillVisibility() {
+        const navbarBottom = navbar ? navbar.getBoundingClientRect().bottom : 75;
+        const barTop = categoryBar.getBoundingClientRect().top;
+
+        // When bar is at or above navbar bottom (i.e. it has scrolled up and is now stuck)
+        if (barTop <= navbarBottom + 5) {
+            // Collapsed: show only first 5 pills (index 0 = All, 1-5 = categories)
+            pills.forEach(function(pill, i) {
+                // pills[0] is "All", pills[1..5] are categories, pills[6..] are hidden
+                if (i >= 5) {
+                    pill.style.display = 'none';
+                } else {
+                    pill.style.display = '';
+                }
+            });
+            categoryBar.classList.add('pills-collapsed');
+        } else {
+            // Expanded: show all pills
+            pills.forEach(function(pill) {
+                pill.style.display = '';
+            });
+            categoryBar.classList.remove('pills-collapsed');
+        }
+    }
+
+    window.addEventListener('scroll', updatePillVisibility, { passive: true });
+    updatePillVisibility(); // run on load
+})();
+</script>

@@ -51,7 +51,7 @@
 </section>
 
 <!-- 2. Browse by Category -->
-<section class="py-4 border-bottom bg-white shadow-sm position-relative z-index-1">
+<section class="category-filter-bar-sticky py-4 border-bottom bg-white shadow-sm position-relative z-index-1">
     <div class="container">
         <h6 class="text-uppercase text-muted fw-bold small mb-3 tracking-wider">Browse by Category</h6>
         <div class="category-filter-wrapper d-flex align-items-center gap-2 pb-2">
