@@ -16,7 +16,6 @@
           <th>ID</th>
           <th>Name</th>
           <th>Slug</th>
-          <th>Status</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -26,12 +25,6 @@
           <td>{{ $category->id }}</td>
           <td>{{ $category->name }}</td>
           <td>{{ $category->slug }}</td>
-          <td>
-            <label class="switch">
-              <input type="checkbox" class="switch-input category-status-switch" data-id="{{ $category->id }}" data-status="{{ $category->status }}" {{ $category->status == 1 ? 'checked' : '' }}>
-              <span class="switch-toggle-slider"></span>
-            </label>
-          </td>
           <td>
             <a href="{{ route('hotel-categories.edit', $category->id) }}" class="btn btn-sm btn-primary"><i class="fa fa-edit"></i></a>
             <form action="{{ route('hotel-categories.destroy', $category->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure?');">

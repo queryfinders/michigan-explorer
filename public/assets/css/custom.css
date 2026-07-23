@@ -1,4 +1,202 @@
+/* Color System - Defining colors centrally using CSS Variables */
+:root {
+  /* Website Brand Theme Colors */
+  --admin-primary: #0160e7;
+  --admin-primary-hover: #0056b3;
+  --admin-primary-rgb: 1, 96, 231;
+  --admin-primary-light: #e6f0fd;
+  
+  --admin-accent: #f5a623;
+  --admin-accent-hover: #e09210;
+  
+  --admin-success: #10b981;
+  --admin-warning: var(--admin-accent);
+  --admin-danger: #ef4444;
+  --admin-info: #06b6d4;
+  
+  --admin-bg-body: #f8fafc;
+  --admin-bg-card: #ffffff;
+  --admin-border-color: #e2e8f0;
+  --admin-text-muted: #64748b;
+  --admin-text-dark: #1e293b;
 
+  /* Gradient definitions */
+  --admin-gradient-primary: linear-gradient(135deg, var(--admin-primary) 0%, #0056b3 100%);
+  --admin-gradient-hover: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+  
+  /* Overrides for Framework variables */
+  --bs-primary: var(--admin-primary) !important;
+  --bs-primary-rgb: var(--admin-primary-rgb) !important;
+  --bs-primary-hover: var(--admin-primary-hover) !important;
+  
+  --bs-body-bg: var(--admin-bg-body) !important;
+  --bs-card-bg: var(--admin-bg-card) !important;
+  
+  --bs-success: var(--admin-success) !important;
+  --bs-warning: var(--admin-warning) !important;
+  --bs-danger: var(--admin-danger) !important;
+  --bs-info: var(--admin-info) !important;
+}
+
+/* Base Body Style */
+body {
+  font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  background-color: var(--bs-body-bg) !important;
+}
+
+/* Sidebar Menu styling */
+.layout-menu {
+  background-color: var(--admin-bg-card) !important;
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.03) !important;
+  border-right: 1px solid var(--admin-border-color) !important;
+}
+
+.menu-vertical .menu-item.active > .menu-link {
+  background: var(--admin-gradient-primary) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px 0 rgba(var(--admin-primary-rgb), 0.3) !important;
+  border-radius: 8px !important;
+}
+
+.menu-vertical .menu-item .menu-link {
+  border-radius: 8px !important;
+  margin: 2px 12px !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.menu-vertical .menu-item .menu-link:hover {
+  background-color: #f1f5f9 !important;
+  color: var(--admin-text-dark) !important;
+}
+
+/* Main Navbar Styling */
+.layout-navbar {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03) !important;
+  margin-top: 15px !important;
+  margin-bottom: 25px !important;
+}
+
+/* Cards styling */
+.card {
+  border: 1px solid var(--admin-border-color) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.02), 0 8px 10px -6px rgba(0, 0, 0, 0.02) !important;
+  background-color: var(--admin-bg-card) !important;
+  transition: box-shadow 0.3s ease !important;
+}
+
+.card:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.04), 0 10px 10px -5px rgba(0, 0, 0, 0.03) !important;
+}
+
+/* Tabs styling */
+.nav-tabs .nav-link {
+  border: none !important;
+  border-bottom: 2px solid transparent !important;
+  color: var(--admin-text-muted) !important;
+  font-weight: 500 !important;
+  padding: 12px 20px !important;
+  transition: all 0.25s ease !important;
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--admin-primary) !important;
+  border-bottom: 2px solid var(--admin-primary) !important;
+  background: transparent !important;
+}
+
+.nav-tabs .nav-link:hover:not(.active) {
+  color: var(--admin-text-dark) !important;
+  border-bottom: 2px solid #cbd5e1 !important;
+}
+
+/* Forms styling */
+.form-control, .form-select {
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  padding: 10px 14px !important;
+  font-size: 0.95rem !important;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--admin-primary) !important;
+  box-shadow: 0 0 0 4px rgba(var(--admin-primary-rgb), 0.1) !important;
+}
+
+/* Buttons styling */
+.btn-primary {
+  background: var(--admin-gradient-primary) !important;
+  border: none !important;
+  box-shadow: 0 4px 6px -1px rgba(var(--admin-primary-rgb), 0.2), 0 2px 4px -2px rgba(var(--admin-primary-rgb), 0.1) !important;
+  transition: all 0.2s ease-in-out !important;
+  font-weight: 500 !important;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 10px 15px -3px rgba(var(--admin-primary-rgb), 0.3), 0 4px 6px -4px rgba(var(--admin-primary-rgb), 0.2) !important;
+}
+
+.btn-primary:active {
+  transform: translateY(1px) !important;
+}
+
+.btn-warning {
+  background: var(--admin-accent) !important;
+  border: none !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 6px -1px rgba(245, 166, 35, 0.2) !important;
+  transition: all 0.2s ease-in-out !important;
+  font-weight: 500 !important;
+}
+
+.btn-warning:hover {
+  background: var(--admin-accent-hover) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 10px 15px -3px rgba(245, 166, 35, 0.3) !important;
+  color: #ffffff !important;
+}
+
+.btn-warning:active {
+  transform: translateY(1px) !important;
+}
+
+/* Table styling */
+.table {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+
+/* Compact table spacing to prevent excessive vertical scrolling */
+.table th {
+  background-color: var(--admin-bg-body) !important;
+  color: #475569 !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.05em !important;
+  border-bottom: 2px solid var(--admin-border-color) !important;
+  padding: 10px 16px !important;
+}
+
+.table td {
+  padding: 10px 16px !important;
+  vertical-align: middle !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+}
+
+.table tbody tr {
+  transition: background-color 0.2s ease !important;
+}
+
+.table tbody tr:hover {
+  background-color: var(--admin-bg-body) !important;
+}
 
 @media only screen and (min-width: 576px){
     .dataTables_filter{margin-right: 1.5rem !important;}
@@ -13,8 +211,5 @@
   justify-content: start;
 }
 .primary_hr{
-  color: #7367f0;
+  color: var(--admin-primary);
 }
-
-  
-  

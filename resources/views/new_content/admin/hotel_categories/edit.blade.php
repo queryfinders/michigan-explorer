@@ -11,25 +11,21 @@
     <form action="{{ route('hotel-categories.update', $hotelCategory->id) }}" method="POST">
       @csrf
       @method('PUT')
-      <div class="mb-3">
-        <label class="form-label" for="name">Name</label>
-        <input type="text" class="form-control" id="name" name="name" value="{{ $hotelCategory->name }}" required />
-      </div>
-      <div class="mb-3">
-        <label class="form-label" for="slug">Slug</label>
-        <input type="text" class="form-control" id="slug" name="slug" value="{{ $hotelCategory->slug }}" required />
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label" for="name">Name</label>
+          <input type="text" class="form-control" id="name" name="name" value="{{ $hotelCategory->name }}" required />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="slug">Slug</label>
+          <input type="text" class="form-control" id="slug" name="slug" value="{{ $hotelCategory->slug }}" required />
+        </div>
       </div>
       <div class="mb-3">
         <label class="form-label" for="description">Description</label>
         <textarea class="form-control tinymce" id="description" name="description">{{ $hotelCategory->description }}</textarea>
       </div>
-      <div class="mb-3">
-        <label class="form-label" for="status">Status</label>
-        <select class="form-select" id="status" name="status">
-          <option value="1" {{ $hotelCategory->status == 1 ? 'selected' : '' }}>Active</option>
-          <option value="0" {{ $hotelCategory->status == 0 ? 'selected' : '' }}>Inactive</option>
-        </select>
-      </div>
+      <input type="hidden" name="status" value="{{ $hotelCategory->status }}" />
       <button type="submit" class="btn btn-primary">Update</button>
       <a href="{{ route('hotel-categories.index') }}" class="btn btn-secondary">Cancel</a>
     </form>

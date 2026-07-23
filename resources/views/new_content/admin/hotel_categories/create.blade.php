@@ -10,25 +10,21 @@
   <div class="card-body">
     <form action="{{ route('hotel-categories.store') }}" method="POST">
       @csrf
-      <div class="mb-3">
-        <label class="form-label" for="name">Name</label>
-        <input type="text" class="form-control" id="name" name="name" required />
-      </div>
-      <div class="mb-3">
-        <label class="form-label" for="slug">Slug</label>
-        <input type="text" class="form-control" id="slug" name="slug" required />
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label" for="name">Name</label>
+          <input type="text" class="form-control" id="name" name="name" required />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="slug">Slug</label>
+          <input type="text" class="form-control" id="slug" name="slug" required />
+        </div>
       </div>
       <div class="mb-3">
         <label class="form-label" for="description">Description</label>
         <textarea class="form-control tinymce" id="description" name="description"></textarea>
       </div>
-      <div class="mb-3">
-        <label class="form-label" for="status">Status</label>
-        <select class="form-select" id="status" name="status">
-          <option value="1">Active</option>
-          <option value="0">Inactive</option>
-        </select>
-      </div>
+      <input type="hidden" name="status" value="1" />
       <button type="submit" class="btn btn-primary">Save</button>
       <a href="{{ route('hotel-categories.index') }}" class="btn btn-secondary">Cancel</a>
     </form>
