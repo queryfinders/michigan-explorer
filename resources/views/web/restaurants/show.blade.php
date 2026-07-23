@@ -98,19 +98,23 @@
             </div>
 
             <!-- Amenities (Cuisine) -->
+            @if((isset($restaurant->cuisines) && $restaurant->cuisines instanceof \Illuminate\Support\Collection && $restaurant->cuisines->count() > 0) || (isset($restaurant->features) && $restaurant->features instanceof \Illuminate\Support\Collection && $restaurant->features->count() > 0))
             <div class="content-card">
                 <h3 class="mb-4">Cuisine & Features</h3>
                 <div class="amenities-grid-premium">
-                    <div class="amenity-card"><i class="fas fa-pizza-slice"></i><span>Italian</span></div>
-                    <div class="amenity-card"><i class="fas fa-fish"></i><span>Seafood</span></div>
-                    <div class="amenity-card"><i class="fas fa-drumstick-bite"></i><span>Steakhouse</span></div>
-                    <div class="amenity-card"><i class="fas fa-leaf"></i><span>Vegetarian Options</span></div>
-                    <div class="amenity-card"><i class="fas fa-wine-glass-alt"></i><span>Fine Wine</span></div>
-                    <div class="amenity-card"><i class="fas fa-ice-cream"></i><span>Desserts</span></div>
-                    <div class="amenity-card"><i class="fas fa-coffee"></i><span>Cafe</span></div>
-                    <div class="amenity-card"><i class="fas fa-parking"></i><span>Valet Parking</span></div>
+                    @if(isset($restaurant->cuisines) && $restaurant->cuisines instanceof \Illuminate\Support\Collection)
+                        @foreach($restaurant->cuisines as $cuisine)
+                        <div class="amenity-card"><i class="fas fa-utensils"></i><span>{{ $cuisine->name }}</span></div>
+                        @endforeach
+                    @endif
+                    @if(isset($restaurant->features) && $restaurant->features instanceof \Illuminate\Support\Collection)
+                        @foreach($restaurant->features as $feature)
+                        <div class="amenity-card"><i class="{{ $feature->icon_class ?? 'fas fa-star' }}"></i><span>{{ $feature->name }}</span></div>
+                        @endforeach
+                    @endif
                 </div>
             </div>
+            @endif
 
             <!-- Hotel Information -> Opening Hours -->
             <div class="content-card">

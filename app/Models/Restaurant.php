@@ -27,4 +27,14 @@ class Restaurant extends Model
     {
         return $this->hasMany(RestaurantFaq::class)->orderBy('sort_order');
     }
+
+    public function cuisines()
+    {
+        return $this->belongsToMany(RestaurantCuisine::class, 'restaurant_cuisine', 'restaurant_id', 'cuisine_id');
+    }
+
+    public function features()
+    {
+        return $this->belongsToMany(RestaurantFeature::class, 'restaurant_feature', 'restaurant_id', 'feature_id');
+    }
 }

@@ -8,6 +8,8 @@ use App\Models\Restaurant;
 use App\Models\RestaurantCategory;
 use App\Models\RestaurantImage;
 use App\Models\RestaurantFaq;
+use App\Models\RestaurantCuisine;
+use App\Models\RestaurantFeature;
 use Illuminate\Support\Facades\Storage;
 
 class RestaurantController extends Controller
@@ -21,7 +23,9 @@ class RestaurantController extends Controller
     public function create()
     {
         $categories = RestaurantCategory::where('status', 1)->get();
-        return view('new_content.admin.restaurants.create', compact('categories'));
+        $cuisines = RestaurantCuisine::where('status', 1)->orderBy('sort_order')->get();
+        $features = RestaurantFeature::where('status', 1)->orderBy('sort_order')->get();
+        return view('new_content.admin.restaurants.create', compact('categories', 'cuisines', 'features'));
     }
 
     public function store(Request $request)
@@ -43,10 +47,18 @@ class RestaurantController extends Controller
             'map_iframe'            => 'nullable|string',
             'gallery_images.*'      => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
             'gallery_alts.*'        => 'nullable|string|max:255',
+            'cuisines'              => 'nullable|array',
+            'cuisines.*'            => 'exists:restaurant_cuisines,id',
+            'features'              => 'nullable|array',
+            'features.*'            => 'exists:restaurant_features,id',
         ]);
 
-        $data = $request->except('_token', '_method', 'featured_image_file', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'gallery_images', 'gallery_alts', 'faqs');
+        $data = $request->except('_token', '_method', 'featured_image_file', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'gallery_images', 'gallery_alts', 'faqs', 'cuisines', 'features');
         $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
+
+        // Comma-separated list for backward compatibility on frontend string rendering
+        $selectedCuisines = RestaurantCuisine::whereIn('id', $request->input('cuisines', []))->pluck('name')->toArray();
+        $data['cuisine'] = implode(', ', $selectedCuisines);
 
         if ($request->hasFile('featured_image_file')) {
             $path = $request->file('featured_image_file')->store('restaurants', 'public');
@@ -54,6 +66,10 @@ class RestaurantController extends Controller
         }
 
         $restaurant = Restaurant::create($data);
+
+        // Sync pivot relations
+        $restaurant->cuisines()->sync($request->input('cuisines', []));
+        $restaurant->features()->sync($request->input('features', []));
 
         // Handle gallery images
         if ($request->hasFile('gallery_images')) {
@@ -89,15 +105,15 @@ class RestaurantController extends Controller
             '@type' => 'Restaurant',
             'name' => $restaurant->name,
             'description' => trim(preg_replace('/\s+/', ' ', html_entity_decode(strip_tags($request->short_description ?: $request->description), ENT_QUOTES, 'UTF-8'))),
-            'url' => $request->website,
+            'url' => $restaurant->website,
             'telephone' => $restaurant->phone,
-            'email' => $request->email,
+            'email' => $restaurant->email,
             'address' => [
                 '@type' => 'PostalAddress',
-                'streetAddress' => $request->address,
-                'addressLocality' => $request->city,
+                'streetAddress' => $restaurant->address,
+                'addressLocality' => $restaurant->city,
                 'addressRegion' => 'MI',
-                'postalCode' => $request->zip,
+                'postalCode' => $restaurant->zip,
                 'addressCountry' => 'US'
             ]
         ];
@@ -141,9 +157,11 @@ class RestaurantController extends Controller
 
     public function edit(Restaurant $restaurant)
     {
-        $restaurant->load(['seo', 'images', 'faqs']);
+        $restaurant->load(['seo', 'images', 'faqs', 'cuisines', 'features']);
         $categories = RestaurantCategory::where('status', 1)->get();
-        return view('new_content.admin.restaurants.edit', compact('restaurant', 'categories'));
+        $cuisines = RestaurantCuisine::where('status', 1)->orderBy('sort_order')->get();
+        $features = RestaurantFeature::where('status', 1)->orderBy('sort_order')->get();
+        return view('new_content.admin.restaurants.edit', compact('restaurant', 'categories', 'cuisines', 'features'));
     }
 
     public function update(Request $request, Restaurant $restaurant)
@@ -166,10 +184,18 @@ class RestaurantController extends Controller
             'gallery_images.*'      => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
             'gallery_alts.*'        => 'nullable|string|max:255',
             'delete_gallery_ids'    => 'nullable|array',
+            'cuisines'              => 'nullable|array',
+            'cuisines.*'            => 'exists:restaurant_cuisines,id',
+            'features'              => 'nullable|array',
+            'features.*'            => 'exists:restaurant_features,id',
         ]);
 
-        $data = $request->except('_token', '_method', 'featured_image_file', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'gallery_images', 'gallery_alts', 'delete_gallery_ids', 'faqs');
+        $data = $request->except('_token', '_method', 'featured_image_file', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'gallery_images', 'gallery_alts', 'delete_gallery_ids', 'faqs', 'cuisines', 'features');
         $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
+
+        // Comma-separated list for backward compatibility on frontend string rendering
+        $selectedCuisines = RestaurantCuisine::whereIn('id', $request->input('cuisines', []))->pluck('name')->toArray();
+        $data['cuisine'] = implode(', ', $selectedCuisines);
 
         if ($request->hasFile('featured_image_file')) {
             // Delete old featured image if exists
@@ -182,6 +208,10 @@ class RestaurantController extends Controller
         }
 
         $restaurant->update($data);
+
+        // Sync pivot relations
+        $restaurant->cuisines()->sync($request->input('cuisines', []));
+        $restaurant->features()->sync($request->input('features', []));
 
         // Delete selected gallery images
         if ($request->has('delete_gallery_ids')) {

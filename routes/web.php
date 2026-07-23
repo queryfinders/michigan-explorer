@@ -106,6 +106,16 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::resource('/admin/restaurant-categories', \App\Http\Controllers\Admin\RestaurantCategoryController::class);
     Route::resource('/admin/restaurants', \App\Http\Controllers\Admin\RestaurantController::class);
 
+    // Cuisines Module
+    Route::post('/admin/cuisines/quick-store', [\App\Http\Controllers\Admin\CuisineController::class, 'quickStore'])->name('cuisines.quick-store');
+    Route::get('/admin/cuisines/status/{id}/{status}', [\App\Http\Controllers\Admin\CuisineController::class, 'changeStatus'])->name('cuisines.status');
+    Route::resource('/admin/cuisines', \App\Http\Controllers\Admin\CuisineController::class);
+
+    // Features Module
+    Route::post('/admin/features/quick-store', [\App\Http\Controllers\Admin\FeatureController::class, 'quickStore'])->name('features.quick-store');
+    Route::get('/admin/features/status/{id}/{status}', [\App\Http\Controllers\Admin\FeatureController::class, 'changeStatus'])->name('features.status');
+    Route::resource('/admin/features', \App\Http\Controllers\Admin\FeatureController::class);
+
     // Attractions Module
     Route::resource('/admin/attraction-categories', \App\Http\Controllers\Admin\AttractionCategoryController::class);
     Route::resource('/admin/attractions', \App\Http\Controllers\Admin\AttractionController::class);

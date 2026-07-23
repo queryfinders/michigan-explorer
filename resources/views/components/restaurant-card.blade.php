@@ -54,13 +54,20 @@
         </p>
         
         <!-- Premium Amenities Row (Restaurant) -->
+        @if(isset($restaurant->features) && $restaurant->features instanceof \Illuminate\Support\Collection && $restaurant->features->count() > 0)
         <div class="listing-amenities d-flex align-items-center gap-3 mb-4 mt-auto text-secondary fs-sm">
-            <span data-bs-toggle="tooltip" title="Outdoor Seating"><i class="fas fa-chair text-primary opacity-75"></i></span>
-            <span data-bs-toggle="tooltip" title="Wine Bar"><i class="fas fa-wine-glass text-primary opacity-75"></i></span>
-            <span data-bs-toggle="tooltip" title="Family Friendly"><i class="fas fa-child text-primary opacity-75"></i></span>
-            <span data-bs-toggle="tooltip" title="Parking"><i class="fas fa-parking text-primary opacity-75"></i></span>
-            <span class="ms-auto fw-bold text-primary fs-xs">+3 MORE</span>
+            @foreach($restaurant->features->take(4) as $feature)
+                <span data-bs-toggle="tooltip" title="{{ $feature->name }}"><i class="{{ $feature->icon_class ?? 'fas fa-star' }} text-primary opacity-75"></i></span>
+            @endforeach
+            @if($restaurant->features->count() > 4)
+                <span class="ms-auto fw-bold text-primary fs-xs">+{{ $restaurant->features->count() - 4 }} MORE</span>
+            @endif
         </div>
+        @else
+        <div class="listing-amenities d-flex align-items-center gap-3 mb-4 mt-auto text-secondary fs-sm">
+            <span data-bs-toggle="tooltip" title="Standard Dining"><i class="fas fa-utensils text-primary opacity-75"></i></span>
+        </div>
+        @endif
         
         <!-- Footer -->
         <div class="hotel-card-footer pt-3 border-top d-flex flex-column gap-3">
