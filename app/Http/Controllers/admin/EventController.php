@@ -27,12 +27,15 @@ class EventController extends Controller
             'event_category_id' => 'required|exists:event_categories,id',
             'status' => 'boolean',
             'video_file' => 'nullable|mimes:mp4,mov,ogg,qt|max:30000',
+            'video_url' => 'nullable|url',
         ]);
 
-        $data = $request->except('_token', '_method', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'video_file');
+        $data = $request->except('_token', '_method', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'video_file', 'video_url');
         if ($request->hasFile('video_file')) {
             $path = $request->file('video_file')->store('events/videos', 'public');
             $data['video'] = 'storage/' . $path;
+        } elseif ($request->filled('video_url')) {
+            $data['video'] = $request->input('video_url');
         }
 
         $event = \App\Models\Event::create($data);
@@ -58,12 +61,30 @@ class EventController extends Controller
             'event_category_id' => 'required|exists:event_categories,id',
             'status' => 'boolean',
             'video_file' => 'nullable|mimes:mp4,mov,ogg,qt|max:30000',
+            'video_url' => 'nullable|url',
+            'delete_video' => 'nullable|boolean',
         ]);
 
-        $data = $request->except('_token', '_method', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'video_file');
+        $data = $request->except('_token', '_method', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'video_file', 'video_url', 'delete_video');
+        // Handle video deletion
+        if ($request->input('delete_video') == '1') {
+            if ($event->video && !str_starts_with($event->video, 'http')) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete(str_replace('storage/', '', $event->video));
+            }
+            $data['video'] = null;
+        }
+
+        // Handle video creation/updates
         if ($request->hasFile('video_file')) {
+            if ($event->video && !str_starts_with($event->video, 'http')) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete(str_replace('storage/', '', $event->video));
+            }
             $path = $request->file('video_file')->store('events/videos', 'public');
             $data['video'] = 'storage/' . $path;
+        } elseif ($request->filled('video_url')) {
+            if ($request->input('delete_video') != '1') {
+                $data['video'] = $request->input('video_url');
+            }
         }
 
         $event->update($data);

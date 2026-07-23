@@ -277,16 +277,21 @@
             <input type="text" class="form-control" id="featured_image_alt" name="featured_image_alt" value="{{ $hotel->featured_image_alt }}" placeholder="e.g. Exterior view of Grand Hotel Resort in Mackinac Island" />
             <div class="form-text">Describe the image clearly for search engines and accessibility.</div>
           </div>
-          <div class="mb-3 border-top pt-3">
+          <!-- <div class="mb-3 border-top pt-3">
             <label class="form-label fw-semibold" for="video_file">Promo Video</label>
             <input type="file" class="form-control" id="video_file" name="video_file" accept="video/mp4,video/x-m4v,video/*" />
             <div class="form-text">Supported: MP4, MOV, WebM. Max 30MB. This video will play on the hotel's detail page.</div>
-            @if($hotel->video)
+            @if($hotel->video && !str_starts_with($hotel->video, 'http'))
               <div class="mt-2">
                 <span class="text-success small"><i class="fas fa-video me-1"></i> Current video uploaded: </span>
                 <a href="{{ asset($hotel->video) }}" target="_blank" class="small fw-bold">{{ basename($hotel->video) }}</a>
               </div>
             @endif
+          </div> -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold" for="video_url">Video URL</label>
+            <input type="url" class="form-control" id="video_url" name="video_url" value="{{ str_starts_with($hotel->video ?? '', 'http') ? $hotel->video : '' }}" placeholder="e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ" />
+            <div class="form-text">Paste a YouTube link directly instead of uploading a video file.</div>
           </div>
         </div>
 
@@ -302,9 +307,17 @@
               <div class="col-md-3 col-sm-4 col-6" id="gallery-video-container">
                 <div class="card border position-relative bg-light">
                   <div class="card-img-top d-flex align-items-center justify-content-center bg-dark text-white position-relative" style="height:140px;overflow:hidden;">
-                    <video class="w-100 h-100 object-fit-cover" muted style="object-fit: cover;">
-                      <source src="{{ asset($hotel->video) }}" type="video/mp4">
-                    </video>
+                    @php
+                      $isYoutube = preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $hotel->video, $matches);
+                      $youtubeId = $isYoutube ? $matches[1] : null;
+                    @endphp
+                    @if($isYoutube)
+                      <img src="https://img.youtube.com/vi/{{ $youtubeId }}/mqdefault.jpg" class="w-100 h-100 object-fit-cover" style="object-fit: cover; height: 140px;" alt="YouTube Thumbnail" />
+                    @else
+                      <video class="w-100 h-100 object-fit-cover" muted style="object-fit: cover;">
+                        <source src="{{ asset($hotel->video) }}" type="video/mp4">
+                      </video>
+                    @endif
                     <div class="position-absolute d-flex align-items-center justify-content-center text-white bg-dark bg-opacity-50 rounded-circle" style="width: 40px; height: 40px; pointer-events: none; top:50%; left:50%; transform:translate(-50%, -50%);">
                       <i class="fas fa-play"></i>
                     </div>

@@ -79,22 +79,37 @@
     @endphp
     <div class="gallery-grid mb-4">
         {{-- Main featured image or video --}}
-        <div class="gallery-item main-img">
+        <div class="gallery-item main-img position-relative">
             @if(!empty($hotel->video))
-                <div class="video-wrapper-premium w-100 h-100">
+                <div class="video-wrapper-premium w-100 h-100 position-relative">
                     <div class="video-loading-spinner" id="videoSpinnerHotels">
                         <div class="spinner-border text-white" role="status" style="width: 1.5rem; height: 1.5rem;">
                             <span class="visually-hidden">Loading...</span>
                         </div>
                     </div>
-                    <video class="w-100 h-100 object-fit-cover rounded-3 shadow-sm" controls autoplay muted loop playsinline style="object-fit: cover;"
-                           onplay="document.getElementById('videoSpinnerHotels').style.display='none'"
-                           onplaying="document.getElementById('videoSpinnerHotels').style.display='none'"
-                           onwaiting="document.getElementById('videoSpinnerHotels').style.display='flex'"
-                           oncanplay="document.getElementById('videoSpinnerHotels').style.display='none'">
-                        <source src="{{ asset($hotel->video) }}" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
+                    @php
+                        $isYoutube = preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $hotel->video, $matches);
+                        $youtubeId = $isYoutube ? $matches[1] : null;
+                    @endphp
+                    @if($isYoutube)
+                        <iframe class="w-100 h-100 rounded-3 shadow-sm" style="min-height:350px;" src="https://www.youtube.com/embed/{{ $youtubeId }}?autoplay=1&mute=1&loop=1&playlist={{ $youtubeId }}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen onload="document.getElementById('videoSpinnerHotels').style.display='none'"></iframe>
+                    @else
+                        <video class="w-100 h-100 object-fit-cover rounded-3 shadow-sm" controls autoplay muted loop playsinline style="object-fit: cover;"
+                               onplay="document.getElementById('videoSpinnerHotels').style.display='none'"
+                               onplaying="document.getElementById('videoSpinnerHotels').style.display='none'"
+                               onwaiting="document.getElementById('videoSpinnerHotels').style.display='flex'"
+                               oncanplay="document.getElementById('videoSpinnerHotels').style.display='none'">
+                            <source src="{{ asset($hotel->video) }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    @endif
+                    
+                    {{-- Fullscreen button overlay --}}
+                    <div class="position-absolute bottom-0 end-0 m-3" style="z-index: 11;">
+                        <button class="btn btn-sm btn-dark bg-opacity-75 rounded-pill px-3 text-white border-0" onclick="openCustomGallery(0)">
+                            <i class="fas fa-expand-arrows-alt me-1"></i> View Video Gallery
+                        </button>
+                    </div>
                 </div>
             @else
                 <img src="{{ $allGalleryImages[0]['src'] }}" alt="{{ $allGalleryImages[0]['alt'] }}" onclick="openCustomGallery(0)" class="cursor-pointer">
@@ -102,7 +117,10 @@
         </div>
         {{-- Thumbnails: show up to 4 --}}
         @for($gi = 1; $gi <= min(4, count($allGalleryImages) - 1); $gi++)
-        <div class="gallery-item cursor-pointer" onclick="openCustomGallery({{ $gi }})">
+        @php
+            $lightboxIndex = !empty($hotel->video) ? $gi + 1 : $gi;
+        @endphp
+        <div class="gallery-item cursor-pointer" onclick="openCustomGallery({{ $lightboxIndex }})">
             <img src="{{ $allGalleryImages[$gi]['src'] }}" alt="{{ $allGalleryImages[$gi]['alt'] }}">
             @if($gi === 4 && $extraCount > 0)
                 <div class="gallery-overlay-count">+{{ $extraCount }}</div>
@@ -353,7 +371,15 @@
 <script>
     const galleryItemsList = [
         @if(!empty($hotel->video))
-        { type: 'video', src: "{{ asset($hotel->video) }}" },
+            @php
+                $isYoutube = preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $hotel->video, $matches);
+                $youtubeId = $isYoutube ? $matches[1] : null;
+            @endphp
+            @if($isYoutube)
+                { type: 'youtube', src: "https://www.youtube.com/embed/{{ $youtubeId }}?autoplay=1&mute=1" },
+            @else
+                { type: 'video', src: "{{ asset($hotel->video) }}" },
+            @endif
         @endif
         @foreach($allGalleryImages as $gImg)
         { type: 'image', src: "{{ $gImg['src'] }}" },
@@ -362,13 +388,7 @@
     let currentGalleryIndex = 0;
 
     function openCustomGallery(index = 0) {
-        // Adjust index if video is present (since video is placed first at index 0)
-        @if(!empty($hotel->video))
-            currentGalleryIndex = index + 1;
-        @else
-            currentGalleryIndex = index;
-        @endif
-        
+        currentGalleryIndex = index;
         document.getElementById('customGalleryLightbox').style.display = 'flex';
         document.body.style.overflow = 'hidden'; // Disable scroll
         updateLightbox();
@@ -376,9 +396,11 @@
     }
 
     function closeCustomGallery() {
-        // Pause any playing lightbox video
+        // Pause any playing lightbox video or remove youtube iframe
         const videoEl = document.getElementById('lightbox-main-video');
         if (videoEl) videoEl.pause();
+        const existingIframe = document.getElementById('lightbox-main-iframe');
+        if (existingIframe) existingIframe.remove();
         
         document.getElementById('customGalleryLightbox').style.display = 'none';
         document.body.style.overflow = 'auto'; // Re-enable scroll
@@ -395,6 +417,11 @@
         const item = galleryItemsList[currentGalleryIndex];
         const imgEl = document.getElementById('lightbox-main-img');
         const videoEl = document.getElementById('lightbox-main-video');
+        const container = document.querySelector('#customGalleryLightbox .lightbox-image-container');
+        
+        // Remove existing YouTube iframe if any
+        const existingIframe = document.getElementById('lightbox-main-iframe');
+        if (existingIframe) existingIframe.remove();
         
         if (videoEl) {
             videoEl.pause();
@@ -404,13 +431,35 @@
             imgEl.style.display = 'none';
         }
         
+        // Reset container defaults
+        container.style.maxWidth = '85%';
+        container.style.width = 'auto';
+        
         if (item.type === 'video') {
+            container.style.maxWidth = '95%';
+            container.style.width = '1000px';
             if (videoEl) {
                 videoEl.src = item.src;
                 videoEl.style.display = 'block';
+                videoEl.style.width = '100%';
+                videoEl.style.maxWidth = '1000px';
+                videoEl.style.height = 'auto';
+                videoEl.style.maxHeight = '70vh';
                 videoEl.load();
                 videoEl.play();
             }
+        } else if (item.type === 'youtube') {
+            container.style.maxWidth = '95%';
+            container.style.width = '1000px';
+            const iframe = document.createElement('iframe');
+            iframe.id = 'lightbox-main-iframe';
+            iframe.src = item.src;
+            iframe.className = 'rounded';
+            iframe.style.width = '100%';
+            iframe.style.maxWidth = '1000px';
+            iframe.style.height = '65vh';
+            iframe.style.border = 'none';
+            container.appendChild(iframe);
         } else {
             if (imgEl) {
                 imgEl.style.opacity = 0;
@@ -460,6 +509,15 @@
             if (e.key === 'ArrowRight') changeLightboxImage(1);
             if (e.key === 'ArrowLeft') changeLightboxImage(-1);
         }
+    });
+
+    // Auto-open video popup on page load if video is present
+    document.addEventListener('DOMContentLoaded', function() {
+        @if(!empty($hotel->video))
+            setTimeout(() => {
+                openCustomGallery(0);
+            }, 600);
+        @endif
     });
 </script>
 

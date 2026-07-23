@@ -53,50 +53,52 @@
 <!-- 2. Browse by Category -->
 <section class="category-filter-bar-sticky py-4 border-bottom bg-white shadow-sm position-relative z-index-1">
     <div class="container">
-        <h6 class="text-uppercase text-muted fw-bold small mb-3 tracking-wider">Browse by Category</h6>
-        <div class="category-filter-wrapper d-flex align-items-center flex-wrap gap-2 pb-2">
-            
-            <a href="{{ route('web.attractions.index') }}" class="category-pill {{ !isset($currentCategory) ? 'active' : '' }}">
-                <span class="cat-name">All Places</span>
-                <span class="cat-count">112</span>
-            </a>
+        <div class="d-flex align-items-center flex-wrap gap-3">
+            <h6 class="text-uppercase text-muted fw-bold small mb-0 tracking-wider text-nowrap">Browse by Category</h6>
+            <div class="category-filter-wrapper d-flex align-items-center flex-wrap gap-2">
+                
+                <a href="{{ route('web.attractions.index', ['scroll' => 1]) }}" class="category-pill {{ !isset($currentCategory) ? 'active' : '' }}">
+                    <span class="cat-name">All Places</span>
+                    <span class="cat-count">112</span>
+                </a>
 
-            @php
-                // Check if current category is in the featured list
-                $isCurrentFeatured = false;
-                if(isset($currentCategory) && isset($featuredCategories)) {
-                    foreach($featuredCategories as $cat) {
-                        if($cat->id === $currentCategory->id) {
-                            $isCurrentFeatured = true;
-                            break;
+                @php
+                    // Check if current category is in the featured list
+                    $isCurrentFeatured = false;
+                    if(isset($currentCategory) && isset($featuredCategories)) {
+                        foreach($featuredCategories as $cat) {
+                            if($cat->id === $currentCategory->id) {
+                                $isCurrentFeatured = true;
+                                break;
+                            }
                         }
                     }
-                }
-                
-                $displayCategories = isset($featuredCategories) ? $featuredCategories->toArray() : [];
-                
-                // If current category is not featured, replace the last item with it
-                if(isset($currentCategory) && !$isCurrentFeatured && count($displayCategories) > 0) {
-                    $displayCategories[count($displayCategories) - 1] = $currentCategory->toArray();
-                }
-                
-                // Limit to 6 categories to ensure it fills reasonable space without wrapping on desktop
-                $displayCategories = array_slice($displayCategories, 0, 6);
-            @endphp
+                    
+                    $displayCategories = isset($featuredCategories) ? $featuredCategories->toArray() : [];
+                    
+                    // If current category is not featured, replace the last item with it
+                    if(isset($currentCategory) && !$isCurrentFeatured && count($displayCategories) > 0) {
+                        $displayCategories[count($displayCategories) - 1] = $currentCategory->toArray();
+                    }
+                    
+                    // Limit to 5 categories to ensure it fills reasonable space without wrapping on desktop
+                    $displayCategories = array_slice($displayCategories, 0, 5);
+                @endphp
 
-            @foreach($displayCategories as $cat)
-                @php $catObj = (object)$cat; @endphp
-                <a href="{{ route('web.attractions.category', $catObj->slug) }}" class="category-pill {{ (isset($currentCategory) && $currentCategory->id === $catObj->id) ? 'active' : '' }}">
-                    <span class="cat-name">{{ $catObj->name }}</span>
-                    <span class="cat-count">{{ $catObj->attractions_count ?? 30 }}</span>
+                @foreach($displayCategories as $cat)
+                    @php $catObj = (object)$cat; @endphp
+                    <a href="{{ route('web.attractions.category', $catObj->slug) }}" class="category-pill {{ (isset($currentCategory) && $currentCategory->id === $catObj->id) ? 'active' : '' }}">
+                        <span class="cat-name">{{ $catObj->name }}</span>
+                        <span class="cat-count">{{ $catObj->attractions_count ?? 30 }}</span>
+                    </a>
+                @endforeach
+
+                <!-- More Categories Button -->
+                <a href="#" class="category-pill bg-light" data-bs-toggle="modal" data-bs-target="#categoriesModal">
+                    <span class="cat-name">More...</span>
                 </a>
-            @endforeach
 
-            <!-- More Categories Button -->
-            <a href="#" class="category-pill bg-light" data-bs-toggle="modal" data-bs-target="#categoriesModal">
-                <span class="cat-name">More...</span>
-            </a>
-
+            </div>
         </div>
     </div>
 </section>
@@ -105,18 +107,9 @@
 <section class="py-5 auto-style-8">
     <div class="container py-4">
         
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-5">
-            <div>
-                <h2 class="fw-bold mb-0 auto-style-9">{{ isset($currentCategory) ? 'Showing ' . $attractions->total() . ' ' . $currentCategory->name : 'Available Attractions' }}</h2>
-                <p class="text-muted mt-2 mb-0">Showing {{ $attractions->count() }} of {{ $attractions->total() }} attractions found</p>
-            </div>
-            <div style="width: 380px; max-width: 100%;">
-                <form action="{{ route('web.search') }}" method="GET" class="nav-search-box-premium">
-                    <i class="fas fa-search nav-search-icon-premium"></i>
-                    <input type="text" name="keyword" placeholder="Search attractions..." class="form-control nav-search-input-premium">
-                    <button type="submit" class="nav-search-btn-premium">Search</button>
-                </form>
-            </div>
+        <div class="mb-5">
+            <h2 class="fw-bold mb-0 auto-style-9">{{ isset($currentCategory) ? 'Showing ' . $attractions->total() . ' ' . $currentCategory->name : 'Available Attractions' }}</h2>
+            <p class="text-muted mt-2 mb-0">Showing {{ $attractions->count() }} of {{ $attractions->total() }} attractions found</p>
         </div>
 
         <div class="row g-4" id="all-attractions">

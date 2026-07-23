@@ -46,7 +46,7 @@
 
     <!-- Dynamic Actions -->
     <div class="d-flex flex-wrap justify-content-center gap-3 mt-3">
-        <a href="{{ route('web.search') }}" class="btn btn-outline-secondary rounded-pill px-4 fw-bold d-inline-flex align-items-center justify-content-center">Clear Search</a>
+        <a href="{{ route('web.search', ['clear' => 1]) }}" class="btn btn-outline-secondary rounded-pill px-4 fw-bold d-inline-flex align-items-center justify-content-center">Clear Search</a>
         
         @if($tab == 'hotels')
             <a href="{{ route('web.search', ['tab' => 'hotels']) }}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center">Browse All Hotels</a>

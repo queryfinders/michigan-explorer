@@ -171,6 +171,26 @@
             });
         });
         
+        // Auto-scroll to category results if category slug is in the URL or scroll=1 param is present on page load
+        if (window.location.pathname.includes('/category/') || window.location.search.includes('scroll=1')) {
+            setTimeout(() => {
+                const target = document.getElementById("all-hotels") || 
+                               document.getElementById("all-restaurants") || 
+                               document.getElementById("all-attractions") || 
+                               document.getElementById("all-events");
+                if (target) {
+                    const offset = 180; // offset for sticky headers
+                    const elementPosition = target.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - offset;
+                    
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            }, 400); // slight delay to let layout render
+        }
+        
         console.log("Michigan Explorer Theme Initialized.");
     });
 </script>

@@ -255,6 +255,11 @@
             <input type="file" class="form-control" id="video_file" name="video_file" accept="video/mp4,video/x-m4v,video/*" />
             <div class="form-text">Supported: MP4, MOV, WebM. Max 30MB. This video will play on the hotel's detail page.</div>
           </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold" for="video_url">OR YouTube Video URL</label>
+            <input type="url" class="form-control" id="video_url" name="video_url" placeholder="e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ" />
+            <div class="form-text">Paste a YouTube link directly instead of uploading a video file.</div>
+          </div>
         </div>
 
         <!-- Tab 4: Gallery -->

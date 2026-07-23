@@ -152,6 +152,22 @@ class SearchController extends Controller
      */
     public function index(Request $request)
     {
+        // Handle explicit clear
+        if ($request->has('clear')) {
+            session()->forget('last_search_params');
+            return redirect()->route('web.search');
+        }
+
+        // If there are query parameters in the URL, save them to session and redirect to /search
+        if (count($request->query()) > 0) {
+            session(['last_search_params' => $request->query()]);
+            return redirect()->route('web.search');
+        }
+
+        // Retrieve search parameters from session
+        $searchParams = session('last_search_params', []);
+        $request->merge($searchParams);
+
         $q   = $request->input('keyword') ?? $request->input('q');
         $tab = $request->input('tab', 'all');
 

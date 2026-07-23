@@ -28,32 +28,34 @@
 <!-- 2. Browse by Category -->
 <section class="category-filter-bar-sticky py-4 border-bottom bg-white shadow-sm position-relative z-index-1">
     <div class="container">
-        <h6 class="text-uppercase text-muted fw-bold small mb-3 tracking-wider">Browse by Category</h6>
-        <div class="category-filter-wrapper d-flex align-items-center flex-wrap gap-2 pb-2">
-            
-            <a href="{{ route('web.events.index') }}" class="category-pill {{ !isset($currentCategory) ? 'active' : '' }}">
-                <span class="cat-name">All Events</span>
-                <span class="cat-count">48</span>
-            </a>
-            
-            @php
-                $displayCategories = isset($featuredCategories) ? $featuredCategories->toArray() : [];
-                // Limit to 6 categories to ensure it fills reasonable space without wrapping on desktop
-                $displayCategories = array_slice($displayCategories, 0, 6);
-            @endphp
-
-            @foreach($displayCategories as $cat)
-                @php $catObj = (object)$cat; @endphp
-                <a href="{{ route('web.events.category', $catObj->slug) }}" class="category-pill {{ (isset($currentCategory) && $currentCategory->id === $catObj->id) ? 'active' : '' }}">
-                    <span class="cat-name">{{ $catObj->name }}</span>
-                    <span class="cat-count">{{ $catObj->events_count ?? rand(5, 20) }}</span>
+        <div class="d-flex align-items-center flex-wrap gap-3">
+            <h6 class="text-uppercase text-muted fw-bold small mb-0 tracking-wider text-nowrap">Browse by Category</h6>
+            <div class="category-filter-wrapper d-flex align-items-center flex-wrap gap-2">
+                
+                <a href="{{ route('web.events.index', ['scroll' => 1]) }}" class="category-pill {{ !isset($currentCategory) ? 'active' : '' }}">
+                    <span class="cat-name">All Events</span>
+                    <span class="cat-count">48</span>
                 </a>
-            @endforeach
+                
+                @php
+                    $displayCategories = isset($featuredCategories) ? $featuredCategories->toArray() : [];
+                    // Limit to 5 categories to ensure it fills reasonable space without wrapping on desktop
+                    $displayCategories = array_slice($displayCategories, 0, 5);
+                @endphp
 
-            <!-- More Categories Button -->
-            <a href="#" class="category-pill bg-light" data-bs-toggle="modal" data-bs-target="#categoriesModal">
-                <span class="cat-name">More...</span>
-            </a>
+                @foreach($displayCategories as $cat)
+                    @php $catObj = (object)$cat; @endphp
+                    <a href="{{ route('web.events.category', $catObj->slug) }}" class="category-pill {{ (isset($currentCategory) && $currentCategory->id === $catObj->id) ? 'active' : '' }}">
+                        <span class="cat-name">{{ $catObj->name }}</span>
+                        <span class="cat-count">{{ $catObj->events_count ?? rand(5, 20) }}</span>
+                    </a>
+                @endforeach
+
+                <!-- More Categories Button -->
+                <a href="#" class="category-pill bg-light" data-bs-toggle="modal" data-bs-target="#categoriesModal">
+                    <span class="cat-name">More...</span>
+                </a>
+            </div>
         </div>
     </div>
 </section>

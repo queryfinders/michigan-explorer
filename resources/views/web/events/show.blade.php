@@ -84,14 +84,22 @@
                                 <span class="visually-hidden">Loading...</span>
                             </div>
                         </div>
-                        <video class="w-100 h-100 object-fit-cover rounded-3 shadow-sm" controls autoplay muted loop playsinline style="object-fit: cover;"
-                               onplay="document.getElementById('videoSpinnerEvents').style.display='none'"
-                               onplaying="document.getElementById('videoSpinnerEvents').style.display='none'"
-                               onwaiting="document.getElementById('videoSpinnerEvents').style.display='flex'"
-                               oncanplay="document.getElementById('videoSpinnerEvents').style.display='none'">
-                            <source src="{{ asset($event->video) }}" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
+                        @php
+                            $isYoutube = preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $event->video, $matches);
+                            $youtubeId = $isYoutube ? $matches[1] : null;
+                        @endphp
+                        @if($isYoutube)
+                            <iframe class="w-100 h-100 rounded-3 shadow-sm" style="min-height:350px;" src="https://www.youtube.com/embed/{{ $youtubeId }}?autoplay=1&mute=1&loop=1&playlist={{ $youtubeId }}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen onload="document.getElementById('videoSpinnerEvents').style.display='none'"></iframe>
+                        @else
+                            <video class="w-100 h-100 object-fit-cover rounded-3 shadow-sm" controls autoplay muted loop playsinline style="object-fit: cover;"
+                                   onplay="document.getElementById('videoSpinnerEvents').style.display='none'"
+                                   onplaying="document.getElementById('videoSpinnerEvents').style.display='none'"
+                                   onwaiting="document.getElementById('videoSpinnerEvents').style.display='flex'"
+                                   oncanplay="document.getElementById('videoSpinnerEvents').style.display='none'">
+                                <source src="{{ asset($event->video) }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        @endif
                     </div>
                 </div>
                 @endif

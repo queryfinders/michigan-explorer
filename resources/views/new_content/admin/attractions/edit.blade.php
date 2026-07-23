@@ -65,13 +65,24 @@
         <label class="form-label fw-semibold" for="video_file">Promo Video</label>
         <input type="file" class="form-control" id="video_file" name="video_file" accept="video/mp4,video/x-m4v,video/*" />
         <div class="form-text">Supported: MP4, MOV, WebM. Max 30MB. This video will play on the attraction's detail page.</div>
-        @if($attraction->video)
+        @if($attraction->video && !str_starts_with($attraction->video, 'http'))
           <div class="mt-2">
             <span class="text-success small"><i class="fas fa-video me-1"></i> Current video uploaded: </span>
             <a href="{{ asset($attraction->video) }}" target="_blank" class="small fw-bold">{{ basename($attraction->video) }}</a>
           </div>
         @endif
       </div>
+      <div class="mb-3">
+        <label class="form-label fw-semibold" for="video_url">OR YouTube Video URL</label>
+        <input type="url" class="form-control" id="video_url" name="video_url" value="{{ str_starts_with($attraction->video ?? '', 'http') ? $attraction->video : '' }}" placeholder="e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ" />
+        <div class="form-text">Paste a YouTube link directly instead of uploading a video file.</div>
+      </div>
+      @if($attraction->video)
+      <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="delete_video" name="delete_video" value="1">
+        <label class="form-check-label text-danger" for="delete_video">Delete current video</label>
+      </div>
+      @endif
       <div class="mb-3">
         <label class="form-label" for="status">Status</label>
         <select class="form-select" id="status" name="status">
