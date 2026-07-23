@@ -16,9 +16,10 @@
     <h3 class="mb-1 fw-bold">Amenities</h3>
     <p class="text-muted mb-0">Manage hotel and room amenities.</p>
   </div>
-  <div>
-    <a href="{{ route('amenities.create') }}" class="btn btn-primary">Add Amenity</a>
-  </div>
+  <div class="d-flex align-items-center gap-2">
+        <input type="text" class="form-control global-search-input" placeholder="Search..." style="width: 220px;" />
+        <a href="{{ route('amenities.create') }}" class="btn btn-primary">Add Amenity</a>
+    </div>
 </div>
 
 

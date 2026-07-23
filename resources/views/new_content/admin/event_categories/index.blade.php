@@ -16,9 +16,10 @@
     <h3 class="mb-1 fw-bold">Event Categories</h3>
     <p class="text-muted mb-0">Manage event categories and types.</p>
   </div>
-  <div>
-    <a href="{{ route('event-categories.create') }}" class="btn btn-primary">Add Category</a>
-  </div>
+  <div class="d-flex align-items-center gap-2">
+        <input type="text" class="form-control global-search-input" placeholder="Search..." style="width: 220px;" />
+        <a href="{{ route('event-categories.create') }}" class="btn btn-primary">Add Category</a>
+    </div>
 </div>
 
 

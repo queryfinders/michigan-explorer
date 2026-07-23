@@ -89,7 +89,7 @@ psalm-baseline.xml
 # Ignore compiled assets
 /public/mix-manifest.json
 /public/js
-/public/css
+# /public/css
 
 # Vite
 vite.config.timestamp-*

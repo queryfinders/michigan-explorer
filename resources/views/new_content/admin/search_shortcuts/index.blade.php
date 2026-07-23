@@ -22,7 +22,8 @@
         <h3 class="mb-1 fw-bold">Search Shortcuts</h3>
         <p class="text-muted mb-0">Manage shortcuts for the search system.</p>
     </div>
-    <div>
+    <div class="d-flex align-items-center gap-2">
+        <input type="text" class="form-control global-search-input" placeholder="Search..." style="width: 220px;" />
         <a href="{{ route('search-shortcuts.create') }}" class="btn btn-primary">Add Shortcut</a>
     </div>
 </div>

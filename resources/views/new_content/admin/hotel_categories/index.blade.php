@@ -16,9 +16,10 @@
     <h3 class="mb-1 fw-bold">Hotel Categories</h3>
     <p class="text-muted mb-0">Manage all hotel categories and classifications.</p>
   </div>
-  <div>
-    <a href="{{ route('hotel-categories.create') }}" class="btn btn-primary">Add Category</a>
-  </div>
+  <div class="d-flex align-items-center gap-2">
+        <input type="text" class="form-control global-search-input" placeholder="Search..." style="width: 220px;" />
+        <a href="{{ route('hotel-categories.create') }}" class="btn btn-primary">Add Category</a>
+    </div>
 </div>
 
 

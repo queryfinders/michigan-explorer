@@ -15,9 +15,10 @@
     <h3 class="mb-1 fw-bold">Restaurants</h3>
     <p class="text-muted mb-0">Manage all restaurants and eateries in Michigan.</p>
   </div>
-  <div>
-    <a href="{{ route('restaurants.create') }}" class="btn btn-primary">Add Restaurant</a>
-  </div>
+  <div class="d-flex align-items-center gap-2">
+        <input type="text" class="form-control global-search-input" placeholder="Search..." style="width: 220px;" />
+        <a href="{{ route('restaurants.create') }}" class="btn btn-primary">Add Restaurant</a>
+    </div>
 </div>
 
 

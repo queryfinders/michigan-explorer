@@ -82,6 +82,23 @@
           }
           return originalConfirm(message);
       };
+
+      // Global real-time frontend table search
+      $(document).on('input', '.global-search-input', function() {
+          var query = $(this).val().toLowerCase();
+          var $table = $('table');
+          
+          $table.find('tbody tr').each(function() {
+              var text = $(this).text().toLowerCase();
+              
+              // Skip empty state rows
+              if ($(this).find('td[colspan]').length) {
+                  return;
+              }
+              
+              $(this).toggle(text.indexOf(query) > -1);
+          });
+      });
   });
 </script>
 

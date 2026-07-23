@@ -15,6 +15,9 @@
     <h3 class="mb-1 fw-bold">Contact Messages</h3>
     <p class="text-muted mb-0">Review and manage contact submissions from users.</p>
   </div>
+  <div>
+    <input type="text" class="form-control global-search-input" placeholder="Search..." style="width: 220px;" />
+  </div>
 </div>
 
 

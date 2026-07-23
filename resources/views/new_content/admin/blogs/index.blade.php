@@ -15,9 +15,10 @@
     <h3 class="mb-1 fw-bold">Blogs</h3>
     <p class="text-muted mb-0">Manage all blog posts and articles.</p>
   </div>
-  <div>
-    <a href="{{ route('blogs.create') }}" class="btn btn-primary">Add Blog</a>
-  </div>
+  <div class="d-flex align-items-center gap-2">
+        <input type="text" class="form-control global-search-input" placeholder="Search..." style="width: 220px;" />
+        <a href="{{ route('blogs.create') }}" class="btn btn-primary">Add Blog</a>
+    </div>
 </div>
 
 

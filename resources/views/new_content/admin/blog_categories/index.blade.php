@@ -16,9 +16,10 @@
     <h3 class="mb-1 fw-bold">Blog Categories</h3>
     <p class="text-muted mb-0">Manage blog post categories.</p>
   </div>
-  <div>
-    <a href="{{ route('blog-categories.create') }}" class="btn btn-primary">Add Category</a>
-  </div>
+  <div class="d-flex align-items-center gap-2">
+        <input type="text" class="form-control global-search-input" placeholder="Search..." style="width: 220px;" />
+        <a href="{{ route('blog-categories.create') }}" class="btn btn-primary">Add Category</a>
+    </div>
 </div>
 
 

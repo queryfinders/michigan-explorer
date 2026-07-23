@@ -15,9 +15,10 @@
     <h3 class="mb-1 fw-bold">Pages</h3>
     <p class="text-muted mb-0">Manage static pages and content sections.</p>
   </div>
-  <div>
-    <a href="{{ route('pages.create') }}" class="btn btn-primary">Add Page</a>
-  </div>
+  <div class="d-flex align-items-center gap-2">
+        <input type="text" class="form-control global-search-input" placeholder="Search..." style="width: 220px;" />
+        <a href="{{ route('pages.create') }}" class="btn btn-primary">Add Page</a>
+    </div>
 </div>
 
 

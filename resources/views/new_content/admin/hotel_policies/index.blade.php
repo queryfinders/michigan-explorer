@@ -16,9 +16,10 @@
     <h3 class="mb-1 fw-bold">Hotel Policies</h3>
     <p class="text-muted mb-0">Manage hotel policies and rules.</p>
   </div>
-  <div>
-    <a href="{{ route('hotel-policies.create') }}" class="btn btn-primary">Add Hotel Policy</a>
-  </div>
+  <div class="d-flex align-items-center gap-2">
+        <input type="text" class="form-control global-search-input" placeholder="Search..." style="width: 220px;" />
+        <a href="{{ route('hotel-policies.create') }}" class="btn btn-primary">Add Hotel Policy</a>
+    </div>
 </div>
 
 
