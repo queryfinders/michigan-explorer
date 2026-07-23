@@ -27,7 +27,7 @@
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-rowgroup-bs5/rowgroup.bootstrap5.css')}}">
 
 <!-- custom css -->
-<link rel="stylesheet" href="{{asset('assets/css/custom.css')}}?v=1.3">
+<link rel="stylesheet" href="{{asset('assets/css/custom.css')}}?v=1.8">
 
 <!-- Vendor Styles -->
 @yield('vendor-style')

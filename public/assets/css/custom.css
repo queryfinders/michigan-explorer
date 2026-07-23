@@ -1,10 +1,13 @@
 /* Color System - Defining colors centrally using CSS Variables */
 :root {
   /* Website Brand Theme Colors */
-  --admin-primary: #4f46e5;
-  --admin-primary-hover: #4338ca;
-  --admin-primary-rgb: 79, 70, 229;
-  --admin-primary-light: #eef2ff;
+  --primary-color: #0d6efd;
+  --search-primary: #ff9f1c;
+
+  --admin-primary: var(--primary-color);
+  --admin-primary-hover: #0b5ed7;
+  --admin-primary-rgb: 13, 110, 253;
+  --admin-primary-light: #e7f1ff;
   
   --admin-accent: #f59e0b;
   --admin-accent-hover: #d97706;
@@ -523,7 +526,7 @@ h4.fw-bold.py-3.mb-4 span.text-muted {
 
 /* Seamless single-input search box with embedded background SVG icon */
 .global-search-input {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E") !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ff9f1c' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E") !important;
   background-repeat: no-repeat !important;
   background-position: 12px center !important;
   background-size: 15px !important;
@@ -532,8 +535,37 @@ h4.fw-bold.py-3.mb-4 span.text-muted {
   transition: all 0.15s ease-in-out !important;
 }
 
+.global-search-input:hover {
+  border-color: var(--search-primary) !important;
+}
+
 .global-search-input:focus {
-  border-color: var(--admin-primary) !important;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1) !important;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%234f46e5' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E") !important;
+  border-color: var(--search-primary) !important;
+  box-shadow: 0 0 0 3px rgba(255, 159, 28, 0.15) !important;
+}
+
+/* Style for primary 'Add' action buttons in list headers to be orange with white text */
+html body a.btn.btn-primary[href*="create"],
+html body button.btn.btn-primary[onclick*="create"],
+html body .d-flex.align-items-center.gap-2 > a.btn.btn-primary,
+html body .d-flex.align-items-center.gap-2 > a.btn-primary {
+  --bs-btn-bg: var(--search-primary) !important;
+  --bs-btn-border-color: var(--search-primary) !important;
+  --bs-btn-hover-bg: #e58f19 !important;
+  --bs-btn-hover-border-color: #e58f19 !important;
+  --bs-btn-active-bg: #e58f19 !important;
+  --bs-btn-active-border-color: #e58f19 !important;
+  background-color: var(--search-primary) !important;
+  border-color: var(--search-primary) !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+html body a.btn.btn-primary[href*="create"]:hover,
+html body button.btn.btn-primary[onclick*="create"]:hover,
+html body .d-flex.align-items-center.gap-2 > a.btn.btn-primary:hover,
+html body .d-flex.align-items-center.gap-2 > a.btn-primary:hover {
+  background-color: #e58f19 !important;
+  border-color: #e58f19 !important;
+  color: #ffffff !important;
 }

@@ -104,3 +104,39 @@
 
 @yield('page-script')
 <!-- END: Page JS-->
+
+<style>
+  /* Force Add and Save/Submit buttons in the admin to be orange */
+  html body a.btn.btn-primary[href*="create"],
+  html body button.btn.btn-primary[onclick*="create"],
+  html body .d-flex.align-items-center.gap-2 > a.btn.btn-primary,
+  html body .d-flex.align-items-center.gap-2 > a.btn-primary,
+  html body button[type="submit"].btn-primary,
+  html body input[type="submit"].btn-primary,
+  html body form button.btn-primary {
+    background: #ff9f1c !important;
+    background-color: #ff9f1c !important;
+    background-image: none !important;
+    border-color: #ff9f1c !important;
+    color: #ffffff !important;
+    --bs-btn-bg: #ff9f1c !important;
+    --bs-btn-border-color: #ff9f1c !important;
+    --bs-btn-hover-bg: #e58f19 !important;
+    --bs-btn-hover-border-color: #e58f19 !important;
+    --bs-btn-active-bg: #e58f19 !important;
+    --bs-btn-active-border-color: #e58f19 !important;
+  }
+  html body a.btn.btn-primary[href*="create"]:hover,
+  html body button.btn.btn-primary[onclick*="create"]:hover,
+  html body .d-flex.align-items-center.gap-2 > a.btn.btn-primary:hover,
+  html body .d-flex.align-items-center.gap-2 > a.btn-primary:hover,
+  html body button[type="submit"].btn-primary:hover,
+  html body input[type="submit"].btn-primary:hover,
+  html body form button.btn-primary:hover {
+    background: #e58f19 !important;
+    background-color: #e58f19 !important;
+    background-image: none !important;
+    border-color: #e58f19 !important;
+    color: #ffffff !important;
+  }
+</style>
