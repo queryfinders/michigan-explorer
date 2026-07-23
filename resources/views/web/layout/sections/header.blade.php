@@ -25,9 +25,6 @@
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('web.blogs.*') ? 'active' : '' }}" href="{{ route('web.blogs.index') }}">Travel Guides</a>
                 </li>
-                <li class="nav-item ms-xl-3">
-                    <a href="{{ route('web.search') }}" class="nav-link {{ request()->routeIs('web.search') ? 'active' : '' }}" aria-label="Search"><i class="fa fa-search"></i></a>
-                </li>
                 <li class="nav-item ms-xl-3 mt-2 mt-xl-0">
                     <a href="{{ route('web.contact') }}" class="btn btn-primary btn-sm rounded-pill px-4 py-2">Contact Us</a>
                 </li>

@@ -23,7 +23,7 @@
         </div>
 
         <!-- Alpine.js Smart Search Component -->
-        <div x-data="smartSearch()" class="smart-search-container" data-aos="zoom-in" data-aos-delay="400" data-aos-duration="1000" @click.away="isOpen = false">
+        <div x-data="smartSearch()" id="heroSearchContainer" class="smart-search-container" data-aos="zoom-in" data-aos-delay="400" data-aos-duration="1000" @click.away="isOpen = false">
             
             <form action="{{ route('web.search') }}" method="GET" class="smart-search-box" @submit="onSubmit">
                 <i class="fas fa-search smart-search-icon" x-show="!isLoading"></i>
@@ -363,4 +363,23 @@
     </div>
 </section>
 
+@endsection
+
+@section('webLayoutScript')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchContainer = document.getElementById('heroSearchContainer');
+        if (!searchContainer) return;
+        
+        const initialOffset = searchContainer.offsetTop + 120;
+        
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > initialOffset) {
+                searchContainer.classList.add('sticky-active');
+            } else {
+                searchContainer.classList.remove('sticky-active');
+            }
+        });
+    });
+</script>
 @endsection

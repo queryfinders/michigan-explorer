@@ -325,19 +325,19 @@ document.addEventListener('DOMContentLoaded', function() {
         
         let url = '';
         switch(type) {
-            case 'global_search': url = `${appUrl}/search?q=${val}`; break;
+            case 'global_search': url = `${appUrl}/search?keyword=${val}`; break;
             case 'hotels': url = `${appUrl}/search?tab=hotels`; break;
             case 'restaurants': url = `${appUrl}/search?tab=restaurants`; break;
             case 'attractions': url = `${appUrl}/search?tab=attractions`; break;
             case 'events': url = `${appUrl}/search?tab=events`; break;
             case 'travel_guides': url = `${appUrl}/search?tab=travel_guides`; break;
-            case 'city': url = `${appUrl}/search?q=${val}`; break;
+            case 'city': url = `${appUrl}/search?keyword=${val}`; break;
             case 'hotel_category': url = `${appUrl}/search?tab=hotels&category=${val}`; break;
             case 'restaurant_category': url = `${appUrl}/search?tab=restaurants&category=${val}`; break;
             case 'attraction_category': url = `${appUrl}/search?tab=attractions&category=${val}`; break;
             case 'event_category': url = `${appUrl}/search?tab=events&category=${val}`; break;
             case 'blog_category': url = `${appUrl}/search?tab=travel_guides&category=${val}`; break;
-            case 'destination': url = `${appUrl}/search?q=${val}`; break;
+            case 'destination': url = `${appUrl}/search?keyword=${val}`; break;
             case 'custom_url': url = val ? (val.startsWith('http') ? val : `${appUrl}/${val.replace(/^\//, '')}`) : ''; break;
         }
         

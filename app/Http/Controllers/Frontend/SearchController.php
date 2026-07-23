@@ -44,7 +44,7 @@ class SearchController extends Controller
      */
     public function autocomplete(Request $request)
     {
-        $q = trim($request->input('q', ''));
+        $q = trim($request->input('keyword', $request->input('q', '')));
 
         // Reject empty or too-short queries immediately
         if (empty($q) || strlen($q) < 2) {
@@ -61,11 +61,11 @@ class SearchController extends Controller
                 'title'    => $isBlog ? $item->title : $item->name,
                 'url'      => route($routeName, $item->slug),
                 'image'    => $img
-                    ? (str_starts_with($img, 'http') ? $img : asset($img))
-                    : asset('website/assets/images/placeholder.jpg'),
+                     ? (str_starts_with($img, 'http') ? $img : asset($img))
+                     : asset('website/assets/images/placeholder.jpg'),
                 'location' => $isBlog
-                    ? ($item->category->name ?? 'Article')
-                    : ($item->city ?? 'Michigan'),
+                     ? ($item->category->name ?? 'Article')
+                     : ($item->city ?? 'Michigan'),
             ];
         };
 
@@ -78,7 +78,7 @@ class SearchController extends Controller
             $results['Hotels'] = [
                 'items'        => $hotelsQuery->take(3)->get()->map(fn ($item) => $mapItem($item, 'web.hotels.show')),
                 'has_more'     => $hotelsCount > 3,
-                'view_all_url' => route('web.search', ['tab' => 'hotels', 'q' => $q]),
+                'view_all_url' => route('web.search', ['tab' => 'hotels', 'keyword' => $q]),
                 'icon'         => 'fas fa-hotel',
             ];
         }
@@ -92,7 +92,7 @@ class SearchController extends Controller
             $results['Restaurants'] = [
                 'items'        => $restQuery->take(3)->get()->map(fn ($item) => $mapItem($item, 'web.restaurants.show')),
                 'has_more'     => $restCount > 3,
-                'view_all_url' => route('web.search', ['tab' => 'restaurants', 'q' => $q]),
+                'view_all_url' => route('web.search', ['tab' => 'restaurants', 'keyword' => $q]),
                 'icon'         => 'fas fa-utensils',
             ];
         }
@@ -106,7 +106,7 @@ class SearchController extends Controller
             $results['Attractions'] = [
                 'items'        => $attrQuery->take(3)->get()->map(fn ($item) => $mapItem($item, 'web.attractions.show')),
                 'has_more'     => $attrCount > 3,
-                'view_all_url' => route('web.search', ['tab' => 'attractions', 'q' => $q]),
+                'view_all_url' => route('web.search', ['tab' => 'attractions', 'keyword' => $q]),
                 'icon'         => 'fas fa-map-marked-alt',
             ];
         }
@@ -120,7 +120,7 @@ class SearchController extends Controller
             $results['Events'] = [
                 'items'        => $eventQuery->take(3)->get()->map(fn ($item) => $mapItem($item, 'web.events.show')),
                 'has_more'     => $eventCount > 3,
-                'view_all_url' => route('web.search', ['tab' => 'events', 'q' => $q]),
+                'view_all_url' => route('web.search', ['tab' => 'events', 'keyword' => $q]),
                 'icon'         => 'fas fa-calendar-alt',
             ];
         }
@@ -135,7 +135,7 @@ class SearchController extends Controller
             $results['Travel Guides'] = [
                 'items'        => $blogQuery->take(3)->get()->map(fn ($item) => $mapItem($item, 'web.blogs.show', true)),
                 'has_more'     => $blogCount > 3,
-                'view_all_url' => route('web.search', ['tab' => 'travel_guides', 'q' => $q]),
+                'view_all_url' => route('web.search', ['tab' => 'travel_guides', 'keyword' => $q]),
                 'icon'         => 'fas fa-book-open',
             ];
         }
@@ -152,7 +152,7 @@ class SearchController extends Controller
      */
     public function index(Request $request)
     {
-        $q   = $request->input('q');
+        $q   = $request->input('keyword') ?? $request->input('q');
         $tab = $request->input('tab', 'all');
 
         // Log the search keyword for analytics; increment if it already exists
