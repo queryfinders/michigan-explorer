@@ -23,12 +23,13 @@
   --admin-text-muted: #6b7280;
   --admin-text-dark: #111827;
 
-  /* Sidebar Theme - Clean Premium Light */
-  --admin-sidebar-bg: #ffffff;
-  --admin-sidebar-text: #6b7280;
-  --admin-sidebar-header-text: #9ca3af;
-  --admin-sidebar-hover-bg: #f3f4f6;
-  --admin-sidebar-hover-text: #111827;
+  /* Sidebar Theme - Premium Dark Gradient */
+  --admin-sidebar-bg: linear-gradient(160deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%);
+  --admin-sidebar-solid: #0f172a;
+  --admin-sidebar-text: rgba(203, 213, 225, 0.85);
+  --admin-sidebar-header-text: rgba(148, 163, 184, 0.6);
+  --admin-sidebar-hover-bg: rgba(255, 255, 255, 0.08);
+  --admin-sidebar-hover-text: #ffffff;
 
   /* Gradient definitions */
   --admin-gradient-primary: linear-gradient(135deg, var(--admin-primary) 0%, #7c3aed 100%);
@@ -75,25 +76,26 @@ body {
   padding: 0.5rem 1.5rem !important;
 }
 
-/* Sidebar Menu styling - Clean Professional Light */
+/* Sidebar Menu styling - Premium Dark Gradient */
 .layout-menu {
-  background-color: var(--admin-sidebar-bg) !important;
-  border-right: 1px solid var(--admin-border-color) !important;
-  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.02) !important;
+  background: linear-gradient(160deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%) !important;
+  border-right: none !important;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25) !important;
 }
 
 .layout-menu .app-brand {
-  background-color: var(--admin-sidebar-bg) !important;
-  border-bottom: 1px solid var(--admin-border-color) !important;
+  background: transparent !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
 .layout-menu .app-brand .layout-menu-toggle {
-  background-color: var(--admin-primary) !important;
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
 }
 
 /* Brand logo text in sidebar */
 .app-brand-text {
-  color: var(--admin-text-dark) !important;
+  color: #ffffff !important;
   font-size: 1.2rem !important;
   font-weight: 700 !important;
   letter-spacing: -0.03em !important;
@@ -101,27 +103,28 @@ body {
 
 /* Menu Items and Links */
 .menu-vertical .menu-item .menu-link {
-  color: var(--admin-sidebar-text) !important;
+  color: rgba(203, 213, 225, 0.85) !important;
   font-weight: 500 !important;
-  border-radius: 6px !important;
+  border-radius: 8px !important;
   margin: 2px 12px !important;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .menu-vertical .menu-item .menu-link:hover,
 .menu-vertical .menu-item.open > .menu-link {
-  background-color: var(--admin-sidebar-hover-bg) !important;
-  color: var(--admin-sidebar-hover-text) !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
   transform: translateX(2px) !important;
 }
 
 /* Active State styling */
 .menu-vertical .menu-item.active > .menu-link {
-  background: var(--admin-gradient-primary) !important;
+  background: linear-gradient(90deg, rgba(99,102,241,0.85) 0%, rgba(139,92,246,0.85) 100%) !important;
   color: #ffffff !important;
-  box-shadow: 0 4px 10px rgba(var(--admin-primary-rgb), 0.2) !important;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35) !important;
   font-weight: 600 !important;
   position: relative !important;
+  backdrop-filter: blur(4px) !important;
 }
 
 /* Vertical Indicator Line for Active Menu item */
@@ -132,13 +135,13 @@ body {
   top: 20% !important;
   height: 60% !important;
   width: 4px !important;
-  background-color: #ffffff !important;
+  background-color: #a5b4fc !important;
   border-radius: 0 4px 4px 0 !important;
 }
 
 /* Menu Headers (Dividers) */
 .menu-vertical .menu-header {
-  color: var(--admin-sidebar-header-text) !important;
+  color: rgba(148, 163, 184, 0.55) !important;
   font-weight: 700 !important;
   letter-spacing: 0.05em !important;
   text-transform: uppercase !important;
@@ -154,14 +157,15 @@ body {
 .menu-vertical .menu-sub .menu-link {
   padding-left: 2.25rem !important;
   font-size: 0.85rem !important;
+  color: rgba(203, 213, 225, 0.7) !important;
 }
 
 /* Inner menu item dot styling */
 .menu-vertical .menu-sub .menu-item .menu-link::before {
-  background-color: var(--admin-sidebar-text) !important;
+  background-color: rgba(203, 213, 225, 0.4) !important;
 }
 .menu-vertical .menu-sub .menu-item.active > .menu-link::before {
-  background-color: var(--admin-primary) !important;
+  background-color: #a5b4fc !important;
 }
 /* Hide default dots if explicit icons are present in the submenu */
 .menu-vertical .menu-sub .menu-item .menu-link:has(i)::before {
