@@ -7,69 +7,83 @@
 @section('title', 'Search Shortcuts')
 @section('content')
 
-<div class="container-xxl flex-grow-1 container-p-y">
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Search Shortcuts</h5>
-            <a href="{{ route('search-shortcuts.create') }}" class="btn btn-primary">Add Shortcut</a>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive text-nowrap">
-                <table class="table table-hover" id="shortcutsTable">
-                    <thead>
-                        <tr>
-                            <th style="width: 50px;"></th>
-                            <th>Icon</th>
-                            <th>Title</th>
-                            <th>Action Type</th>
-                            <th>Destination</th>
-                            <th>Clicks</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="sortableList">
-                        @foreach($searchShortcuts as $shortcut)
-                        <tr data-id="{{ $shortcut->id }}">
-                            <td class="cursor-pointer handle"><i class="fa fa-bars text-muted"></i></td>
-                            <td>
-                                @if($shortcut->icon)
-                                    <i class="{{ $shortcut->icon }} {{ $shortcut->icon_color }} fs-4"></i>
-                                @endif
-                            </td>
-                            <td><strong>{{ $shortcut->title }}</strong></td>
-                            <td><span class="badge bg-label-info">{{ $shortcut->action_type->label() }}</span></td>
-                            <td><a href="{{ route('web.search_shortcuts.track', $shortcut->id) }}" target="_blank" class="text-primary small text-truncate d-inline-block" style="max-width:200px;">{{ $shortcut->target_url }}</a></td>
-                            <td>
-                                <div><span class="fw-bold">{{ number_format($shortcut->click_count) }}</span> Clicks</div>
-                                @if($shortcut->last_clicked_at)
-                                    <small class="text-muted" title="{{ $shortcut->last_clicked_at }}">Last: {{ $shortcut->last_clicked_at->diffForHumans() }}</small>
-                                @endif
-                            </td>
-                            <td>
-                                <div class="form-check form-switch mb-2">
-                                    <input class="form-check-input status-toggle" type="checkbox" data-id="{{ $shortcut->id }}" {{ $shortcut->status ? 'checked' : '' }}>
-                                </div>
-                            </td>
-                            <td>
-                                <a href="{{ route('search-shortcuts.edit', $shortcut->id) }}" class="btn btn-sm btn-icon btn-outline-primary"><i class="fa fa-edit"></i></a>
-                                <form action="{{ route('search-shortcuts.destroy', $shortcut->id) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-icon btn-outline-danger" onclick="return confirm('Are you sure?')"><i class="fa fa-trash"></i></button>
-                                </form>
-                            </td>
-                        </tr>
-                        @endforeach
-                        
-                        @if($searchShortcuts->isEmpty())
-                        <tr>
-                            <td colspan="8" class="text-center">No shortcuts found. Create one!</td>
-                        </tr>
-                        @endif
-                    </tbody>
-                </table>
-            </div>
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-1">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="javascript:void(0);">Settings</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Search Shortcuts</li>
+    </ol>
+</nav>
+
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="mb-1 fw-bold">Search Shortcuts</h3>
+        <p class="text-muted mb-0">Manage shortcuts for the search system.</p>
+    </div>
+    <div>
+        <a href="{{ route('search-shortcuts.create') }}" class="btn btn-primary">Add Shortcut</a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive text-nowrap">
+            <table class="table table-hover" id="shortcutsTable">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;"></th>
+                        <th>Icon</th>
+                        <th>Title</th>
+                        <th>Action Type</th>
+                        <th>Destination</th>
+                        <th>Clicks</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="sortableList">
+                    @foreach($searchShortcuts as $shortcut)
+                    <tr data-id="{{ $shortcut->id }}">
+                        <td class="cursor-pointer handle"><i class="fa fa-bars text-muted"></i></td>
+                        <td>
+                            @if($shortcut->icon)
+                                <i class="{{ $shortcut->icon }} {{ $shortcut->icon_color }} fs-4"></i>
+                            @endif
+                        </td>
+                        <td><strong>{{ $shortcut->title }}</strong></td>
+                        <td><span class="badge bg-label-info">{{ $shortcut->action_type->label() }}</span></td>
+                        <td><a href="{{ route('web.search_shortcuts.track', $shortcut->id) }}" target="_blank" class="text-primary small text-truncate d-inline-block" style="max-width:200px;">{{ $shortcut->target_url }}</a></td>
+                        <td>
+                            <div><span class="fw-bold">{{ number_format($shortcut->click_count) }}</span> Clicks</div>
+                            @if($shortcut->last_clicked_at)
+                                <small class="text-muted" title="{{ $shortcut->last_clicked_at }}">Last: {{ $shortcut->last_clicked_at->diffForHumans() }}</small>
+                            @endif
+                        </td>
+                        <td>
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input status-toggle" type="checkbox" data-id="{{ $shortcut->id }}" {{ $shortcut->status ? 'checked' : '' }}>
+                            </div>
+                        </td>
+                        <td>
+                            <a href="{{ route('search-shortcuts.edit', $shortcut->id) }}" class="btn btn-sm btn-icon btn-outline-primary"><i class="fa fa-edit"></i></a>
+                            <form action="{{ route('search-shortcuts.destroy', $shortcut->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-icon btn-outline-danger" onclick="return confirm('Are you sure?')"><i class="fa fa-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    @endforeach
+                    
+                    @if($searchShortcuts->isEmpty())
+                    <tr>
+                        <td colspan="8" class="text-center">No shortcuts found. Create one!</td>
+                    </tr>
+                    @endif
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

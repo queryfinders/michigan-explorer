@@ -13,12 +13,18 @@
       @method('PUT')
       <div class="row mb-3">
         <div class="col-md-6">
-          <label class="form-label" for="name">Name</label>
-          <input type="text" class="form-control" id="name" name="name" value="{{ $hotelCategory->name }}" required />
+          <label class="form-label" for="name">Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $hotelCategory->name) }}" required />
+          @error('name')
+            <div class="invalid-feedback">{{ $message }}</div>
+          @enderror
         </div>
         <div class="col-md-6">
-          <label class="form-label" for="slug">Slug</label>
-          <input type="text" class="form-control" id="slug" name="slug" value="{{ $hotelCategory->slug }}" required />
+          <label class="form-label" for="slug">Slug <span class="text-danger">*</span></label>
+          <input type="text" class="form-control @error('slug') is-invalid @enderror" id="slug" name="slug" value="{{ old('slug', $hotelCategory->slug) }}" required />
+          @error('slug')
+            <div class="invalid-feedback">{{ $message }}</div>
+          @enderror
         </div>
       </div>
       <div class="mb-3">
@@ -47,6 +53,17 @@
           editor.save();
         });
       }
+    });
+
+    // Auto-fill slug from category name
+    $('#name').on('input', function() {
+      var name = $(this).val();
+      var slug = name.toLowerCase()
+                     .trim()
+                     .replace(/[^a-z0-9\s-]/g, '')
+                     .replace(/\s+/g, '-')
+                     .replace(/-+/g, '-');
+      $('#slug').val(slug);
     });
   });
 </script>

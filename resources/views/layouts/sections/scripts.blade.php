@@ -27,5 +27,63 @@
 @stack('pricing-script')
 <!-- END: Pricing Modal JS-->
 <!-- BEGIN: Page JS-->
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  $(document).ready(function() {
+      let activeForm = null;
+
+      // Detect button click on delete forms
+      $(document).on('click', 'form:has(input[name="_method"][value="DELETE"]) button[type="submit"], form:has(input[name="_method"][value="DELETE"]) input[type="submit"]', function(e) {
+          activeForm = $(this).closest('form')[0];
+      });
+
+      // Detect form submit for delete forms
+      $(document).on('submit', 'form:has(input[name="_method"][value="DELETE"])', function(e) {
+          activeForm = this;
+      });
+
+      // Override global window.confirm to intercept native delete confirmation alerts
+      const originalConfirm = window.confirm;
+      window.confirm = function(message) {
+          if (activeForm) {
+              const form = activeForm;
+              activeForm = null; // reset reference immediately
+
+              // If this form has already been confirmed via SweetAlert2, proceed with submit
+              if ($(form).data('confirmed')) {
+                  return true;
+              }
+
+              // Display beautiful SweetAlert2 modal in the center
+              Swal.fire({
+                  title: 'Are you sure?',
+                  text: "You won't be able to revert this!",
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#4f46e5', // Brand Indigo primary
+                  cancelButtonColor: '#6b7280', // Secondary slate grey
+                  confirmButtonText: 'Yes, delete it!',
+                  cancelButtonText: 'Cancel',
+                  customClass: {
+                      confirmButton: 'btn btn-danger me-2',
+                      cancelButton: 'btn btn-secondary'
+                  },
+                  buttonsStyling: false
+              }).then((result) => {
+                  if (result.isConfirmed) {
+                      $(form).data('confirmed', true);
+                      form.submit();
+                  }
+              });
+
+              return false; // Prevent native form submit immediately
+          }
+          return originalConfirm(message);
+      };
+  });
+</script>
+
 @yield('page-script')
 <!-- END: Page JS-->

@@ -3,11 +3,25 @@
 @section('title', 'System Settings')
 
 @section('content')
-<div class="card mb-4">
-  @include('layouts.messages')
-  <div class="card-header d-flex justify-content-between align-items-center">
-    <h5 class="mb-0">System Settings</h5>
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-1">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Dashboard</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Settings</li>
+  </ol>
+</nav>
+
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h3 class="mb-1 fw-bold">Settings</h3>
+    <p class="text-muted mb-0">Configure system settings and variables.</p>
   </div>
+</div>
+
+@include('layouts.messages')
+
+<div class="card mb-4">
   <div class="card-body">
     <form action="{{ route('settings.store') }}" method="POST">
       @csrf

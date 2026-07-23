@@ -3,12 +3,28 @@
 @section('title', 'Booking Features')
 
 @section('content')
-<div class="card">
-  @include('layouts.messages')
-  <h5 class="card-header">Booking Features</h5>
-  <div class="d-flex justify-content-end me-md-4 mb-3">
-    <a href="{{ route('booking-features.create') }}" class="btn btn-primary text-white me-3">Add Booking Feature</a>
+<nav aria-label="breadcrumb" class="mb-1">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="javascript:void(0);">Hotels</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Booking Features</li>
+  </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h3 class="mb-1 fw-bold">Booking Features</h3>
+    <p class="text-muted mb-0">Manage booking feature options.</p>
   </div>
+  <div>
+    <a href="{{ route('booking-features.create') }}" class="btn btn-primary">Add Booking Feature</a>
+  </div>
+</div>
+
+
+@include('layouts.messages')
+
+<div class="card">
   <div class="table-responsive pt-0">
     <table class="table">
       <thead>

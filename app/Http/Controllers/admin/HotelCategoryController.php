@@ -21,8 +21,8 @@ class HotelCategoryController extends Controller
     public function store(\Illuminate\Http\Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:hotel_categories',
+            'name' => 'required|string|max:255|unique:hotel_categories,name',
+            'slug' => 'required|string|max:255|unique:hotel_categories,slug',
             'status' => 'boolean'
         ]);
 
@@ -38,7 +38,7 @@ class HotelCategoryController extends Controller
     public function update(\Illuminate\Http\Request $request, \App\Models\HotelCategory $hotelCategory)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:hotel_categories,name,' . $hotelCategory->id,
             'slug' => 'required|string|max:255|unique:hotel_categories,slug,' . $hotelCategory->id,
             'status' => 'boolean'
         ]);

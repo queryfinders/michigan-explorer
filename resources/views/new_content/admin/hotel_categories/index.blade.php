@@ -3,12 +3,28 @@
 @section('title', 'Hotel Categories')
 
 @section('content')
-<div class="card">
-  @include('layouts.messages')
-  <h5 class="card-header">Hotel Categories</h5>
-  <div class="d-flex justify-content-end me-md-4 mb-3">
-    <a href="{{ route('hotel-categories.create') }}" class="btn btn-primary text-white me-3">Add Category</a>
+<nav aria-label="breadcrumb" class="mb-1">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="javascript:void(0);">Hotels</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Categories</li>
+  </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h3 class="mb-1 fw-bold">Hotel Categories</h3>
+    <p class="text-muted mb-0">Manage all hotel categories and classifications.</p>
   </div>
+  <div>
+    <a href="{{ route('hotel-categories.create') }}" class="btn btn-primary">Add Category</a>
+  </div>
+</div>
+
+
+@include('layouts.messages')
+
+<div class="card">
   <div class="table-responsive pt-0">
     <table class="table">
       <thead>
@@ -16,6 +32,7 @@
           <th>ID</th>
           <th>Name</th>
           <th>Slug</th>
+          <th>Status</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -23,8 +40,14 @@
         @foreach($categories as $category)
         <tr>
           <td>{{ $category->id }}</td>
-          <td>{{ $category->name }}</td>
+          <td><strong>{{ $category->name }}</strong></td>
           <td>{{ $category->slug }}</td>
+          <td>
+            <label class="switch">
+              <input type="checkbox" class="switch-input category-status-switch" data-id="{{ $category->id }}" data-status="{{ $category->status }}" {{ $category->status == 1 ? 'checked' : '' }}>
+              <span class="switch-toggle-slider"></span>
+            </label>
+          </td>
           <td>
             <a href="{{ route('hotel-categories.edit', $category->id) }}" class="btn btn-sm btn-primary"><i class="fa fa-edit"></i></a>
             <form action="{{ route('hotel-categories.destroy', $category->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure?');">

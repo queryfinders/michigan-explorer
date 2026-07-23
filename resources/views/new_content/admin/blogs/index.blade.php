@@ -3,12 +3,27 @@
 @section('title', 'Blogs')
 
 @section('content')
-<div class="card">
-  @include('layouts.messages')
-  <h5 class="card-header">Blogs</h5>
-  <div class="d-flex justify-content-end me-md-4 mb-3">
-    <a href="{{ route('blogs.create') }}" class="btn btn-primary text-white me-3">Add Blog</a>
+<nav aria-label="breadcrumb" class="mb-1">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Dashboard</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Blogs</li>
+  </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h3 class="mb-1 fw-bold">Blogs</h3>
+    <p class="text-muted mb-0">Manage all blog posts and articles.</p>
   </div>
+  <div>
+    <a href="{{ route('blogs.create') }}" class="btn btn-primary">Add Blog</a>
+  </div>
+</div>
+
+
+@include('layouts.messages')
+
+<div class="card">
   <div class="table-responsive pt-0">
     <table class="table">
       <thead>

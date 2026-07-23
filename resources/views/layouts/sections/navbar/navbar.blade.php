@@ -36,6 +36,13 @@ $navbarDetached = ($navbarDetached ?? '');
       <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
 
         <ul class="navbar-nav flex-row align-items-center ms-auto">
+          <!-- View Site Button -->
+          <li class="nav-item me-3">
+            <a href="{{ url('/') }}" target="_blank" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1" style="padding: 4px 10px; font-size: 0.8rem; font-weight: 500; border-radius: 6px;">
+              <i class="ti ti-external-link" style="font-size: 0.9rem;"></i>
+              <span>View Site</span>
+            </a>
+          </li>
           <li class="nav-item me-2 me-xl-0">
             <span class="fw-semibold d-block">
               {{Session::get('name')}}

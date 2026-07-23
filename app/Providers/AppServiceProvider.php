@@ -4,11 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
-/**
- * Class AppServiceProvider
- *
- * Registers and bootstraps global application services and observers.
- */
+use Illuminate\Pagination\Paginator;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -30,5 +26,8 @@ class AppServiceProvider extends ServiceProvider
     {
         // Register the observer to handle cache invalidation for dynamic search shortcuts
         \App\Models\SearchShortcut::observe(\App\Observers\SearchShortcutObserver::class);
+        
+        // Force Bootstrap 5 styling for pagination elements
+        Paginator::useBootstrapFive();
     }
 }
