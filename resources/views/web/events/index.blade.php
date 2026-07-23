@@ -26,7 +26,7 @@
 </section>
 
 <!-- 2. Browse by Category -->
-<section class="py-4 border-bottom bg-white shadow-sm position-relative z-index-1">
+<section class="category-filter-bar-sticky py-4 border-bottom bg-white shadow-sm position-relative z-index-1">
     <div class="container">
         <h6 class="text-uppercase text-muted fw-bold small mb-3 tracking-wider">Browse by Category</h6>
         <div class="category-filter-wrapper d-flex align-items-center flex-wrap gap-2 pb-2">
@@ -152,21 +152,24 @@
 
 <!-- Modal: Categories -->
 <div class="modal fade" id="categoriesModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header border-0">
-                <h5 class="modal-title fw-bold">All Categories</h5>
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold fs-4">All Categories</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-0">
-                <div class="horizontal-scroll-wrapper d-flex flex-column gap-1 p-3">
+            <div class="modal-body p-4">
+                <div class="row g-3">
                     @foreach($allCategories as $cat)
-                                    <a href="{{ route('web.events.category', $cat->slug) }}" class="text-decoration-none text-dark d-flex align-items-center p-2 rounded-3 hover-bg-light transition-all">
-                                        <div>
-                                            <div class="fw-bold small">{{ $cat->name }}</div>
-                                            <div class="text-muted fs-xs">{{ $cat->events_count ?? 0 }} {{ Str::plural('Event', $cat->events_count ?? 0) }}</div>
-                                        </div>
-                                    </a>
+                    <div class="col-md-3 col-sm-6">
+                        <a href="{{ route('web.events.category', $cat->slug) }}" class="modal-category-card">
+                            <div>
+                                <div class="fw-bold text-heading" style="font-size: 0.9rem;">{{ $cat->name }}</div>
+                                <div class="text-muted fs-xs mt-1">{{ $cat->events_count ?? 0 }} {{ Str::plural('Event', $cat->events_count ?? 0) }}</div>
+                            </div>
+                            <i class="fas fa-chevron-right text-muted opacity-50 fs-xs"></i>
+                        </a>
+                    </div>
                     @endforeach
                 </div>
             </div>

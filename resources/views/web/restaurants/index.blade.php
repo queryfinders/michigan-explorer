@@ -105,10 +105,17 @@
 <section class="py-5 auto-style-8">
     <div class="container py-4">
         
-        <div class="d-flex justify-content-between align-items-end mb-5">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-5">
             <div>
                 <h2 class="fw-bold mb-0 auto-style-9">{{ isset($currentCategory) ? 'Showing ' . $restaurants->total() . ' ' . $currentCategory->name : 'Available Restaurants' }}</h2>
                 <p class="text-muted mt-2 mb-0">Showing {{ $restaurants->count() }} of {{ $restaurants->total() }} restaurants found</p>
+            </div>
+            <div style="width: 380px; max-width: 100%;">
+                <form action="{{ route('web.search') }}" method="GET" class="nav-search-box-premium">
+                    <i class="fas fa-search nav-search-icon-premium"></i>
+                    <input type="text" name="keyword" placeholder="Search restaurants..." class="form-control nav-search-input-premium">
+                    <button type="submit" class="nav-search-btn-premium">Search</button>
+                </form>
             </div>
         </div>
 
@@ -116,7 +123,7 @@
             @forelse($restaurants as $index => $restaurant)
             <!-- Restaurant Card -->
             <div class="col-lg-4 col-md-6">
-                <x-restaurant-card :restaurant="$restaurant" :featured="$restaurant->is_featured == 1" />
+                <x-restaurant-card :restaurant="$restaurant" :featured="($restaurant->is_featured ?? 0) == 1" />
             </div>
             @empty
             <!-- Static Fallback Data for Empty State -->
@@ -160,31 +167,21 @@
                     <input type="text" id="categorySearch" class="form-control form-control-lg rounded-pill ps-5 bg-light border-0 py-3" placeholder="Search dining categories..." autocomplete="off">
                 </div>
 
-                <!-- Alphabetically Grouped Categories -->
+                <!-- Flat Grid Categories -->
                 <div id="categoryListContainer">
-                    @php
-                        $groupedCategories = (isset($allCategories) ? $allCategories : collect())->groupBy(function($item, $key) {
-                            return strtoupper(substr($item->name, 0, 1));
-                        });
-                    @endphp
-
-                    @foreach($groupedCategories as $letter => $catGroup)
-                        <div class="category-group mb-4">
-                            <h4 class="fw-bold text-primary mb-3 border-bottom pb-2">{{ $letter }}</h4>
-                            <div class="horizontal-scroll-wrapper d-flex gap-3 pb-2">
-                                @foreach($catGroup as $cat)
-                                <div class="category-item flex-shrink-0" style="width: 200px;" data-name="{{ strtolower($cat->name) }}">
-                                    <a href="{{ route('web.restaurants.category', $cat->slug) }}" class="text-decoration-none text-dark d-flex align-items-center p-2 rounded-3 hover-bg-light transition-all">
-                                        <div>
-                                            <div class="fw-bold small">{{ $cat->name }}</div>
-                                            <div class="text-muted fs-xs">{{ $cat->restaurants_count ?? 0 }} {{ Str::plural('Restaurant', $cat->restaurants_count ?? 0) }}</div>
-                                        </div>
-                                    </a>
+                    <div class="row g-3">
+                        @foreach((isset($allCategories) ? $allCategories : collect())->sortBy('name') as $cat)
+                        <div class="col-md-3 col-sm-6 category-item" data-name="{{ strtolower($cat->name) }}">
+                            <a href="{{ route('web.restaurants.category', $cat->slug) }}" class="modal-category-card">
+                                <div>
+                                    <div class="fw-bold text-heading" style="font-size: 0.9rem;">{{ $cat->name }}</div>
+                                    <div class="text-muted fs-xs mt-1">{{ $cat->restaurants_count ?? 0 }} {{ Str::plural('Restaurant', $cat->restaurants_count ?? 0) }}</div>
                                 </div>
-                                @endforeach
-                            </div>
+                                <i class="fas fa-chevron-right text-muted opacity-50 fs-xs"></i>
+                            </a>
                         </div>
-                    @endforeach
+                        @endforeach
+                    </div>
                 </div>
                 
                 <!-- No Results State -->
@@ -207,32 +204,20 @@
         const searchInput = document.getElementById('categorySearch');
         if (!searchInput) return;
         
-        const categoryGroups = document.querySelectorAll('.category-group');
+        const categoryItems = document.querySelectorAll('.category-item');
         const noResultsState = document.getElementById('noResultsState');
         
         searchInput.addEventListener('input', function() {
             const searchTerm = this.value.toLowerCase().trim();
             let totalMatches = 0;
             
-            categoryGroups.forEach(group => {
-                let groupMatches = 0;
-                const items = group.querySelectorAll('.category-item');
-                
-                items.forEach(item => {
-                    const name = item.getAttribute('data-name');
-                    if (name.includes(searchTerm)) {
-                        item.style.display = 'block';
-                        groupMatches++;
-                        totalMatches++;
-                    } else {
-                        item.style.display = 'none';
-                    }
-                });
-                
-                if (groupMatches === 0) {
-                    group.style.display = 'none';
+            categoryItems.forEach(item => {
+                const name = item.getAttribute('data-name');
+                if (name.includes(searchTerm)) {
+                    item.style.display = 'block';
+                    totalMatches++;
                 } else {
-                    group.style.display = 'block';
+                    item.style.display = 'none';
                 }
             });
             

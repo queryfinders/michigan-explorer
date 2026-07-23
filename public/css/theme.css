@@ -2629,3 +2629,169 @@ font-size: 0.85rem;
     scrollbar-color: #c3d2e6 #f1f5f9;
 }
 
+/* Premium Sticky Search Bar on Homepage Scroll */
+.smart-search-container.sticky-active {
+    position: fixed !important;
+    top: 90px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 100% !important;
+    max-width: 750px !important;
+    z-index: 1040 !important;
+    padding: 0 20px !important;
+    animation: stickySlideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.smart-search-container.sticky-active .smart-search-box {
+    height: 60px !important;
+    padding: 5px 10px 5px 25px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+.smart-search-container.sticky-active .smart-search-icon {
+    font-size: 1.2rem !important;
+    margin-right: 12px !important;
+}
+
+.smart-search-container.sticky-active .smart-search-input {
+    font-size: 0.9rem !important;
+}
+
+.smart-search-container.sticky-active .smart-search-btn {
+    padding: 0 20px !important;
+    font-size: 0.85rem !important;
+    height: 48px !important;
+}
+
+.smart-search-container.sticky-active .autocomplete-dropdown {
+    top: 65px !important;
+}
+
+@keyframes stickySlideDown {
+    from { transform: translate(-50%, -20px); opacity: 0; }
+    to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+/* Category Filter Bar Sticky */
+.category-filter-bar-sticky {
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    top: 75px !important;
+    z-index: 1020 !important;
+    background-color: #ffffff !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08) !important;
+    transition: top 0.3s ease;
+}
+
+/* Header Scroll Search Input Styles */
+.nav-search-bar {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    width: 380px;
+    margin-left: 20px;
+}
+
+#mainNav.scrolled-active .nav-search-bar {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.nav-search-box-premium {
+    display: flex;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 100px;
+    padding: 3px 5px 3px 15px;
+    height: 40px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    width: 100%;
+}
+
+.nav-search-icon-premium {
+    font-size: 0.9rem;
+    color: #ff9f1c;
+    margin-right: 10px;
+}
+
+.nav-search-input-premium {
+    border: none !important;
+    background: transparent !important;
+    outline: none !important;
+    box-shadow: none !important;
+    font-size: 0.85rem !important;
+    padding: 0 !important;
+    width: 100%;
+    color: var(--secondary-color);
+}
+
+.nav-search-input-premium::placeholder {
+    color: #94a3b8;
+}
+
+.nav-search-btn-premium {
+    background-color: #ff9f1c !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 50px !important;
+    padding: 0 18px !important;
+    font-size: 0.8rem !important;
+    font-weight: 700 !important;
+    height: 32px !important;
+    transition: background-color 0.2s ease !important;
+    box-shadow: 0 2px 6px rgba(255, 159, 28, 0.2) !important;
+}
+
+.nav-search-btn-premium:hover {
+    background-color: #e58f19 !important;
+}
+
+/* Premium Category Modal Styles */
+.modal-category-card {
+    background: #f8fafc;
+    border: 1px solid #f1f5f9;
+    border-radius: 10px;
+    padding: 8px 14px;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-decoration: none !important;
+    color: #1e293b;
+    height: 100%;
+}
+
+.modal-category-card:hover {
+    background: #ffffff;
+    border-color: var(--primary-color, #0d6efd);
+    box-shadow: 0 4px 15px rgba(13, 110, 253, 0.08);
+    transform: translateY(-2px);
+    color: var(--primary-color, #0d6efd);
+}
+
+.modal-category-card:hover .text-muted {
+    color: var(--primary-color, #0d6efd) !important;
+    opacity: 0.7;
+}
+
+.modal-category-card i {
+    transition: transform 0.2s ease;
+}
+
+.modal-category-card:hover i {
+    transform: translateX(3px);
+    color: var(--primary-color, #0d6efd) !important;
+    opacity: 1 !important;
+}
+
+.category-letter-header {
+    margin-top: 10px;
+}
+

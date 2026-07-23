@@ -39,7 +39,7 @@
                 <div class="search-loader" x-show="isLoading" class="d-none"></div>
                 <input 
                     type="text" 
-                    name="q" 
+                    name="keyword" 
                     class="smart-search-input" 
                     placeholder="Search hotels, restaurants, attractions, events or destinations..." 
                     autocomplete="off"
@@ -356,11 +356,11 @@
                             @foreach($results as $item)
                                 <div class="col-md-6 col-lg-4">
                                     @if($tab == 'hotels')
-                                        <x-hotel-card :hotel="$item" :featured="$item->is_featured == 1" />
+                                        <x-hotel-card :hotel="$item" :featured="($item->is_featured ?? 0) == 1" />
                                     @elseif($tab == 'restaurants')
-                                        <x-restaurant-card :restaurant="$item" :featured="$item->is_featured == 1" />
+                                        <x-restaurant-card :restaurant="$item" :featured="($item->is_featured ?? 0) == 1" />
                                     @elseif($tab == 'attractions')
-                                        <x-attraction-card :attraction="$item" :featured="$item->is_featured == 1" />
+                                        <x-attraction-card :attraction="$item" :featured="($item->is_featured ?? 0) == 1" />
                                     @elseif($tab == 'events')
                                         <x-event-card :event="$item" />
                                     @elseif($tab == 'travel_guides')

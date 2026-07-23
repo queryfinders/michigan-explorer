@@ -39,7 +39,7 @@
                 if (this.debounceTimer) clearTimeout(this.debounceTimer);
 
                 this.debounceTimer = setTimeout(() => {
-                    fetch('/search/autocomplete?q=' + encodeURIComponent(this.keyword))
+                    fetch('/search/autocomplete?keyword=' + encodeURIComponent(this.keyword))
                         .then(res => res.json())
                         .then(data => {
                             let results = {};
@@ -92,7 +92,7 @@
                 }
                 // If nothing is selected, submit form normally
                 if (this.keyword.trim() !== '') {
-                    window.location.href = '/search?q=' + encodeURIComponent(this.keyword);
+                    window.location.href = '/search?keyword=' + encodeURIComponent(this.keyword);
                 }
             },
 
