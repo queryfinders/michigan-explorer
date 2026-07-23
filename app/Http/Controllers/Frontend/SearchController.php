@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use App\Models\Hotel;
 use App\Models\Restaurant;
 use App\Models\Attraction;
@@ -11,107 +12,150 @@ use App\Models\Event;
 use App\Models\Blog;
 use App\Models\SearchKeyword;
 
+/**
+ * Class SearchController
+ *
+ * Handles global search functionality, autocomplete suggestions, and search shortcut tracking.
+ * Provides filtered search results across Hotels, Restaurants, Attractions, Events, and Blogs.
+ */
 class SearchController extends Controller
 {
+    /**
+     * Track a click on a search shortcut and redirect to its target URL.
+     *
+     * @param int $id The ID of the search shortcut.
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function trackShortcut($id)
     {
         $shortcut = \App\Models\SearchShortcut::findOrFail($id);
-        
-        $shortcut->increment('click_count');
-        $shortcut->update(['last_clicked_at' => now()]);
-        
+
+        // Combine increment + timestamp update into a single query
+        $shortcut->increment('click_count', 1, ['last_clicked_at' => now()]);
+
         return redirect()->to($shortcut->target_url);
     }
 
+    /**
+     * Provide autocomplete suggestions based on the user's search query.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function autocomplete(Request $request)
     {
         $q = trim($request->input('q', ''));
+
+        // Reject empty or too-short queries immediately
         if (empty($q) || strlen($q) < 2) {
             return response()->json([]);
         }
 
         $results = [];
 
-        // Helper function for mapping
-        $mapItem = function($item, $routeName, $isBlog = false) {
+        // Reusable mapper: reads pre-selected lightweight columns only
+        $mapItem = function ($item, $routeName, $isBlog = false) {
             $img = $item->featured_image ?? $item->image ?? null;
             return [
-                'id' => $item->id,
-                'title' => $isBlog ? $item->title : $item->name,
-                'url' => route($routeName, $item->slug),
-                'image' => $img ? (str_starts_with($img, 'http') ? $img : asset($img)) : asset('website/assets/images/placeholder.jpg'),
-                'location' => $isBlog ? ($item->category->name ?? 'Article') : ($item->city ?? 'Michigan'),
+                'id'       => $item->id,
+                'title'    => $isBlog ? $item->title : $item->name,
+                'url'      => route($routeName, $item->slug),
+                'image'    => $img
+                    ? (str_starts_with($img, 'http') ? $img : asset($img))
+                    : asset('website/assets/images/placeholder.jpg'),
+                'location' => $isBlog
+                    ? ($item->category->name ?? 'Article')
+                    : ($item->city ?? 'Michigan'),
             ];
         };
 
-        // Hotels
-        $hotelsQuery = Hotel::where('status', 1)->where('name', 'like', "%{$q}%");
+        // Hotels — select only the lightweight columns needed for the autocomplete card
+        $hotelsQuery = Hotel::select(['id', 'name', 'slug', 'featured_image', 'city'])
+            ->where('status', 1)
+            ->where('name', 'like', "%{$q}%");
         $hotelsCount = (clone $hotelsQuery)->count();
         if ($hotelsCount > 0) {
             $results['Hotels'] = [
-                'items' => $hotelsQuery->take(3)->get()->map(fn($item) => $mapItem($item, 'web.hotels.show')),
-                'has_more' => $hotelsCount > 3,
+                'items'        => $hotelsQuery->take(3)->get()->map(fn ($item) => $mapItem($item, 'web.hotels.show')),
+                'has_more'     => $hotelsCount > 3,
                 'view_all_url' => route('web.search', ['tab' => 'hotels', 'q' => $q]),
-                'icon' => 'fas fa-hotel'
+                'icon'         => 'fas fa-hotel',
             ];
         }
 
         // Restaurants
-        $restQuery = Restaurant::where('status', 1)->where('name', 'like', "%{$q}%");
+        $restQuery = Restaurant::select(['id', 'name', 'slug', 'featured_image', 'city'])
+            ->where('status', 1)
+            ->where('name', 'like', "%{$q}%");
         $restCount = (clone $restQuery)->count();
         if ($restCount > 0) {
             $results['Restaurants'] = [
-                'items' => $restQuery->take(3)->get()->map(fn($item) => $mapItem($item, 'web.restaurants.show')),
-                'has_more' => $restCount > 3,
+                'items'        => $restQuery->take(3)->get()->map(fn ($item) => $mapItem($item, 'web.restaurants.show')),
+                'has_more'     => $restCount > 3,
                 'view_all_url' => route('web.search', ['tab' => 'restaurants', 'q' => $q]),
-                'icon' => 'fas fa-utensils'
+                'icon'         => 'fas fa-utensils',
             ];
         }
 
         // Attractions
-        $attrQuery = Attraction::where('status', 1)->where('name', 'like', "%{$q}%");
+        $attrQuery = Attraction::select(['id', 'name', 'slug', 'featured_image', 'city'])
+            ->where('status', 1)
+            ->where('name', 'like', "%{$q}%");
         $attrCount = (clone $attrQuery)->count();
         if ($attrCount > 0) {
             $results['Attractions'] = [
-                'items' => $attrQuery->take(3)->get()->map(fn($item) => $mapItem($item, 'web.attractions.show')),
-                'has_more' => $attrCount > 3,
+                'items'        => $attrQuery->take(3)->get()->map(fn ($item) => $mapItem($item, 'web.attractions.show')),
+                'has_more'     => $attrCount > 3,
                 'view_all_url' => route('web.search', ['tab' => 'attractions', 'q' => $q]),
-                'icon' => 'fas fa-map-marked-alt'
+                'icon'         => 'fas fa-map-marked-alt',
             ];
         }
 
         // Events
-        $eventQuery = Event::where('status', 1)->where('name', 'like', "%{$q}%");
+        $eventQuery = Event::select(['id', 'name', 'slug', 'featured_image', 'city'])
+            ->where('status', 1)
+            ->where('name', 'like', "%{$q}%");
         $eventCount = (clone $eventQuery)->count();
         if ($eventCount > 0) {
             $results['Events'] = [
-                'items' => $eventQuery->take(3)->get()->map(fn($item) => $mapItem($item, 'web.events.show')),
-                'has_more' => $eventCount > 3,
+                'items'        => $eventQuery->take(3)->get()->map(fn ($item) => $mapItem($item, 'web.events.show')),
+                'has_more'     => $eventCount > 3,
                 'view_all_url' => route('web.search', ['tab' => 'events', 'q' => $q]),
-                'icon' => 'fas fa-calendar-alt'
+                'icon'         => 'fas fa-calendar-alt',
             ];
         }
 
-        // Travel Guides (Blogs)
-        $blogQuery = Blog::with('category')->where('status', 'published')->where('title', 'like', "%{$q}%");
+        // Travel Guides (Blogs) — eager-load only the category name needed for the location label
+        $blogQuery = Blog::with(['category:id,name'])
+            ->select(['id', 'title', 'slug', 'featured_image', 'blog_category_id'])
+            ->where('status', 'published')
+            ->where('title', 'like', "%{$q}%");
         $blogCount = (clone $blogQuery)->count();
         if ($blogCount > 0) {
             $results['Travel Guides'] = [
-                'items' => $blogQuery->take(3)->get()->map(fn($item) => $mapItem($item, 'web.blogs.show', true)),
-                'has_more' => $blogCount > 3,
+                'items'        => $blogQuery->take(3)->get()->map(fn ($item) => $mapItem($item, 'web.blogs.show', true)),
+                'has_more'     => $blogCount > 3,
                 'view_all_url' => route('web.search', ['tab' => 'travel_guides', 'q' => $q]),
-                'icon' => 'fas fa-book-open'
+                'icon'         => 'fas fa-book-open',
             ];
         }
 
         return response()->json($results);
     }
 
+    /**
+     * Display the global search results page.
+     * Handles keyword tracking, counts per category, and filtering logic.
+     *
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\View
+     */
     public function index(Request $request)
     {
-        $q = $request->input('q');
+        $q   = $request->input('q');
         $tab = $request->input('tab', 'all');
 
+        // Log the search keyword for analytics; increment if it already exists
         if ($q) {
             $keyword = SearchKeyword::firstOrCreate(['keyword' => strtolower(trim($q))]);
             if (!$keyword->wasRecentlyCreated) {
@@ -119,13 +163,22 @@ class SearchController extends Controller
             }
         }
 
-        // Get total counts for tabs
+        // DRY closure for keyword-based WHERE conditions on name/description
+        $keywordScope = fn ($query) => $query->where(function ($q2) use ($q) {
+            $q2->where('name', 'like', "%{$q}%")->orWhere('description', 'like', "%{$q}%");
+        });
+
+        // Get total counts for tab badges
         $counts = [
-            'hotels' => Hotel::where('status', 1)->when($q, function($query, $q) { return $query->where('name', 'like', "%{$q}%")->orWhere('description', 'like', "%{$q}%"); })->count(),
-            'restaurants' => Restaurant::where('status', 1)->when($q, function($query, $q) { return $query->where('name', 'like', "%{$q}%")->orWhere('description', 'like', "%{$q}%"); })->count(),
-            'attractions' => Attraction::where('status', 1)->when($q, function($query, $q) { return $query->where('name', 'like', "%{$q}%")->orWhere('description', 'like', "%{$q}%"); })->count(),
-            'events' => Event::where('status', 1)->when($q, function($query, $q) { return $query->where('name', 'like', "%{$q}%")->orWhere('description', 'like', "%{$q}%"); })->count(),
-            'blogs' => Blog::where('status', 'published')->when($q, function($query, $q) { return $query->where('title', 'like', "%{$q}%")->orWhere('content', 'like', "%{$q}%"); })->count(),
+            'hotels'      => Hotel::where('status', 1)->when($q, $keywordScope)->count(),
+            'restaurants' => Restaurant::where('status', 1)->when($q, $keywordScope)->count(),
+            'attractions' => Attraction::where('status', 1)->when($q, $keywordScope)->count(),
+            'events'      => Event::where('status', 1)->when($q, $keywordScope)->count(),
+            'blogs'       => Blog::where('status', 'published')->when($q, function ($query) use ($q) {
+                $query->where(function ($q2) use ($q) {
+                    $q2->where('title', 'like', "%{$q}%")->orWhere('content', 'like', "%{$q}%");
+                });
+            })->count(),
         ];
         $counts['all'] = array_sum($counts);
 
@@ -155,35 +208,23 @@ class SearchController extends Controller
             $filters = $this->getBlogFilters();
         }
 
+        // Show cached recommendations when a specific tab returns zero results
         $recommendations = collect();
-        if ($tab != 'all' && $results->isEmpty()) {
-            $recommendations = \Illuminate\Support\Facades\Cache::remember("search_recommendations_{$tab}_v2", 3600, function() use ($tab) {
-                if ($tab == 'hotels') {
-                    $recs = \App\Models\Hotel::with(['category'])->where('status', 1)->where('is_featured', 1)->inRandomOrder()->take(4)->get();
-                    return $recs->isEmpty() ? \App\Models\Hotel::with(['category'])->where('status', 1)->latest()->take(4)->get() : $recs;
-                }
-                if ($tab == 'restaurants') {
-                    $recs = \App\Models\Restaurant::with(['category'])->where('status', 1)->where('is_featured', 1)->inRandomOrder()->take(4)->get();
-                    return $recs->isEmpty() ? \App\Models\Restaurant::with(['category'])->where('status', 1)->latest()->take(4)->get() : $recs;
-                }
-                if ($tab == 'attractions') {
-                    $recs = \App\Models\Attraction::with(['category'])->where('status', 1)->where('is_featured', 1)->inRandomOrder()->take(4)->get();
-                    return $recs->isEmpty() ? \App\Models\Attraction::with(['category'])->where('status', 1)->latest()->take(4)->get() : $recs;
-                }
-                if ($tab == 'events') {
-                    $recs = \App\Models\Event::with(['category'])->where('status', 1)->where('start_date', '>=', now())->orderBy('start_date', 'asc')->take(4)->get();
-                    return $recs->isEmpty() ? \App\Models\Event::with(['category'])->where('status', 1)->latest()->take(4)->get() : $recs;
-                }
-                if ($tab == 'travel_guides') {
-                    return \App\Models\Blog::with(['category'])->where('status', 'published')->latest()->take(4)->get();
-                }
-                return collect();
+        if ($tab !== 'all' && $results->isEmpty()) {
+            $recommendations = Cache::remember("search_recommendations_{$tab}_v2", 3600, function () use ($tab) {
+                return $this->getRecommendations($tab);
             });
         }
 
         return view('web.search', compact('results', 'q', 'tab', 'counts', 'filters', 'recommendations'));
     }
 
+    /**
+     * Build the search query for Hotels based on request filters.
+     *
+     * @param Request $request
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     private function searchHotels(Request $request)
     {
         $q = $request->input('q');
@@ -225,6 +266,12 @@ class SearchController extends Controller
         return $query;
     }
 
+    /**
+     * Build the search query for Restaurants based on request filters.
+     *
+     * @param Request $request
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     private function searchRestaurants(Request $request)
     {
         $q = $request->input('q');
@@ -254,6 +301,12 @@ class SearchController extends Controller
         return $query;
     }
 
+    /**
+     * Build the search query for Attractions based on request filters.
+     *
+     * @param Request $request
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     private function searchAttractions(Request $request)
     {
         $q = $request->input('q');
@@ -280,6 +333,12 @@ class SearchController extends Controller
         return $query;
     }
 
+    /**
+     * Build the search query for Events based on request filters.
+     *
+     * @param Request $request
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     private function searchEvents(Request $request)
     {
         $q = $request->input('q');
@@ -315,6 +374,12 @@ class SearchController extends Controller
         return $query;
     }
 
+    /**
+     * Build the search query for Blogs (Travel Guides) based on request filters.
+     *
+     * @param Request $request
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     private function searchBlogs(Request $request)
     {
         $q = $request->input('q');
@@ -334,6 +399,14 @@ class SearchController extends Controller
         return $query;
     }
 
+    /**
+     * Apply sorting logic to a given Eloquent query builder.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string|null $sort
+     * @param string $modelType
+     * @return void
+     */
     private function applySorting($query, $sort, $modelType = 'generic')
     {
         $dateColumn = ($modelType == 'blog') ? 'published_at' : 'created_at';
@@ -362,44 +435,112 @@ class SearchController extends Controller
         }
     }
 
+    /**
+     * Get cached recommended items when a tab has no results.
+     *
+     * @param string $tab
+     * @return \Illuminate\Support\Collection
+     */
+    private function getRecommendations(string $tab)
+    {
+        switch ($tab) {
+            case 'hotels':
+                $recs = Hotel::with(['category'])->where('status', 1)->where('is_featured', 1)->inRandomOrder()->take(4)->get();
+                return $recs->isEmpty() ? Hotel::with(['category'])->where('status', 1)->latest()->take(4)->get() : $recs;
+
+            case 'restaurants':
+                $recs = Restaurant::with(['category'])->where('status', 1)->where('is_featured', 1)->inRandomOrder()->take(4)->get();
+                return $recs->isEmpty() ? Restaurant::with(['category'])->where('status', 1)->latest()->take(4)->get() : $recs;
+
+            case 'attractions':
+                $recs = Attraction::with(['category'])->where('status', 1)->where('is_featured', 1)->inRandomOrder()->take(4)->get();
+                return $recs->isEmpty() ? Attraction::with(['category'])->where('status', 1)->latest()->take(4)->get() : $recs;
+
+            case 'events':
+                $recs = Event::with(['category'])->where('status', 1)->where('start_date', '>=', now())->orderBy('start_date', 'asc')->take(4)->get();
+                return $recs->isEmpty() ? Event::with(['category'])->where('status', 1)->latest()->take(4)->get() : $recs;
+
+            case 'travel_guides':
+                return Blog::with(['category'])->where('status', 'published')->latest()->take(4)->get();
+
+            default:
+                return collect();
+        }
+    }
+
+    /**
+     * Get cached hotel filter options (cities, categories, amenities, booking features).
+     *
+     * @return array
+     */
     private function getHotelFilters()
     {
-        return [
-            'cities' => Hotel::where('status', 1)->whereNotNull('city')->distinct()->pluck('city'),
-            'categories' => \App\Models\HotelCategory::where('status', 1)->get(),
-            'amenities' => \App\Models\Amenity::where('status', 1)->get(),
-            'booking_features' => \App\Models\BookingFeature::where('is_active', 1)->get(),
-        ];
+        return Cache::remember('search_filters_hotels', 3600, function () {
+            return [
+                'cities'           => Hotel::where('status', 1)->whereNotNull('city')->distinct()->pluck('city'),
+                'categories'       => \App\Models\HotelCategory::where('status', 1)->get(),
+                'amenities'        => \App\Models\Amenity::where('status', 1)->get(),
+                'booking_features' => \App\Models\BookingFeature::where('is_active', 1)->get(),
+            ];
+        });
     }
-    
+
+    /**
+     * Get cached restaurant filter options (cities, categories).
+     *
+     * @return array
+     */
     private function getRestaurantFilters()
     {
-        return [
-            'cities' => Restaurant::where('status', 1)->whereNotNull('city')->distinct()->pluck('city'),
-            'categories' => \App\Models\RestaurantCategory::where('status', 1)->get(),
-        ];
+        return Cache::remember('search_filters_restaurants', 3600, function () {
+            return [
+                'cities'     => Restaurant::where('status', 1)->whereNotNull('city')->distinct()->pluck('city'),
+                'categories' => \App\Models\RestaurantCategory::where('status', 1)->get(),
+            ];
+        });
     }
 
+    /**
+     * Get cached attraction filter options (cities, categories).
+     *
+     * @return array
+     */
     private function getAttractionFilters()
     {
-        return [
-            'cities' => Attraction::where('status', 1)->whereNotNull('city')->distinct()->pluck('city'),
-            'categories' => \App\Models\AttractionCategory::where('status', 1)->get(),
-        ];
+        return Cache::remember('search_filters_attractions', 3600, function () {
+            return [
+                'cities'     => Attraction::where('status', 1)->whereNotNull('city')->distinct()->pluck('city'),
+                'categories' => \App\Models\AttractionCategory::where('status', 1)->get(),
+            ];
+        });
     }
 
+    /**
+     * Get cached event filter options (cities, categories).
+     *
+     * @return array
+     */
     private function getEventFilters()
     {
-        return [
-            'cities' => Event::where('status', 1)->whereNotNull('city')->distinct()->pluck('city'),
-            'categories' => \App\Models\EventCategory::where('status', 1)->get(),
-        ];
+        return Cache::remember('search_filters_events', 3600, function () {
+            return [
+                'cities'     => Event::where('status', 1)->whereNotNull('city')->distinct()->pluck('city'),
+                'categories' => \App\Models\EventCategory::where('status', 1)->get(),
+            ];
+        });
     }
 
+    /**
+     * Get cached blog/travel guide filter options (categories).
+     *
+     * @return array
+     */
     private function getBlogFilters()
     {
-        return [
-            'categories' => \App\Models\BlogCategory::where('status', 1)->get(),
-        ];
+        return Cache::remember('search_filters_blogs', 3600, function () {
+            return [
+                'categories' => \App\Models\BlogCategory::where('status', 1)->get(),
+            ];
+        });
     }
 }

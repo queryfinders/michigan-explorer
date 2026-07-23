@@ -9,7 +9,8 @@ class ContactController extends Controller
 {
     public function index()
     {
-        return view('web.contact');
+        $page = \App\Models\Page::with('seo')->where('slug', 'contact')->first();
+        return view('web.contact.index', compact('page'));
     }
 
     public function submit(\Illuminate\Http\Request $request)

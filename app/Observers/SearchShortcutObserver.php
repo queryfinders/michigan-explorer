@@ -5,6 +5,11 @@ namespace App\Observers;
 use App\Models\SearchShortcut;
 use Illuminate\Support\Facades\Cache;
 
+/**
+ * Class SearchShortcutObserver
+ *
+ * Observes Eloquent events on the SearchShortcut model to clear related caches.
+ */
 class SearchShortcutObserver
 {
     /**

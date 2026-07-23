@@ -4,6 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class SearchShortcut
+ *
+ * Represents a dynamic search shortcut button displayed on the frontend.
+ * Provides target URL resolution based on the configured ActionType.
+ */
 class SearchShortcut extends Model
 {
     protected $fillable = [
@@ -26,6 +32,11 @@ class SearchShortcut extends Model
         'last_clicked_at' => 'datetime',
     ];
 
+    /**
+     * Get the dynamically generated target URL based on the action type and value.
+     *
+     * @return string
+     */
     public function getTargetUrlAttribute()
     {
         $type = $this->action_type;

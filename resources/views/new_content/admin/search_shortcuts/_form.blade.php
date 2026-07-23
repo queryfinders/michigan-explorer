@@ -1,3 +1,8 @@
+{{-- 
+    File: _form.blade.php
+    Description: Dynamic search related view component.
+    Part of the Michigan Explorer dynamic search system.
+--}}
 @php
     $actionTypes = \App\Enums\ActionType::cases();
     $colors = [

@@ -7,8 +7,21 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 
+/**
+ * Class HomeController
+ *
+ * Handles the logic for rendering the main homepage,
+ * including dynamic content fetching and caching.
+ */
 class HomeController extends Controller
 {
+    /**
+     * Display the application homepage.
+     * Fetches top locations, events, guides, and dynamic search shortcuts.
+     *
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\View
+     */
     public function index(Request $request)
     {
         $hotels = \Illuminate\Support\Facades\Cache::remember('home_hotels', 3600, function() {

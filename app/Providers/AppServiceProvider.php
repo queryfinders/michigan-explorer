@@ -4,6 +4,11 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
+/**
+ * Class AppServiceProvider
+ *
+ * Registers and bootstraps global application services and observers.
+ */
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -23,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        // Register the observer to handle cache invalidation for dynamic search shortcuts
         \App\Models\SearchShortcut::observe(\App\Observers\SearchShortcutObserver::class);
     }
 }

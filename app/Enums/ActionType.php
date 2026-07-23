@@ -2,6 +2,11 @@
 
 namespace App\Enums;
 
+/**
+ * Enum ActionType
+ *
+ * Defines the types of actions or destinations that a dynamic Search Shortcut can route to.
+ */
 enum ActionType: string
 {
     case GLOBAL_SEARCH = 'global_search';
@@ -19,6 +24,11 @@ enum ActionType: string
     case DESTINATION = 'destination';
     case CUSTOM_URL = 'custom_url';
 
+    /**
+     * Get the human-readable label for the action type.
+     *
+     * @return string
+     */
     public function label(): string
     {
         return match($this) {

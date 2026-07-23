@@ -1,3 +1,8 @@
+{{-- 
+    File: index.blade.php
+    Description: Dynamic search related view component.
+    Part of the Michigan Explorer dynamic search system.
+--}}
 @extends('layouts/layoutMaster')
 @section('title', 'Search Shortcuts')
 @section('content')

@@ -1,3 +1,8 @@
+{{-- 
+    File: search.blade.php
+    Description: Dynamic search related view component.
+    Part of the Michigan Explorer dynamic search system.
+--}}
 @extends('web.layout.app_layout')
 
 @section('title', 'Global Search Results - Michigan Explorer')
