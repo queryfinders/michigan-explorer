@@ -56,11 +56,34 @@
             $allGalleryImages[] = ['src' => asset('storage/demo/michigan_hotel_pool_1783683632041.png'), 'alt' => 'Entrance'];
         }
         $extraCount = count($allGalleryImages) - 5;
+        
+        $videoUrl = $restaurant->video;
+        $embedUrl = '';
+        if ($videoUrl) {
+            if (strpos($videoUrl, 'youtube.com/watch?v=') !== false) {
+                $embedUrl = str_replace('watch?v=', 'embed/', $videoUrl);
+            } elseif (strpos($videoUrl, 'youtu.be/') !== false) {
+                $embedUrl = str_replace('youtu.be/', 'youtube.com/embed/', $videoUrl);
+            } elseif (strpos($videoUrl, 'vimeo.com/') !== false) {
+                // Convert vimeo.com/12345 to player.vimeo.com/video/12345
+                $videoId = substr(parse_url($videoUrl, PHP_URL_PATH), 1);
+                $embedUrl = "https://player.vimeo.com/video/" . $videoId;
+            } else {
+                $embedUrl = $videoUrl;
+            }
+        }
     @endphp
     <div class="gallery-grid mb-4" onclick="openCustomGallery()">
         {{-- Main featured image --}}
-        <div class="gallery-item main-img">
+        <div class="gallery-item main-img position-relative">
             <img src="{{ $allGalleryImages[0]['src'] }}" alt="{{ $allGalleryImages[0]['alt'] }}">
+            @if($embedUrl)
+            <div class="position-absolute top-50 start-50 translate-middle" style="pointer-events: none; z-index: 10;">
+                <div class="bg-white rounded-circle d-flex align-items-center justify-content-center shadow" style="width: 60px; height: 60px; opacity: 0.9;">
+                    <i class="fas fa-play text-primary fs-4 ms-1"></i>
+                </div>
+            </div>
+            @endif
         </div>
         {{-- Thumbnails: show up to 4 --}}
         @for($gi = 1; $gi <= min(4, count($allGalleryImages) - 1); $gi++)
@@ -81,6 +104,43 @@
         <div class="quick-fact-item"><i class="fas fa-child"></i> Family Friendly</div>
         <div class="quick-fact-item"><i class="fas fa-wine-glass"></i> Full Bar</div>
     </div>
+
+    @php
+        $hours = is_array($restaurant->opening_hours) ? $restaurant->opening_hours : json_decode($restaurant->opening_hours ?? '{}', true);
+        $groupedHours = [];
+        if (is_array($hours) && !empty($hours)) {
+            $daysOfWeek = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            $currentGroup = null;
+            
+            foreach ($daysOfWeek as $day) {
+                $data = $hours[$day] ?? null;
+                if (!$data) continue;
+                
+                $formattedTime = '';
+                if (!empty($data['closed'])) {
+                    $formattedTime = 'Closed';
+                } elseif (!empty($data['24_hours'])) {
+                    $formattedTime = 'Open 24 Hours';
+                } else {
+                    $open = !empty($data['open']) ? date('h:i A', strtotime($data['open'])) : '';
+                    $close = !empty($data['close']) ? date('h:i A', strtotime($data['close'])) : '';
+                    $formattedTime = ($open && $close) ? "$open – $close" : '';
+                }
+                
+                if (!$currentGroup) {
+                    $currentGroup = ['start_day' => $day, 'end_day' => $day, 'time' => $formattedTime];
+                } elseif ($currentGroup['time'] === $formattedTime) {
+                    $currentGroup['end_day'] = $day;
+                } else {
+                    $groupedHours[] = $currentGroup;
+                    $currentGroup = ['start_day' => $day, 'end_day' => $day, 'time' => $formattedTime];
+                }
+            }
+            if ($currentGroup) {
+                $groupedHours[] = $currentGroup;
+            }
+        }
+    @endphp
 
     <!-- 4. Main Layout -->
     <div class="row">
@@ -116,28 +176,21 @@
             </div>
             @endif
 
-            <!-- Hotel Information -> Opening Hours -->
+            @if(count($groupedHours) > 0)
             <div class="content-card">
                 <h3 class="mb-4">Opening Hours</h3>
                 <div class="info-grid">
-                    <div class="info-item">
-                        <h6>Monday - Thursday</h6>
-                        <p>11:00 AM - 10:00 PM</p>
-                    </div>
-                    <div class="info-item">
-                        <h6>Friday - Saturday</h6>
-                        <p>11:00 AM - 11:30 PM</p>
-                    </div>
-                    <div class="info-item">
-                        <h6>Sunday</h6>
-                        <p>10:00 AM - 9:00 PM (Brunch available)</p>
-                    </div>
-                    <div class="info-item">
-                        <h6>Happy Hour</h6>
-                        <p>Daily 4:00 PM - 6:00 PM</p>
-                    </div>
+                    @foreach($groupedHours as $group)
+                        @if($group['time'])
+                        <div class="info-item">
+                            <h6 class="text-uppercase">{{ $group['start_day'] }}{{ $group['start_day'] !== $group['end_day'] ? ' - ' . $group['end_day'] : '' }}</h6>
+                            <p>{{ $group['time'] }}</p>
+                        </div>
+                        @endif
+                    @endforeach
                 </div>
             </div>
+            @endif
 
             <!-- Location & Map removed from here -->
 
@@ -204,6 +257,21 @@
                 
                 <hr class="text-muted opacity-25">
 
+                @if(count($groupedHours) > 0)
+                <div class="mb-4">
+                    <div class="text-muted small fw-bold text-uppercase mb-2"><i class="far fa-clock me-1"></i> Opening Hours</div>
+                    @foreach($groupedHours as $group)
+                        @if($group['time'])
+                        <div class="d-flex justify-content-between mb-1 small">
+                            <span class="text-capitalize">{{ substr($group['start_day'], 0, 3) }}{{ $group['start_day'] !== $group['end_day'] ? ' – ' . substr($group['end_day'], 0, 3) : '' }}</span>
+                            <span class="fw-semibold">{{ $group['time'] }}</span>
+                        </div>
+                        @endif
+                    @endforeach
+                </div>
+                <hr class="text-muted opacity-25">
+                @endif
+
                 <div class="mb-4 text-center">
                     <p class="text-muted small mb-0">Secure your table in advance through our official reservation partner.</p>
                 </div>
@@ -222,7 +290,7 @@
         <!-- Full-Width Location & Map -->
         <div class="content-card mt-4" id="location-map">
             <h3>Location</h3>
-            <p class="text-muted mb-3"><i class="fas fa-map-marker-alt text-primary me-2"></i> {{ $restaurant->address ?? 'Main Street' }}, {{ $restaurant->city ?? 'Mackinac Island' }}, {{ $restaurant->state ?? 'MI' }}</p>
+            <p class="text-muted mb-3"><i class="fas fa-map-marker-alt text-primary me-2"></i> {{ $restaurant->address ?? '' }}, {{ $restaurant->city ?? '' }} {{ $restaurant->zip ?? '' }}</p>
             <div class="map-container bg-light h-500px">
                 @if(!empty($restaurant->map_iframe))
                     @if(str_contains($restaurant->map_iframe, '<iframe'))
@@ -231,7 +299,7 @@
                         <iframe width="100%" height="100%" frameborder="0" style="border:0;" src="{{ $restaurant->map_iframe }}"></iframe>
                     @endif
                 @else
-                    <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q={{ urlencode(($restaurant->address ?? 'Main Street') . ' ' . ($restaurant->city ?? 'Mackinac Island')) }}&t=&z=13&ie=UTF8&iwloc=&output=embed"></iframe>
+                    <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q={{ urlencode(($restaurant->address ?? '') . ' ' . ($restaurant->city ?? '') . ' ' . ($restaurant->zip ?? '')) }}&t=&z=13&ie=UTF8&iwloc=&output=embed"></iframe>
                 @endif
             </div>
             <div class="d-flex justify-content-between align-items-center mt-3">
@@ -239,7 +307,7 @@
                     <h6 class="fw-bold mb-1">Contact Info</h6>
                     <p class="mb-0 text-muted small"><i class="fas fa-phone-alt me-2"></i> {{ $restaurant->phone ?? '(555) 123-4567' }}</p>
                 </div>
-                <a href="https://maps.google.com/?q={{ urlencode(($restaurant->address ?? 'Main Street') . ' ' . ($restaurant->city ?? 'Mackinac Island')) }}" target="_blank" class="btn btn-outline-primary rounded-pill px-4">Get Directions</a>
+                <a href="https://maps.google.com/?q={{ urlencode(($restaurant->address ?? '') . ' ' . ($restaurant->city ?? '') . ' ' . ($restaurant->zip ?? '')) }}" target="_blank" class="btn btn-outline-primary rounded-pill px-4">Get Directions</a>
             </div>
         </div>
 
@@ -262,7 +330,8 @@
     
     <button class="lightbox-nav lightbox-prev" onclick="changeLightboxImage(-1)"><i class="fas fa-chevron-left"></i></button>
     
-    <div class="lightbox-image-container">
+    <div class="lightbox-image-container" style="display: flex; justify-content: center; align-items: center; width: 100%; height: 100%;">
+        <iframe id="lightbox-main-video" src="" frameborder="0" allow="autoplay; fullscreen" allowfullscreen style="display:none; width: 80vw; height: 80vh; max-width: 1200px;"></iframe>
         <img id="lightbox-main-img" src="" alt="Gallery Image">
     </div>
     
@@ -274,6 +343,7 @@
 </div>
 
 <script>
+    const restaurantVideoUrl = "{!! $embedUrl !!}";
     const galleryImages = [
         @foreach($allGalleryImages as $imgItem)
         "{{ $imgItem['src'] }}",
@@ -292,6 +362,8 @@
     function closeCustomGallery() {
         document.getElementById('customGalleryLightbox').style.display = 'none';
         document.body.style.overflow = 'auto'; // Re-enable scroll
+        const videoEl = document.getElementById('lightbox-main-video');
+        if (videoEl) videoEl.src = ''; // stop video
     }
 
     function changeLightboxImage(direction) {
@@ -303,11 +375,24 @@
 
     function updateLightbox() {
         const imgEl = document.getElementById('lightbox-main-img');
+        const videoEl = document.getElementById('lightbox-main-video');
+        
         imgEl.style.opacity = 0;
-        setTimeout(() => {
-            imgEl.src = galleryImages[currentGalleryIndex];
+        
+        if (currentGalleryIndex === 0 && restaurantVideoUrl) {
+            imgEl.style.display = 'none';
+            videoEl.style.display = 'block';
+            videoEl.src = restaurantVideoUrl + (restaurantVideoUrl.includes('?') ? '&' : '?') + 'autoplay=1&mute=1';
             imgEl.style.opacity = 1;
-        }, 200);
+        } else {
+            videoEl.style.display = 'none';
+            videoEl.src = '';
+            imgEl.style.display = 'block';
+            setTimeout(() => {
+                imgEl.src = galleryImages[currentGalleryIndex];
+                imgEl.style.opacity = 1;
+            }, 200);
+        }
         
         document.getElementById('lightbox-current-idx').innerText = currentGalleryIndex + 1;
         document.getElementById('lightbox-total-idx').innerText = galleryImages.length;
@@ -337,6 +422,16 @@
             if (e.key === 'Escape') closeCustomGallery();
             if (e.key === 'ArrowRight') changeLightboxImage(1);
             if (e.key === 'ArrowLeft') changeLightboxImage(-1);
+        }
+    });
+
+    // Auto-open video on page load if present
+    document.addEventListener('DOMContentLoaded', function() {
+        if (restaurantVideoUrl) {
+            setTimeout(() => {
+                openCustomGallery(0);
+            }, 500); // slight delay for smooth UX
+        }
     });
 </script>
 

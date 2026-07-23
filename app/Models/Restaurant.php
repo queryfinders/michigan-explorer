@@ -8,6 +8,10 @@ class Restaurant extends Model
 {
     protected $guarded = [];
 
+    protected $casts = [
+        'opening_hours' => 'array',
+    ];
+
     public function seo()
     {
         return $this->morphOne(\App\Models\Seo::class, 'seoable');

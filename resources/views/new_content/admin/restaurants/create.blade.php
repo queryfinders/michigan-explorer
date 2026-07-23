@@ -40,14 +40,48 @@
         <div class="tab-pane fade show active" id="basic-pane" role="tabpanel" aria-labelledby="basic-tab">
           <div class="row">
             <div class="col-md-4 mb-3">
-              <label class="form-label" for="restaurant_category_id">Category <span class="text-danger">*</span></label>
-              <select class="form-select @error('restaurant_category_id') is-invalid @enderror" id="restaurant_category_id" name="restaurant_category_id" required>
-                  <option value="">Select Category</option>
-                  @foreach($categories as $category)
-                  <option value="{{ $category->id }}" {{ old('restaurant_category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
-                  @endforeach
-              </select>
-              @error('restaurant_category_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+              <label class="form-label fw-semibold" for="restaurant_category_id">Category <span class="text-danger">*</span></label>
+              {{-- Hidden input that holds the selected category id --}}
+              <input type="hidden" name="restaurant_category_id" id="restaurant_category_id"
+                     value="{{ old('restaurant_category_id') }}" required />
+              @error('restaurant_category_id') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+
+              <div class="cuisine-dropdown-wrapper" id="categoryDropdownWrapper">
+                <div class="cuisine-dropdown-trigger" id="categoryTrigger" onclick="toggleCategoryDropdown()">
+                  <div class="cuisine-tags-area" id="categoryTagsArea">
+                    <span class="cuisine-placeholder" id="categoryPlaceholder">
+                      <i class="fas fa-layer-group me-2 text-muted"></i>Click to select category...
+                    </span>
+                  </div>
+                  <i class="fas fa-chevron-down cuisine-dropdown-arrow" id="categoryArrow"></i>
+                </div>
+                <div class="cuisine-dropdown-panel" id="categoryDropdownPanel" style="display:none;">
+                  <div class="cuisine-search-wrap">
+                    <i class="fas fa-search cuisine-search-icon"></i>
+                    <input type="text" class="cuisine-search-input" id="categorySearchInput"
+                           placeholder="Search categories..." oninput="filterCategories(this.value)" autocomplete="off" />
+                  </div>
+                  <div class="cuisine-divider"></div>
+                  <div class="cuisine-items-list" id="categoryItemsList">
+                    @foreach($categories as $cat)
+                    <label class="cuisine-item" id="cat-label-{{ $cat->id }}">
+                      <input type="radio" name="_cat_radio" value="{{ $cat->id }}"
+                             id="cat_rb_{{ $cat->id }}"
+                             class="cat-rb d-none"
+                             data-name="{{ $cat->name }}"
+                             data-id="{{ $cat->id }}"
+                             {{ old('restaurant_category_id') == $cat->id ? 'checked' : '' }}
+                             onchange="onCategoryChange(this)" />
+                      <span class="cuisine-item-name">{{ $cat->name }}</span>
+                      <span class="cuisine-item-check"><i class="fas fa-check"></i></span>
+                    </label>
+                    @endforeach
+                    <div class="cuisine-no-results d-none" id="categoryNoResults">
+                      <i class="fas fa-search-minus me-2"></i>No categories found
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="name">Name <span class="text-danger">*</span></label>
@@ -60,10 +94,7 @@
               @error('slug') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
           </div>
-          <div class="mb-3">
-            <label class="form-label" for="short_description">Short Description</label>
-            <textarea class="form-control" id="short_description" name="short_description" rows="2"></textarea>
-          </div>
+
           <div class="mb-3">
             <label class="form-label" for="description">Description</label>
             <textarea class="form-control tinymce" id="description" name="description" rows="6"></textarea>
@@ -188,13 +219,58 @@
           </div>
 
           <div class="row">
-            <div class="col-md-6 mb-3">
-              <label class="form-label" for="opening_hours">Opening Hours</label>
-              <input type="text" class="form-control" id="opening_hours" name="opening_hours" placeholder="e.g. Daily 11:00 AM - 10:00 PM" value="{{ old('opening_hours') }}" />
-            </div>
-            <div class="col-md-6 mb-3">
+            <div class="col-md-4 mb-3">
               <label class="form-label" for="starting_price">Average Cost ($)</label>
               <input type="number" class="form-control" id="starting_price" name="starting_price" placeholder="e.g. 45" value="{{ old('starting_price') }}" />
+            </div>
+          </div>
+
+          <div class="col-12 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <label class="form-label fw-bold mb-0">Opening Hours</label>
+              <button type="button" class="btn btn-sm btn-outline-primary" onclick="copyMondayHours()">
+                <i class="fas fa-copy me-1"></i>Copy Monday to All Days
+              </button>
+            </div>
+            <div class="border rounded p-3 bg-white">
+              @php
+                $days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+                $oldHours = old('opening_hours', []);
+              @endphp
+              
+              @foreach($days as $day)
+                @php
+                  $dayData = $oldHours[$day] ?? ['open' => '', 'close' => '', 'closed' => false, '24_hours' => false];
+                  $isClosed = !empty($dayData['closed']);
+                  $is24 = !empty($dayData['24_hours']);
+                  if ($isClosed && $is24) {
+                      $is24 = false; // Closed wins logically if bad DB data
+                  }
+                  $disabled = ($isClosed || $is24) ? 'disabled' : '';
+                @endphp
+                <div class="row align-items-center mb-2 {{ $loop->last ? '' : 'border-bottom pb-2' }}">
+                  <div class="col-md-2 fw-semibold text-capitalize">
+                    {{ $day }}
+                  </div>
+                  <div class="col-md-3">
+                    <input type="time" class="form-control time-input-{{ $day }}" name="opening_hours[{{ $day }}][open]" value="{{ $dayData['open'] }}" {{ $disabled }}>
+                  </div>
+                  <div class="col-md-1 text-center text-muted small fw-bold">TO</div>
+                  <div class="col-md-3">
+                    <input type="time" class="form-control time-input-{{ $day }}" name="opening_hours[{{ $day }}][close]" value="{{ $dayData['close'] }}" {{ $disabled }}>
+                  </div>
+                  <div class="col-md-3 d-flex gap-3">
+                    <div class="form-check mt-2">
+                      <input class="form-check-input closed-checkbox" type="checkbox" name="opening_hours[{{ $day }}][closed]" value="1" id="closed_{{ $day }}" data-day="{{ $day }}" {{ $isClosed ? 'checked' : '' }}>
+                      <label class="form-check-label" for="closed_{{ $day }}">Closed</label>
+                    </div>
+                    <div class="form-check mt-2">
+                      <input class="form-check-input 24h-checkbox" type="checkbox" name="opening_hours[{{ $day }}][24_hours]" value="1" id="24h_{{ $day }}" data-day="{{ $day }}" {{ $is24 ? 'checked' : '' }}>
+                      <label class="form-check-label" for="24h_{{ $day }}">24 Hours</label>
+                    </div>
+                  </div>
+                </div>
+              @endforeach
             </div>
           </div>
 
@@ -204,17 +280,13 @@
               <input type="text" class="form-control" id="city" name="city" value="{{ old('city') }}" />
             </div>
             <div class="col-md-4 mb-3">
-              <label class="form-label" for="state">State</label>
-              <input type="text" class="form-control" id="state" name="state" placeholder="e.g. MI" value="{{ old('state', 'MI') }}" />
-            </div>
-            <div class="col-md-4 mb-3">
               <label class="form-label" for="zip">Zip Code</label>
               <input type="text" class="form-control" id="zip" name="zip" value="{{ old('zip') }}" />
             </div>
-          </div>
-          <div class="mb-3">
-            <label class="form-label" for="address">Street Address</label>
-            <input type="text" class="form-control" id="address" name="address" value="{{ old('address') }}" />
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="address">Street Address</label>
+              <input type="text" class="form-control" id="address" name="address" value="{{ old('address') }}" />
+            </div>
           </div>
           <div class="row">
             <div class="col-md-4 mb-3">
@@ -225,10 +297,12 @@
               <label class="form-label" for="email">Email</label>
               <input type="email" class="form-control" id="email" name="email" value="{{ old('email') }}" />
             </div>
+            {{--
             <div class="col-md-4 mb-3">
               <label class="form-label" for="website">Website URL</label>
               <input type="url" class="form-control" id="website" name="website" value="{{ old('website') }}" />
             </div>
+            --}}
           </div>
           <div class="row">
             <div class="col-md-6 mb-3">
@@ -256,6 +330,14 @@
           <div class="mb-3">
             <label class="form-label" for="featured_image_alt">Image Alt Text (SEO)</label>
             <input type="text" class="form-control" id="featured_image_alt" name="featured_image_alt" placeholder="e.g. Fine dining room interior view" />
+          </div>
+          
+          <hr class="my-4">
+          <h5 class="fw-bold mb-3">Video Details</h5>
+          <div class="mb-3">
+            <label class="form-label fw-semibold" for="video">Video URL (YouTube/Vimeo)</label>
+            <input type="url" class="form-control" id="video" name="video" placeholder="e.g. https://youtube.com/watch?v=..." value="{{ old('video') }}" />
+            <div class="form-text">Paste a Youtube or Vimeo link here. This will display as the first item in the media gallery.</div>
           </div>
         </div>
 
@@ -455,9 +537,11 @@
     const tagsArea = document.getElementById('cuisineTagsArea');
     const placeholder = document.getElementById('cuisinePlaceholder');
     const countEl = document.getElementById('cuisineSelectedCount');
-    tagsArea.innerHTML = '';
+    
+    tagsArea.querySelectorAll('.cuisine-tag').forEach(tag => tag.remove());
+    
     if (cbs.length === 0) {
-      tagsArea.appendChild(placeholder); placeholder.style.display = 'flex';
+      placeholder.style.display = 'flex';
       countEl.textContent = '0 selected'; return;
     }
     placeholder.style.display = 'none';
@@ -514,9 +598,11 @@
     const tagsArea = document.getElementById('featureTagsArea');
     const placeholder = document.getElementById('featurePlaceholder');
     const countEl = document.getElementById('featureSelectedCount');
-    tagsArea.innerHTML = '';
+    
+    tagsArea.querySelectorAll('.feature-tag').forEach(tag => tag.remove());
+    
     if (cbs.length === 0) {
-      tagsArea.appendChild(placeholder); placeholder.style.display = 'flex';
+      placeholder.style.display = 'flex';
       countEl.textContent = '0 selected'; return;
     }
     placeholder.style.display = 'none';
@@ -722,15 +808,22 @@
     });
   }
 
-  // Auto-slug in quick add modals
-  document.getElementById('new_cuisine_name').addEventListener('input', function() {
-    document.getElementById('new_cuisine_slug').value = generateSlug(this.value);
-  });
-  document.getElementById('new_feature_name').addEventListener('input', function() {
-    document.getElementById('new_feature_slug').value = generateSlug(this.value);
-  });
-
   document.addEventListener('DOMContentLoaded', () => {
+    // Auto-slug in quick add modals
+    const newCuisineName = document.getElementById('new_cuisine_name');
+    if (newCuisineName) {
+      newCuisineName.addEventListener('input', function() {
+        document.getElementById('new_cuisine_slug').value = generateSlug(this.value);
+      });
+    }
+
+    const newFeatureName = document.getElementById('new_feature_name');
+    if (newFeatureName) {
+      newFeatureName.addEventListener('input', function() {
+        document.getElementById('new_feature_slug').value = generateSlug(this.value);
+      });
+    }
+
     renderCuisineTags();
     renderFeatureTags();
   });
@@ -818,6 +911,159 @@
         });
       }
     });
+
+    // Pre-select category if old value exists
+    const preselectedCat = document.getElementById('restaurant_category_id').value;
+    if (preselectedCat) {
+      const rb = document.getElementById('cat_rb_' + preselectedCat);
+      if (rb) { rb.checked = true; onCategoryChange(rb); }
+    }
+  });
+
+  // ─── CATEGORY SINGLE-SELECT DROPDOWN ────────────────────────────────────────
+  function toggleCategoryDropdown() {
+    const panel  = document.getElementById('categoryDropdownPanel');
+    const arrow  = document.getElementById('categoryArrow');
+    const isOpen = panel.style.display !== 'none';
+    panel.style.display = isOpen ? 'none' : 'block';
+    arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+    if (!isOpen) document.getElementById('categorySearchInput').focus();
+  }
+  function closeCategoryDropdown() {
+    document.getElementById('categoryDropdownPanel').style.display = 'none';
+    document.getElementById('categoryArrow').style.transform = 'rotate(0deg)';
+  }
+  function filterCategories(val) {
+    const term  = val.toLowerCase();
+    const items = document.querySelectorAll('#categoryItemsList .cuisine-item');
+    let   found = 0;
+    items.forEach(item => {
+      const name = item.querySelector('.cuisine-item-name').textContent.toLowerCase();
+      const show = name.includes(term);
+      item.style.display = show ? '' : 'none';
+      if (show) found++;
+    });
+    document.getElementById('categoryNoResults').classList.toggle('d-none', found > 0);
+  }
+  function onCategoryChange(rb) {
+    const id    = rb.dataset.id;
+    const name  = rb.dataset.name;
+    const hidden= document.getElementById('restaurant_category_id');
+    const tags  = document.getElementById('categoryTagsArea');
+    const ph    = document.getElementById('categoryPlaceholder');
+
+    hidden.value = id;
+
+    // Mark active visually in the list
+    document.querySelectorAll('#categoryItemsList .cuisine-item').forEach(l => l.classList.remove('selected'));
+    document.getElementById('cat-label-' + id).classList.add('selected');
+
+    // Show plain text in trigger (no tag/× button)
+    ph.style.display = 'none';
+    let existing = tags.querySelector('.category-selected-text');
+    if (!existing) {
+      existing = document.createElement('span');
+      existing.className = 'category-selected-text';
+      existing.style.cssText = 'font-size:0.9rem; font-weight:500; color:#333;';
+      tags.insertBefore(existing, ph);
+    }
+    existing.textContent = name;
+
+    closeCategoryDropdown();
+  }
+
+  // Opening Hours JavaScript
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.closed-checkbox, .24h-checkbox').forEach(cb => {
+      cb.addEventListener('change', function() {
+        const day = this.dataset.day;
+        const cbClosed = document.getElementById('closed_' + day);
+        const cb24h = document.getElementById('24h_' + day);
+        const inputs = document.querySelectorAll('.time-input-' + day);
+        
+        if (this.classList.contains('closed-checkbox') && this.checked) {
+          cb24h.checked = false;
+          cb24h.disabled = true;
+        } else if (this.classList.contains('closed-checkbox') && !this.checked) {
+          cb24h.disabled = false;
+        }
+
+        if (this.classList.contains('24h-checkbox') && this.checked) {
+          cbClosed.checked = false;
+          cbClosed.disabled = true;
+        } else if (this.classList.contains('24h-checkbox') && !this.checked) {
+          cbClosed.disabled = false;
+        }
+
+        const shouldDisable = cbClosed.checked || cb24h.checked;
+        
+        inputs.forEach(input => {
+            input.disabled = shouldDisable;
+            if (shouldDisable) {
+                input.value = '';
+                input.classList.add('bg-light');
+            } else {
+                input.classList.remove('bg-light');
+            }
+        });
+      });
+      
+      // Trigger change on load to set initial state
+      cb.dispatchEvent(new Event('change'));
+    });
+  });
+
+  function copyMondayHours() {
+    const days = ['tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    const monOpen = document.querySelector('input[name="opening_hours[monday][open]"]').value;
+    const monClose = document.querySelector('input[name="opening_hours[monday][close]"]').value;
+    const monClosed = document.getElementById('closed_monday').checked;
+    const mon24h = document.getElementById('24h_monday').checked;
+
+    if (!monClosed && !mon24h && (!monOpen || !monClose)) {
+        if (typeof toastr !== 'undefined') {
+            toastr.error('Please set valid times for Monday before copying.');
+        } else {
+            alert('Please set valid times for Monday before copying.');
+        }
+        return;
+    }
+
+    days.forEach(day => {
+      document.querySelector('input[name="opening_hours['+day+'][open]"]').value = monOpen;
+      document.querySelector('input[name="opening_hours['+day+'][close]"]').value = monClose;
+      document.getElementById('closed_' + day).checked = monClosed;
+      document.getElementById('24h_' + day).checked = mon24h;
+      
+      const shouldDisable = monClosed || mon24h;
+      document.querySelectorAll('.time-input-' + day).forEach(input => {
+          input.disabled = shouldDisable;
+          if (shouldDisable) {
+              input.classList.add('bg-light');
+          } else {
+              input.classList.remove('bg-light');
+          }
+      });
+    });
+
+    if (typeof toastr !== 'undefined') {
+        toastr.success('Monday schedule applied to all days.');
+    }
+  }
+
+  function clearCategory() {
+    document.getElementById('restaurant_category_id').value = '';
+    const tags = document.getElementById('categoryTagsArea');
+    const txt  = tags.querySelector('.category-selected-text');
+    if (txt) txt.remove();
+    document.getElementById('categoryPlaceholder').style.display = '';
+    document.querySelectorAll('#categoryItemsList .cuisine-item').forEach(l => l.classList.remove('selected'));
+    document.querySelectorAll('#categoryItemsList .cat-rb').forEach(r => r.checked = false);
+  }
+  // Close when clicking outside
+  document.addEventListener('click', function(e) {
+    const wrapper = document.getElementById('categoryDropdownWrapper');
+    if (wrapper && !wrapper.contains(e.target)) closeCategoryDropdown();
   });
 </script>
 @endsection

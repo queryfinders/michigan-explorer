@@ -51,9 +51,30 @@ class RestaurantController extends Controller
             'cuisines.*'            => 'exists:restaurant_cuisines,id',
             'features'              => 'nullable|array',
             'features.*'            => 'exists:restaurant_features,id',
+            'opening_hours'         => 'nullable|array',
+            'opening_hours.*.open'  => 'nullable|string',
+            'opening_hours.*.close' => 'nullable|string',
+            'opening_hours.*.closed'=> 'nullable|boolean',
+            'opening_hours.*.24_hours'=> 'nullable|boolean',
         ]);
 
-        $data = $request->except('_token', '_method', 'featured_image_file', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'gallery_images', 'gallery_alts', 'faqs', 'cuisines', 'features');
+        if ($request->has('opening_hours')) {
+            $hours = $request->input('opening_hours');
+            foreach ($hours as $day => $data) {
+                if (!empty($data['closed']) && !empty($data['24_hours'])) {
+                    return back()->withErrors(['opening_hours' => 'A day cannot be both Closed and Open 24 Hours (' . ucfirst($day) . ').'])->withInput();
+                }
+                if (empty($data['closed']) && empty($data['24_hours']) && !empty($data['open']) && !empty($data['close'])) {
+                    $openTime = strtotime($data['open']);
+                    $closeTime = strtotime($data['close']);
+                    if ($closeTime <= $openTime) {
+                        return back()->withErrors(['opening_hours' => 'Closing time must be later than opening time on ' . ucfirst($day) . '.'])->withInput();
+                    }
+                }
+            }
+        }
+
+        $data = $request->except('_token', '_method', 'featured_image_file', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'gallery_images', 'gallery_alts', 'faqs', 'cuisines', 'features', 'featured_image_alt');
         $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
 
         // Comma-separated list for backward compatibility on frontend string rendering
@@ -188,9 +209,31 @@ class RestaurantController extends Controller
             'cuisines.*'            => 'exists:restaurant_cuisines,id',
             'features'              => 'nullable|array',
             'features.*'            => 'exists:restaurant_features,id',
+            'opening_hours'         => 'nullable|array',
+            'opening_hours.*.open'  => 'nullable|string',
+            'opening_hours.*.close' => 'nullable|string',
+            'opening_hours.*.closed'=> 'nullable|boolean',
+            'opening_hours.*.24_hours'=> 'nullable|boolean',
         ]);
 
-        $data = $request->except('_token', '_method', 'featured_image_file', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'gallery_images', 'gallery_alts', 'delete_gallery_ids', 'faqs', 'cuisines', 'features');
+        // Custom validation for opening hours to ensure close is after open
+        if ($request->has('opening_hours')) {
+            $hours = $request->input('opening_hours');
+            foreach ($hours as $day => $data) {
+                if (!empty($data['closed']) && !empty($data['24_hours'])) {
+                    return back()->withErrors(['opening_hours' => 'A day cannot be both Closed and Open 24 Hours (' . ucfirst($day) . ').'])->withInput();
+                }
+                if (empty($data['closed']) && empty($data['24_hours']) && !empty($data['open']) && !empty($data['close'])) {
+                    $openTime = strtotime($data['open']);
+                    $closeTime = strtotime($data['close']);
+                    if ($closeTime <= $openTime) {
+                        return back()->withErrors(['opening_hours' => 'Closing time must be later than opening time on ' . ucfirst($day) . '.'])->withInput();
+                    }
+                }
+            }
+        }
+
+        $data = $request->except('_token', '_method', 'featured_image_file', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'gallery_images', 'gallery_alts', 'delete_gallery_ids', 'faqs', 'cuisines', 'features', 'featured_image_alt');
         $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
 
         // Comma-separated list for backward compatibility on frontend string rendering
