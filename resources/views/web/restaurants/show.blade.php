@@ -197,7 +197,6 @@
                         <div class="sidebar-price">${{ $restaurant->starting_price ?? '45' }} <span>/person</span></div>
                     </div>
                     <div class="text-end">
-                        <div class="badge bg-primary fs-6 mb-1 rounded-pill px-3 py-2"><i class="fas fa-star text-warning me-1"></i> 4.8</div>
                         <div class="text-muted small fw-bold">890 reviews</div>
                     </div>
                 </div>

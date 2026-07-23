@@ -98,9 +98,9 @@
     </div>
 
     <!-- Scroll Indicator -->
-    <div class="scroll-indicator" @click="window.scrollTo({top: window.innerHeight, behavior: 'smooth'})">
-        <span class="d-block mb-1 small text-uppercase tracking-wider">Explore More</span>
-        <i class="fas fa-arrow-down fs-4"></i>
+    <div class="scroll-indicator d-inline-flex align-items-center gap-2" onclick="window.scrollTo({top: window.innerHeight, behavior: 'smooth'})">
+        <span>Explore More</span>
+        <i class="fas fa-chevron-down"></i>
     </div>
 </section>
 

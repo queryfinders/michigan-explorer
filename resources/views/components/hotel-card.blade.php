@@ -28,9 +28,6 @@
             @endif
         </div>
         
-        <div class="position-absolute bottom-0 end-0 p-3">
-            <x-premium-badge type="rating" text="4.8" />
-        </div>
     </div>
     
     <!-- Card Body -->
