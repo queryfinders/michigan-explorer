@@ -81,7 +81,7 @@
                 }
                 
                 // Show up to 8 categories
-                $displayCategories = array_slice($displayCategories, 0, 8);
+                $displayCategories = array_slice($displayCategories, 0, 7);
             @endphp
 
             @foreach($displayCategories as $cat)

@@ -11,7 +11,7 @@ class RestaurantController extends Controller
     {
         $restaurants = \App\Models\Restaurant::with(['category', 'features', 'cuisines'])->where('status', 1)->paginate(12);
         $currentCategory = null;
-        $featuredCategories = \App\Models\RestaurantCategory::withCount(['restaurants' => fn($q) => $q->where('status', 1)])->where('is_featured', 1)->take(8)->get();
+        $featuredCategories = \App\Models\RestaurantCategory::withCount(['restaurants' => fn($q) => $q->where('status', 1)])->where('is_featured', 1)->take(7)->get();
         $allCategories    = \App\Models\RestaurantCategory::withCount(['restaurants' => fn($q) => $q->where('status', 1)])->where('status', 1)->orderBy('name')->get();
         $totalRestaurants = \App\Models\Restaurant::where('status', 1)->count();
         $page = \App\Models\Page::with('seo')->where('slug', 'restaurants')->first();
@@ -26,7 +26,7 @@ class RestaurantController extends Controller
         }
         $restaurants = \App\Models\Restaurant::with(['category', 'features', 'cuisines'])->where('restaurant_category_id', $category->id)->where('status', 1)->paginate(12);
         $currentCategory = $category;
-        $featuredCategories = \App\Models\RestaurantCategory::withCount(['restaurants' => fn($q) => $q->where('status', 1)])->where('is_featured', 1)->take(8)->get();
+        $featuredCategories = \App\Models\RestaurantCategory::withCount(['restaurants' => fn($q) => $q->where('status', 1)])->where('is_featured', 1)->take(7)->get();
         $allCategories    = \App\Models\RestaurantCategory::withCount(['restaurants' => fn($q) => $q->where('status', 1)])->where('status', 1)->orderBy('name')->get();
         $totalRestaurants = \App\Models\Restaurant::where('status', 1)->count();
         $page = \App\Models\Page::with('seo')->where('slug', 'restaurants')->first();
