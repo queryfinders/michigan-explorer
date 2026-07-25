@@ -6,10 +6,28 @@
 <div class="container detail-container">
     
     <!-- 1. Breadcrumb -->
+    @php
+        $prevUrl = url()->previous();
+        $prevPath = parse_url($prevUrl, PHP_URL_PATH);
+        
+        $middleLabel = null;
+        $middleUrl = null;
+        
+        if (Str::contains($prevPath, '/restaurants/category/')) {
+            $slug = basename($prevPath);
+            $cat = \App\Models\RestaurantCategory::where('slug', $slug)->first();
+            if ($cat) {
+                $middleLabel = $cat->name;
+                $middleUrl = $prevUrl;
+            }
+        }
+    @endphp
     <nav class="breadcrumb-custom">
         <a href="{{ route('web.home') }}">Home</a> <i class="fas fa-chevron-right mx-2 text-muted fs-7"></i>
         <a href="{{ route('web.restaurants.index') }}">Restaurants</a> <i class="fas fa-chevron-right mx-2 text-muted fs-7"></i>
-        <a href="{{ route('web.restaurants.index', ['city' => $restaurant->city]) }}">{{ $restaurant->city ?? 'Michigan' }}</a> <i class="fas fa-chevron-right mx-2 text-muted fs-7"></i>
+        @if($middleLabel && $middleUrl)
+            <a href="{{ $middleUrl }}">{{ $middleLabel }}</a> <i class="fas fa-chevron-right mx-2 text-muted fs-7"></i>
+        @endif
         <span class="text-muted">{{ $restaurant->name }}</span>
     </nav>
 
@@ -72,6 +90,37 @@
                 $embedUrl = $videoUrl;
             }
         }
+
+        // Determine if open now
+        $isOpen = false;
+        $hoursArray = is_array($restaurant->opening_hours) ? $restaurant->opening_hours : json_decode($restaurant->opening_hours ?? '{}', true);
+        if (is_array($hoursArray)) {
+            $today = strtolower(now()->timezone('America/Detroit')->format('l'));
+            $currentTime = now()->timezone('America/Detroit')->format('H:i');
+            
+            $todayHours = $hoursArray[$today] ?? null;
+            if ($todayHours) {
+                if (isset($todayHours['24_hours']) && $todayHours['24_hours']) {
+                    $isOpen = true;
+                } elseif (!isset($todayHours['closed'])) {
+                    $openTime = $todayHours['open'] ?? '00:00';
+                    $closeTime = $todayHours['close'] ?? '23:59';
+                    
+                    if ($closeTime < $openTime) {
+                        if ($currentTime >= $openTime || $currentTime <= $closeTime) $isOpen = true;
+                    } else {
+                        if ($currentTime >= $openTime && $currentTime <= $closeTime) $isOpen = true;
+                    }
+                }
+            }
+        }
+        
+        // Determine price symbols
+        $priceValue = $restaurant->starting_price ?? 0;
+        $priceSymbols = '$';
+        if ($priceValue >= 100) $priceSymbols = '$$$$';
+        elseif ($priceValue >= 50) $priceSymbols = '$$$';
+        elseif ($priceValue >= 20) $priceSymbols = '$$';
     @endphp
     <div class="gallery-grid mb-4" onclick="openCustomGallery()">
         {{-- Main featured image --}}
@@ -98,11 +147,21 @@
     
     <!-- Quick Facts -->
     <div class="quick-facts-row">
-        <div class="quick-fact-item"><i class="fas fa-utensils"></i> {{ $restaurant->category->name ?? 'Fine Dining' }}</div>
-        <div class="quick-fact-item"><i class="fas fa-door-open"></i> Open Now</div>
-        <div class="quick-fact-item"><i class="fas fa-dollar-sign"></i>$$$</div>
-        <div class="quick-fact-item"><i class="fas fa-child"></i> Family Friendly</div>
-        <div class="quick-fact-item"><i class="fas fa-wine-glass"></i> Full Bar</div>
+        <div class="quick-fact-item"><i class="fas fa-utensils"></i> {{ $restaurant->category->name ?? 'Dining' }}</div>
+        
+        @if($isOpen)
+            <div class="quick-fact-item text-success fw-bold"><i class="fas fa-door-open"></i> Open Now</div>
+        @else
+            <div class="quick-fact-item text-danger fw-bold"><i class="fas fa-door-closed"></i> Closed</div>
+        @endif
+        
+        <div class="quick-fact-item"><i class="fas fa-wallet text-success"></i><span class="text-success fw-bold ms-1">Starts at ${{ number_format($priceValue) }}</span></div>
+        
+        @if(isset($restaurant->features) && $restaurant->features instanceof \Illuminate\Support\Collection && $restaurant->features->count() > 0)
+            @foreach($restaurant->features->take(2) as $feature)
+                <div class="quick-fact-item"><i class="{{ $feature->icon_class ?? 'fas fa-star' }}"></i> {{ $feature->name }}</div>
+            @endforeach
+        @endif
     </div>
 
     @php
@@ -152,8 +211,12 @@
             <div class="content-card">
                 <h3>About {{ $restaurant->name }}</h3>
                 <div class="text-muted lh-18">
-                    <p>{{ $restaurant->description ?: 'Experience the finest waterfront dining in Traverse City. Our culinary team crafts exquisite dishes using locally sourced ingredients, perfectly paired with our award-winning wine selection.' }}</p>
-                    <p>Whether you are here for a romantic dinner or a family gathering, our beautifully appointed dining room and exceptional service ensure a perfect evening.</p>
+                    @if($restaurant->description)
+                        {!! $restaurant->description !!}
+                    @else
+                        <p>Experience the finest waterfront dining in Traverse City. Our culinary team crafts exquisite dishes using locally sourced ingredients, perfectly paired with our award-winning wine selection.</p>
+                        <p>Whether you are here for a romantic dinner or a family gathering, our beautifully appointed dining room and exceptional service ensure a perfect evening.</p>
+                    @endif
                 </div>
             </div>
 
@@ -280,10 +343,12 @@
                     Reserve a Table <i class="fas fa-external-link-alt ms-2"></i>
                 </a>
 
+                {{-- 
                 <div class="mt-4 text-center">
                     <p class="small text-muted mb-2"><i class="fas fa-check-circle text-success me-1"></i> Free Cancellation</p>
                     <p class="small text-muted mb-0"><i class="fas fa-lock text-success me-1"></i> Secure & Trusted Booking</p>
                 </div>
+                --}}
             </div>
         </div>
         

@@ -17,7 +17,7 @@
   </div>
   <div class="d-flex align-items-center gap-2">
         <input type="text" class="form-control global-search-input" placeholder="Search..." style="width: 220px;" />
-        <a href="{{ route('blogs.create') }}" class="btn btn-primary">Add Blog</a>
+        <a href="{{ route('blogs.create') }}" class="btn btn-warning text-white">Add Blog</a>
     </div>
 </div>
 
@@ -29,7 +29,7 @@
     <table class="table">
       <thead>
         <tr>
-          <th>ID</th>
+          <th>SR NO</th>
           <th>Title</th>
           <th>Category</th>
           <th>Status</th>
@@ -40,7 +40,7 @@
       <tbody>
         @foreach($blogs as $blog)
         <tr>
-          <td>{{ $blog->id }}</td>
+          <td>{{ $loop->iteration }}</td>
           <td>{{ $blog->title }}</td>
           <td>{{ $blog->category ? $blog->category->name : 'N/A' }}</td>
           <td><span class="badge bg-{{ $blog->status == 'published' ? 'success' : ($blog->status == 'draft' ? 'secondary' : 'warning') }}">{{ ucfirst($blog->status) }}</span></td>
@@ -57,9 +57,16 @@
         @endforeach
       </tbody>
     </table>
-    <div class="d-flex justify-content-center mt-4">
-        {{ $blogs->links() }}
+    <div class="d-flex justify-content-between align-items-center mt-4 px-3 mb-3">
+        <div class="text-muted" style="font-size: 0.85rem;">
+            Showing {{ $blogs->firstItem() ?? 0 }} to {{ $blogs->lastItem() ?? 0 }} out of {{ $blogs->total() }} records
+        </div>
+        <div>
+            {{ $blogs->links() }}
+        </div>
     </div>
   </div>
 </div>
 @endsection
+
+

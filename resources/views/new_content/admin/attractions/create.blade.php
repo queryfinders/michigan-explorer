@@ -33,7 +33,12 @@
       </div>
       <div class="mb-3">
         <label class="form-label" for="city">City</label>
-        <input type="text" class="form-control" id="city" name="city" />
+        <select class="form-select select2" id="city" name="city">
+          <option value="">Select a city</option>
+          @foreach(config('michigan_cities') as $m_city)
+            <option value="{{ $m_city }}" {{ old('city') == $m_city ? 'selected' : '' }}>{{ $m_city }}</option>
+          @endforeach
+        </select>
       </div>
       <h6 class="mt-4 fw-bold border-bottom pb-2">SEO & Schema Settings</h6>
       <div class="mb-3">

@@ -29,7 +29,7 @@ class HomeController extends Controller
         });
         
         $restaurants = \Illuminate\Support\Facades\Cache::remember('home_restaurants', 3600, function() {
-            return \App\Models\Restaurant::where('status', 1)->take(3)->get();
+            return \App\Models\Restaurant::where('status', 1)->where('is_featured', 1)->take(3)->get();
         });
         
         $attractions = \Illuminate\Support\Facades\Cache::remember('home_attractions', 3600, function() {

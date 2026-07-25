@@ -17,7 +17,7 @@
   </div>
   <div class="d-flex align-items-center gap-2">
         <input type="text" class="form-control global-search-input" placeholder="Search..." style="width: 220px;" />
-        <a href="{{ route('hotels.create') }}" class="btn btn-primary">Add Hotel</a>
+        <a href="{{ route('hotels.create') }}" class="btn btn-warning text-white">Add Hotel</a>
     </div>
 </div>
 
@@ -29,7 +29,7 @@
     <table class="table">
       <thead>
         <tr>
-          <th>ID</th>
+          <th>SR NO</th>
           <th>Name</th>
           <th>Category</th>
           <th>City</th>
@@ -40,7 +40,7 @@
       <tbody>
         @foreach($hotels as $hotel)
         <tr>
-          <td>{{ $hotel->id }}</td>
+          <td>{{ $loop->iteration }}</td>
           <td><strong>{{ $hotel->name }}</strong></td>
           <td>{{ $hotel->category ? $hotel->category->name : 'N/A' }}</td>
           <td>{{ $hotel->city }}</td>
@@ -62,8 +62,13 @@
         @endforeach
       </tbody>
     </table>
-    <div class="d-flex justify-content-center mt-4">
-        {{ $hotels->links() }}
+    <div class="d-flex justify-content-between align-items-center mt-4 px-3 mb-3">
+        <div class="text-muted" style="font-size: 0.85rem;">
+            Showing {{ $hotels->firstItem() ?? 0 }} to {{ $hotels->lastItem() ?? 0 }} out of {{ $hotels->total() }} records
+        </div>
+        <div>
+            {{ $hotels->links() }}
+        </div>
     </div>
   </div>
 </div>
@@ -94,3 +99,5 @@
   });
 </script>
 @endsection
+
+

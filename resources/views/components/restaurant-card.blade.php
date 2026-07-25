@@ -4,6 +4,43 @@
     'compact' => false
 ])
 
+@php
+    // Determine if open now
+    $isOpen = false;
+    if (isset($restaurant->opening_hours) && is_array($restaurant->opening_hours)) {
+        $today = strtolower(now()->timezone('America/Detroit')->format('l'));
+        $currentTime = now()->timezone('America/Detroit')->format('H:i');
+        
+        $todayHours = $restaurant->opening_hours[$today] ?? null;
+        if ($todayHours) {
+            if (isset($todayHours['24_hours']) && $todayHours['24_hours']) {
+                $isOpen = true;
+            } elseif (!isset($todayHours['closed'])) {
+                $openTime = $todayHours['open'] ?? '00:00';
+                $closeTime = $todayHours['close'] ?? '23:59';
+                
+                // Handle cases where close time is past midnight (e.g. 02:00)
+                if ($closeTime < $openTime) {
+                    if ($currentTime >= $openTime || $currentTime <= $closeTime) {
+                        $isOpen = true;
+                    }
+                } else {
+                    if ($currentTime >= $openTime && $currentTime <= $closeTime) {
+                        $isOpen = true;
+                    }
+                }
+            }
+        }
+    }
+
+    // Determine price symbols
+    $priceValue = $restaurant->starting_price ?? 0;
+    $priceSymbols = '$';
+    if ($priceValue >= 100) $priceSymbols = '$$$$';
+    elseif ($priceValue >= 50) $priceSymbols = '$$$';
+    elseif ($priceValue >= 20) $priceSymbols = '$$';
+@endphp
+
 <div class="listing-card position-relative cursor-pointer" onclick="window.location.href='{{ route('web.restaurants.show', $restaurant->slug ?? 'demo') }}'">
     
     <!-- Image Wrapper -->
@@ -38,7 +75,11 @@
                 <i class="fas fa-map-marker-alt text-primary"></i> 
                 {{ $restaurant->city ?? 'Michigan' }}
             </div>
-            <div class="text-success small fw-bold"><i class="fas fa-door-open me-1"></i> Open Now</div>
+            @if($isOpen)
+                <div class="text-success small fw-bold"><i class="fas fa-door-open me-1"></i> Open Now</div>
+            @else
+                <div class="text-danger small fw-bold"><i class="fas fa-door-closed me-1"></i> Closed</div>
+            @endif
         </div>
         
         <h3 class="listing-title fw-bold text-heading mb-1 fs-5 font-heading">
@@ -46,11 +87,14 @@
         </h3>
         
         <div class="text-muted small mb-3 fw-bold text-uppercase fs-xs letter-spacing-wide">
-            {{ $restaurant->category->name ?? 'Italian' }} &bull; Fine Dining
+            {{ $restaurant->category->name ?? 'Dining' }} 
+            @if(isset($restaurant->cuisines) && $restaurant->cuisines->count() > 0)
+                &bull; {{ $restaurant->cuisines->first()->name }}
+            @endif
         </div>
         
         <p class="listing-desc text-muted mb-3 text-truncate-2 lh-16 transition-base fs-095rem">
-            {{ Str::limit($restaurant->description ?? 'Savor exquisite culinary masterpieces with breathtaking waterfront views and exceptional service.', 150) }}
+            {{ Str::limit(strip_tags($restaurant->description ?? 'Savor exquisite culinary masterpieces with breathtaking waterfront views and exceptional service.'), 150) }}
         </p>
         
         <!-- Premium Amenities Row (Restaurant) -->
@@ -73,7 +117,7 @@
         <div class="hotel-card-footer pt-3 border-top d-flex flex-column gap-3">
             <div class="d-flex justify-content-between align-items-end">
                 <div class="hotel-price text-heading fw-bold fs-6">
-                    <span class="text-success">$$$</span> <span class="text-muted fw-normal fs-xs ms-1">Average $25-50</span>
+                    <span class="text-success">{{ $priceSymbols }}</span> <span class="text-muted fw-normal fs-xs ms-1">Starts at ${{ number_format($priceValue) }}</span>
                 </div>
             </div>
             

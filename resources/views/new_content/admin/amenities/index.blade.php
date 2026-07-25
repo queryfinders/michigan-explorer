@@ -18,7 +18,7 @@
   </div>
   <div class="d-flex align-items-center gap-2">
         <input type="text" class="form-control global-search-input" placeholder="Search..." style="width: 220px;" />
-        <a href="{{ route('amenities.create') }}" class="btn btn-primary">Add Amenity</a>
+        <a href="{{ route('amenities.create') }}" class="btn btn-warning text-white">Add Amenity</a>
     </div>
 </div>
 
@@ -30,7 +30,7 @@
     <table class="table">
       <thead>
         <tr>
-          <th>ID</th>
+          <th>SR NO</th>
           <th>Name</th>
           <th>Slug</th>
           <th>Icon</th>
@@ -41,7 +41,7 @@
       <tbody>
         @foreach($amenities as $amenity)
         <tr>
-          <td>{{ $amenity->id }}</td>
+          <td>{{ $loop->iteration }}</td>
           <td><strong>{{ $amenity->name }}</strong></td>
           <td>{{ $amenity->slug }}</td>
           <td>
@@ -96,3 +96,4 @@
   });
 </script>
 @endsection
+

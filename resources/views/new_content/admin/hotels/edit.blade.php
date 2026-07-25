@@ -41,8 +41,11 @@
         <div class="tab-pane fade show active" id="basic-pane" role="tabpanel" aria-labelledby="basic-tab">
           <div class="row">
             <div class="col-md-4 mb-3">
-              <label class="form-label" for="hotel_category_id">Category <span class="text-danger">*</span></label>
-              <select class="form-select @error('hotel_category_id') is-invalid @enderror" id="hotel_category_id" name="hotel_category_id" required>
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label class="form-label mb-0" for="hotel_category_id">Category <span class="text-danger">*</span></label>
+                <a href="{{ route('hotel-categories.create') }}" target="_blank" class="btn btn-sm btn-link p-0 text-primary fw-semibold"><i class="fas fa-plus-circle me-1"></i>Add Category</a>
+              </div>
+              <select class="form-select select2 @error('hotel_category_id') is-invalid @enderror" id="hotel_category_id" name="hotel_category_id" required>
                   <option value="">Select Category</option>
                   @foreach($categories as $category)
                   <option value="{{ $category->id }}" {{ (old('hotel_category_id') ?? $hotel->hotel_category_id) == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
@@ -83,7 +86,12 @@
           <div class="row">
             <div class="col-md-4 mb-3">
               <label class="form-label" for="city">City</label>
-              <input type="text" class="form-control" id="city" name="city" value="{{ $hotel->city }}" />
+              <select class="form-select select2" id="city" name="city">
+                <option value="">Select a city</option>
+                @foreach(config('michigan_cities') as $m_city)
+                  <option value="{{ $m_city }}" {{ old('city', $hotel->city) == $m_city ? 'selected' : '' }}>{{ $m_city }}</option>
+                @endforeach
+              </select>
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="zip">Zip Code</label>

@@ -24,7 +24,7 @@
     </div>
     <div class="d-flex align-items-center gap-2">
         <input type="text" class="form-control global-search-input" placeholder="Search..." style="width: 220px;" />
-        <a href="{{ route('search-shortcuts.create') }}" class="btn btn-primary">Add Shortcut</a>
+        <a href="{{ route('search-shortcuts.create') }}" class="btn btn-warning text-white">Add Shortcut</a>
     </div>
 </div>
 

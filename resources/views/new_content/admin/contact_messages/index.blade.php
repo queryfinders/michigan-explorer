@@ -62,9 +62,15 @@
         @endforeach
       </tbody>
     </table>
-    <div class="d-flex justify-content-center mt-4">
-        {{ $messages->links() }}
+    <div class="d-flex justify-content-between align-items-center mt-4 px-3 mb-3">
+        <div class="text-muted" style="font-size: 0.85rem;">
+            Showing {{ $messages->firstItem() ?? 0 }} to {{ $messages->lastItem() ?? 0 }} out of {{ $messages->total() }} records
+        </div>
+        <div>
+            {{ $messages->links() }}
+        </div>
     </div>
   </div>
 </div>
 @endsection
+

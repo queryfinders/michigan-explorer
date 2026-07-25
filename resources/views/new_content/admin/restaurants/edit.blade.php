@@ -41,47 +41,17 @@
         <div class="tab-pane fade show active" id="basic-pane" role="tabpanel" aria-labelledby="basic-tab">
           <div class="row">
             <div class="col-md-4 mb-3">
-              <label class="form-label fw-semibold" for="restaurant_category_id">Category <span class="text-danger">*</span></label>
-              <input type="hidden" name="restaurant_category_id" id="restaurant_category_id"
-                     value="{{ old('restaurant_category_id', $restaurant->restaurant_category_id) }}" required />
-              @error('restaurant_category_id') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
-
-              <div class="cuisine-dropdown-wrapper" id="categoryDropdownWrapper">
-                <div class="cuisine-dropdown-trigger" id="categoryTrigger" onclick="toggleCategoryDropdown()">
-                  <div class="cuisine-tags-area" id="categoryTagsArea">
-                    <span class="cuisine-placeholder" id="categoryPlaceholder">
-                      <i class="fas fa-layer-group me-2 text-muted"></i>Click to select category...
-                    </span>
-                  </div>
-                  <i class="fas fa-chevron-down cuisine-dropdown-arrow" id="categoryArrow"></i>
-                </div>
-                <div class="cuisine-dropdown-panel" id="categoryDropdownPanel" style="display:none;">
-                  <div class="cuisine-search-wrap">
-                    <i class="fas fa-search cuisine-search-icon"></i>
-                    <input type="text" class="cuisine-search-input" id="categorySearchInput"
-                           placeholder="Search categories..." oninput="filterCategories(this.value)" autocomplete="off" />
-                  </div>
-                  <div class="cuisine-divider"></div>
-                  <div class="cuisine-items-list" id="categoryItemsList">
-                    @foreach($categories as $cat)
-                    <label class="cuisine-item" id="cat-label-{{ $cat->id }}">
-                      <input type="radio" name="_cat_radio" value="{{ $cat->id }}"
-                             id="cat_rb_{{ $cat->id }}"
-                             class="cat-rb d-none"
-                             data-name="{{ $cat->name }}"
-                             data-id="{{ $cat->id }}"
-                             {{ old('restaurant_category_id', $restaurant->restaurant_category_id) == $cat->id ? 'checked' : '' }}
-                             onchange="onCategoryChange(this)" />
-                      <span class="cuisine-item-name">{{ $cat->name }}</span>
-                      <span class="cuisine-item-check"><i class="fas fa-check"></i></span>
-                    </label>
-                    @endforeach
-                    <div class="cuisine-no-results d-none" id="categoryNoResults">
-                      <i class="fas fa-search-minus me-2"></i>No categories found
-                    </div>
-                  </div>
-                </div>
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label class="form-label mb-0" for="restaurant_category_id">Category <span class="text-danger">*</span></label>
+                <a href="{{ route('restaurant-categories.create') }}" target="_blank" class="btn btn-sm btn-link p-0 text-primary fw-semibold"><i class="fas fa-plus-circle me-1"></i>Add Category</a>
               </div>
+              <select class="form-select select2 @error('restaurant_category_id') is-invalid @enderror" id="restaurant_category_id" name="restaurant_category_id" required>
+                  <option value="">Select Category</option>
+                  @foreach($categories as $category)
+                  <option value="{{ $category->id }}" {{ old('restaurant_category_id', $restaurant->restaurant_category_id) == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                  @endforeach
+              </select>
+              @error('restaurant_category_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="name">Name <span class="text-danger">*</span></label>
@@ -281,7 +251,12 @@
           <div class="row">
             <div class="col-md-4 mb-3">
               <label class="form-label" for="city">City</label>
-              <input type="text" class="form-control" id="city" name="city" value="{{ old('city', $restaurant->city) }}" />
+              <select class="form-select select2" id="city" name="city">
+                <option value="">Select a city</option>
+                @foreach(config('michigan_cities') as $m_city)
+                  <option value="{{ $m_city }}" {{ old('city', $restaurant->city) == $m_city ? 'selected' : '' }}>{{ $m_city }}</option>
+                @endforeach
+              </select>
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="zip">Zip Code</label>
@@ -401,7 +376,7 @@
                 </div>
                 <div class="mb-2">
                   <label class="form-label fw-semibold">Answer</label>
-                  <textarea class="form-control" name="faqs[{{ $index }}][answer]" rows="3" required>{{ $faq->answer }}</textarea>
+                  <textarea class="form-control tinymce" name="faqs[{{ $index }}][answer]" rows="3" required>{{ $faq->answer }}</textarea>
                 </div>
               </div>
             </div>
@@ -763,12 +738,27 @@
           </div>
           <div class="mb-2">
             <label class="form-label fw-semibold">Answer</label>
-            <textarea class="form-control" id="faq_answer_${faqIndex}" name="faqs[${faqIndex}][answer]" rows="3" required placeholder="e.g. Yes, we have a variety of vegetarian and vegan dishes on our menu."></textarea>
+            <textarea class="form-control tinymce" id="faq_answer_${faqIndex}" name="faqs[${faqIndex}][answer]" rows="3" required placeholder="e.g. Yes, we have a variety of vegetarian and vegan dishes on our menu."></textarea>
           </div>
         </div>
       </div>
     `;
     container.insertAdjacentHTML('beforeend', html);
+    
+    if (typeof tinymce !== 'undefined') {
+      tinymce.init({
+        selector: '#faq_answer_' + faqIndex,
+        plugins: 'advlist autolink lists link image charmap preview anchor pagebreak',
+        toolbar_mode: 'floating',
+        height: 300,
+        setup: function (editor) {
+          editor.on('change', function () {
+            editor.save();
+          });
+        }
+      });
+    }
+    
     faqIndex++;
   }
 

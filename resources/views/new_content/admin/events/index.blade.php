@@ -17,7 +17,7 @@
   </div>
   <div class="d-flex align-items-center gap-2">
         <input type="text" class="form-control global-search-input" placeholder="Search..." style="width: 220px;" />
-        <a href="{{ route('events.create') }}" class="btn btn-primary">Add Event</a>
+        <a href="{{ route('events.create') }}" class="btn btn-warning text-white">Add Event</a>
     </div>
 </div>
 
@@ -29,7 +29,7 @@
     <table class="table">
       <thead>
         <tr>
-          <th>ID</th>
+          <th>SR NO</th>
           <th>Name</th>
           <th>Category</th>
           <th>Start Date</th>
@@ -41,7 +41,7 @@
       <tbody>
         @foreach($events as $event)
         <tr>
-          <td>{{ $event->id }}</td>
+          <td>{{ $loop->iteration }}</td>
           <td>{{ $event->name }}</td>
           <td>{{ $event->category ? $event->category->name : 'N/A' }}</td>
           <td>{{ $event->start_date ? \Carbon\Carbon::parse($event->start_date)->format('M d, Y g:i A') : 'N/A' }}</td>
@@ -59,9 +59,16 @@
         @endforeach
       </tbody>
     </table>
-    <div class="d-flex justify-content-center mt-4">
-        {{ $events->links() }}
+    <div class="d-flex justify-content-between align-items-center mt-4 px-3 mb-3">
+        <div class="text-muted" style="font-size: 0.85rem;">
+            Showing {{ $events->firstItem() ?? 0 }} to {{ $events->lastItem() ?? 0 }} out of {{ $events->total() }} records
+        </div>
+        <div>
+            {{ $events->links() }}
+        </div>
     </div>
   </div>
 </div>
 @endsection
+
+

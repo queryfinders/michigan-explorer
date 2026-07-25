@@ -18,7 +18,7 @@
   </div>
   <div class="d-flex align-items-center gap-2">
         <input type="text" class="form-control global-search-input" placeholder="Search..." style="width: 220px;" />
-        <a href="{{ route('hotel-policies.create') }}" class="btn btn-primary">Add Hotel Policy</a>
+        <a href="{{ route('hotel-policies.create') }}" class="btn btn-warning text-white">Add Hotel Policy</a>
     </div>
 </div>
 
@@ -30,7 +30,7 @@
     <table class="table">
       <thead>
         <tr>
-          <th>ID</th>
+          <th>SR NO</th>
           <th>Name</th>
           <th>Input Type</th>
           <th>Sort Order</th>
@@ -41,7 +41,7 @@
       <tbody>
         @foreach($policies as $policy)
         <tr>
-          <td>{{ $policy->id }}</td>
+          <td>{{ $loop->iteration }}</td>
           <td><strong>{{ $policy->name }}</strong></td>
           <td>{{ ucfirst($policy->input_type) }}</td>
           <td>{{ $policy->sort_order }}</td>
@@ -95,3 +95,4 @@
   });
 </script>
 @endsection
+

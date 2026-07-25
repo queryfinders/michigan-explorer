@@ -18,7 +18,7 @@
   </div>
   <div class="d-flex align-items-center gap-2">
         <input type="text" class="form-control global-search-input" placeholder="Search..." style="width: 220px;" />
-        <a href="{{ route('restaurant-categories.create') }}" class="btn btn-primary">Add Category</a>
+        <a href="{{ route('restaurant-categories.create') }}" class="btn btn-warning text-white">Add Category</a>
     </div>
 </div>
 
@@ -30,7 +30,7 @@
     <table class="table">
       <thead>
         <tr>
-          <th>ID</th>
+          <th>SR NO</th>
           <th>Name</th>
           <th>Slug</th>
           <th>Status</th>
@@ -40,10 +40,15 @@
       <tbody>
         @foreach($categories as $category)
         <tr>
-          <td>{{ $category->id }}</td>
+          <td>{{ $loop->iteration }}</td>
           <td>{{ $category->name }}</td>
           <td>{{ $category->slug }}</td>
-          <td>{{ $category->status ? 'Active' : 'Inactive' }}</td>
+          <td>
+            <label class="switch">
+              <input type="checkbox" class="switch-input category-status-switch" data-id="{{ $category->id }}" data-status="{{ $category->status }}" {{ $category->status == 1 ? 'checked' : '' }}>
+              <span class="switch-toggle-slider"></span>
+            </label>
+          </td>
           <td>
             <a href="{{ route('restaurant-categories.edit', $category->id) }}" class="btn btn-sm btn-primary"><i class="fa fa-edit"></i></a>
             <form action="{{ route('restaurant-categories.destroy', $category->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure?');">
@@ -56,9 +61,42 @@
         @endforeach
       </tbody>
     </table>
-    <div class="d-flex justify-content-center mt-4">
-        {{ $categories->links() }}
+    <div class="d-flex justify-content-between align-items-center mt-4 px-3 mb-3">
+        <div class="text-muted" style="font-size: 0.85rem;">
+            Showing {{ $categories->firstItem() ?? 0 }} to {{ $categories->lastItem() ?? 0 }} out of {{ $categories->total() }} records
+        </div>
+        <div>
+            {{ $categories->links() }}
+        </div>
     </div>
   </div>
 </div>
 @endsection
+
+@section('page-script')
+<script>
+  $(document).ready(function() {
+      $(document).on('change', '.category-status-switch', function (e) {
+          e.preventDefault();
+          var id = $(this).data('id');
+          var status = $(this).data('status');
+          var $switch = $(this);
+
+          $.ajax({
+              url: '{{ url("admin/restaurant-categories/status") }}/' + id + '/' + status,
+              type: 'GET',
+              success: function (response) {
+                  if (response.success) {
+                      $switch.data('status', response.status);
+                  }
+              },
+              error: function (xhr, status, error) {
+                  console.error(error);
+              }
+          });
+      });
+  });
+</script>
+@endsection
+
+

@@ -18,7 +18,7 @@
   </div>
   <div class="d-flex align-items-center gap-2">
         <input type="text" class="form-control global-search-input" placeholder="Search..." style="width: 220px;" />
-        <a href="{{ route('booking-features.create') }}" class="btn btn-primary">Add Booking Feature</a>
+        <a href="{{ route('booking-features.create') }}" class="btn btn-warning text-white">Add Booking Feature</a>
     </div>
 </div>
 
@@ -30,7 +30,7 @@
     <table class="table">
       <thead>
         <tr>
-          <th>ID</th>
+          <th>SR NO</th>
           <th>Name</th>
           <th>Icon</th>
           <th>Sort Order</th>
@@ -41,7 +41,7 @@
       <tbody>
         @foreach($features as $feature)
         <tr>
-          <td>{{ $feature->id }}</td>
+          <td>{{ $loop->iteration }}</td>
           <td><strong>{{ $feature->name }}</strong></td>
           <td>
             @if($feature->icon)
@@ -101,3 +101,4 @@
   });
 </script>
 @endsection
+

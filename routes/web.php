@@ -103,7 +103,9 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::resource('/admin/hotel-policies', \App\Http\Controllers\Admin\HotelPolicyController::class);
 
     // Restaurants Module
+    Route::get('/admin/restaurant-categories/status/{id}/{status}', [\App\Http\Controllers\Admin\RestaurantCategoryController::class, 'changeStatus'])->name('restaurant-categories.status');
     Route::resource('/admin/restaurant-categories', \App\Http\Controllers\Admin\RestaurantCategoryController::class);
+    Route::get('/admin/restaurants/status/{id}/{status}', [\App\Http\Controllers\Admin\RestaurantController::class, 'changeStatus'])->name('restaurants.status');
     Route::resource('/admin/restaurants', \App\Http\Controllers\Admin\RestaurantController::class);
 
     // Cuisines Module

@@ -372,4 +372,17 @@ class RestaurantController extends Controller
         $restaurant->delete();
         return redirect()->route('restaurants.index')->with('success', 'Restaurant deleted successfully.');
     }
+
+    public function changeStatus($id, $status)
+    {
+        $restaurant = Restaurant::findOrFail($id);
+        $restaurant->status = $status == 1 ? 0 : 1;
+        $restaurant->save();
+
+        return response()->json([
+            'success' => true,
+            'status' => $restaurant->status,
+            'message' => 'Status changed successfully.'
+        ]);
+    }
 }

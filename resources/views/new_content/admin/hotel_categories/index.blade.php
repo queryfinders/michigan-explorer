@@ -18,7 +18,7 @@
   </div>
   <div class="d-flex align-items-center gap-2">
         <input type="text" class="form-control global-search-input" placeholder="Search..." style="width: 220px;" />
-        <a href="{{ route('hotel-categories.create') }}" class="btn btn-primary">Add Category</a>
+        <a href="{{ route('hotel-categories.create') }}" class="btn btn-warning text-white">Add Category</a>
     </div>
 </div>
 
@@ -30,7 +30,7 @@
     <table class="table">
       <thead>
         <tr>
-          <th>ID</th>
+          <th>SR NO</th>
           <th>Name</th>
           <th>Slug</th>
           <th>Status</th>
@@ -40,7 +40,7 @@
       <tbody>
         @foreach($categories as $category)
         <tr>
-          <td>{{ $category->id }}</td>
+          <td>{{ $loop->iteration }}</td>
           <td><strong>{{ $category->name }}</strong></td>
           <td>{{ $category->slug }}</td>
           <td>
@@ -61,8 +61,13 @@
         @endforeach
       </tbody>
     </table>
-    <div class="d-flex justify-content-center mt-4">
-        {{ $categories->links() }}
+    <div class="d-flex justify-content-between align-items-center mt-4 px-3 mb-3">
+        <div class="text-muted" style="font-size: 0.85rem;">
+            Showing {{ $categories->firstItem() ?? 0 }} to {{ $categories->lastItem() ?? 0 }} out of {{ $categories->total() }} records
+        </div>
+        <div>
+            {{ $categories->links() }}
+        </div>
     </div>
   </div>
 </div>
@@ -93,3 +98,5 @@
   });
 </script>
 @endsection
+
+

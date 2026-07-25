@@ -17,7 +17,7 @@
   </div>
   <div class="d-flex align-items-center gap-2">
         <input type="text" class="form-control global-search-input" placeholder="Search..." style="width: 220px;" />
-        <a href="{{ route('pages.create') }}" class="btn btn-primary">Add Page</a>
+        <a href="{{ route('pages.create') }}" class="btn btn-warning text-white">Add Page</a>
     </div>
 </div>
 
@@ -29,7 +29,7 @@
     <table class="table">
       <thead>
         <tr>
-          <th>ID</th>
+          <th>SR NO</th>
           <th>Title</th>
           <th>Slug</th>
           <th>Status</th>
@@ -39,7 +39,7 @@
       <tbody>
         @foreach($pages as $page)
         <tr>
-          <td>{{ $page->id }}</td>
+          <td>{{ $loop->iteration }}</td>
           <td>{{ $page->title }}</td>
           <td>{{ $page->slug }}</td>
           <td>
@@ -60,8 +60,13 @@
         @endforeach
       </tbody>
     </table>
-    <div class="d-flex justify-content-center mt-4">
-        {{ $pages->links() }}
+    <div class="d-flex justify-content-between align-items-center mt-4 px-3 mb-3">
+        <div class="text-muted" style="font-size: 0.85rem;">
+            Showing {{ $pages->firstItem() ?? 0 }} to {{ $pages->lastItem() ?? 0 }} out of {{ $pages->total() }} records
+        </div>
+        <div>
+            {{ $pages->links() }}
+        </div>
     </div>
   </div>
 </div>
@@ -92,3 +97,5 @@
   });
 </script>
 @endsection
+
+
