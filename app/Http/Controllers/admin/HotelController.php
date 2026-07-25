@@ -47,7 +47,7 @@ class HotelController extends Controller
             'gallery_alts.*'        => 'nullable|string|max:255',
         ]);
 
-        $data = $request->except('_token', '_method', 'featured_image_file', 'video_file', 'video_url', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'amenities', 'booking_features', 'hotel_policies', 'gallery_images', 'gallery_alts', 'faqs');
+        $data = $request->except('_token', '_method', 'featured_image_file', 'video_file', 'video_url', 'meta_title', 'meta_description', 'og_title', 'og_description', 'schema_markup', 'amenities', 'booking_features', 'hotel_policies', 'gallery_images', 'gallery_alts', 'faqs');
         $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
 
         if ($request->hasFile('featured_image_file')) {
@@ -105,7 +105,7 @@ class HotelController extends Controller
             }
         }
 
-        $seoData = $request->only(['meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description']);
+        $seoData = $request->only(['meta_title', 'meta_description', 'og_title', 'og_description']);
         
         $schema = [
             '@context' => 'https://schema.org',
@@ -177,7 +177,7 @@ class HotelController extends Controller
             'delete_gallery_ids'    => 'nullable|array',
         ]);
 
-        $data = $request->except('_token', '_method', 'featured_image_file', 'video_file', 'video_url', 'delete_video', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'amenities', 'booking_features', 'hotel_policies', 'gallery_images', 'gallery_alts', 'delete_gallery_ids', 'faqs');
+        $data = $request->except('_token', '_method', 'featured_image_file', 'video_file', 'video_url', 'delete_video', 'meta_title', 'meta_description', 'og_title', 'og_description', 'schema_markup', 'amenities', 'booking_features', 'hotel_policies', 'gallery_images', 'gallery_alts', 'delete_gallery_ids', 'faqs');
         $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
 
         if ($request->hasFile('featured_image_file')) {
@@ -279,7 +279,7 @@ class HotelController extends Controller
             $hotel->faqs()->delete();
         }
 
-        $seoData = $request->only(['meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description']);
+        $seoData = $request->only(['meta_title', 'meta_description', 'og_title', 'og_description']);
         
         $schema = [
             '@context' => 'https://schema.org',

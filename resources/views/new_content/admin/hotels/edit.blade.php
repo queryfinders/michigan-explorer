@@ -511,25 +511,19 @@
         <div class="tab-pane fade" id="seo-pane" role="tabpanel" aria-labelledby="seo-tab">
           <div class="mb-3">
             <label class="form-label" for="meta_title">Meta Title</label>
-            <input type="text" class="form-control" id="meta_title" name="meta_title" value="{{ $hotel->seo->meta_title ?? '' }}" />
+            <input type="text" class="form-control" id="meta_title" name="meta_title" placeholder="e.g. Best Hotel in Michigan | Michigan Explorer" value="{{ $hotel->seo->meta_title ?? '' }}" />
           </div>
           <div class="mb-3">
-            <label class="form-label" for="meta_description">Meta Description</label>
-            <textarea class="form-control" id="meta_description" name="meta_description" rows="2">{{ $hotel->seo->meta_description ?? '' }}</textarea>
+            <label class="form-label" for="meta_description">Meta Description <span class="text-muted small ms-2 fw-normal" id="meta_desc_count">(0 / 160)</span></label>
+            <textarea class="form-control" id="meta_description" name="meta_description" placeholder="e.g. Discover the best hotel in Michigan..." maxlength="160" rows="2">{{ $hotel->seo->meta_description ?? '' }}</textarea>
           </div>
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label class="form-label" for="canonical_url">Canonical URL</label>
-              <input type="url" class="form-control" id="canonical_url" name="canonical_url" value="{{ $hotel->seo->canonical_url ?? '' }}" />
-            </div>
-            <div class="col-md-6 mb-3">
+          <div class="mb-3">
               <label class="form-label" for="og_title">OG Title</label>
-              <input type="text" class="form-control" id="og_title" name="og_title" value="{{ $hotel->seo->og_title ?? '' }}" />
+              <input type="text" class="form-control" id="og_title" name="og_title" placeholder="e.g. Best Hotel in Michigan" value="{{ $hotel->seo->og_title ?? '' }}" />
             </div>
-          </div>
           <div class="mb-3">
-            <label class="form-label" for="og_description">OG Description</label>
-            <textarea class="form-control" id="og_description" name="og_description" rows="2">{{ $hotel->seo->og_description ?? '' }}</textarea>
+            <label class="form-label" for="og_description">OG Description <span class="text-muted small ms-2 fw-normal" id="og_desc_count">(0 / 160)</span></label>
+            <textarea class="form-control" id="og_description" name="og_description" placeholder="e.g. Discover the best hotel in Michigan..." maxlength="160" rows="2">{{ $hotel->seo->og_description ?? '' }}</textarea>
           </div>
           <div class="mb-3">
             <label class="form-label" for="schema_markup">Schema Markup (JSON-LD) - <span class="text-info">Auto-generated</span></label>
@@ -572,6 +566,166 @@
     </form>
   </div>
 </div>
+
+
+<div class="modal fade" id="addBookingFeatureModal" tabindex="-1" aria-labelledby="addBookingFeatureModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addBookingFeatureModalLabel"><i class="fas fa-plus-circle me-2 text-primary"></i>Add New Booking Feature</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="bf-modal-alert" class="d-none"></div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="new_bf_name">Feature Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="new_bf_name" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="new_bf_icon">Icon</label>
+          <div class="dropdown">
+            <button class="btn btn-outline-secondary w-100 text-start d-flex justify-content-between align-items-center" type="button" id="bfIconDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false" style="background: #fff; border: 1px solid #d9dee3; padding: 8px 12px; height: 38px;">
+              <span><i id="bf_selected_icon_display" class="fas fa-check me-2"></i> <span id="bf_selected_icon_text">fas fa-check</span></span>
+              <i class="fas fa-chevron-down text-muted"></i>
+            </button>
+            <div class="dropdown-menu w-100 p-3" aria-labelledby="bfIconDropdownBtn">
+              <input type="text" class="form-control mb-3" id="bfIconSearch" placeholder="Search icons...">
+              <div class="d-flex flex-wrap gap-2 icon-picker-grid" id="bfIconGrid" style="max-height: 200px; overflow-y: auto;">
+                @foreach($popularBfIcons as $ic)
+                  <div class="icon-option bf-icon-option p-2 border rounded cursor-pointer text-center" data-icon="{{ $ic }}" style="width: 45px; height: 45px; display:flex; align-items:center; justify-content:center; cursor: pointer;" title="{{ $ic }}">
+                    <i class="{{ $ic }} fs-5"></i>
+                  </div>
+                @endforeach
+              </div>
+            </div>
+          </div>
+
+<div class="modal fade" id="addHotelPolicyModal" tabindex="-1" aria-labelledby="addHotelPolicyModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addHotelPolicyModalLabel"><i class="fas fa-plus-circle me-2 text-primary"></i>Add New Hotel Policy</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="policy-modal-alert" class="d-none"></div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="new_policy_name">Policy Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="new_policy_name" placeholder="e.g. Breakfast Schedule" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="new_policy_type">Input Type</label>
+          <select class="form-select" id="new_policy_type">
+            <option value="textarea">Large Text Area (Multiple Lines)</option>
+            <option value="text">Single Line Text</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="saveNewHotelPolicy()">
+          <span id="savePolicyBtnText">Save Policy</span>
+          <div id="savePolicyBtnSpinner" class="spinner-border spinner-border-sm d-none" role="status"></div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addCategoryModalLabel"><i class="fas fa-plus-circle me-2 text-primary"></i>Add New Category</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="category-modal-alert" class="d-none"></div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold" for="new_category_name">Category Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="new_category_name" onkeyup="document.getElementById('new_category_slug').value = this.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold" for="new_category_slug">Slug <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="new_category_slug" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="saveNewCategory()">
+            <span id="saveCategoryBtnText"><i class="fas fa-plus me-1"></i>Add Category</span>
+            <span id="saveCategoryBtnSpinner" class="d-none"><span class="spinner-border spinner-border-sm me-1"></span>Saving...</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+// Icon Picker Search (Amenity)
+      const amenityIconSearch = document.getElementById('amenityIconSearch');
+      if (amenityIconSearch) {
+          amenityIconSearch.addEventListener('input', function() {
+              const term = this.value.toLowerCase();
+              document.querySelectorAll('.amenity-icon-option').forEach(opt => {
+                  const iconName = opt.getAttribute('data-icon').toLowerCase();
+                  opt.style.display = iconName.includes(term) ? 'flex' : 'none';
+              });
+          });
+      }
+      // Icon Selection (Amenity)
+      document.querySelectorAll('.amenity-icon-option').forEach(opt => {
+          opt.addEventListener('click', function() {
+              const iconName = this.getAttribute('data-icon');
+              document.getElementById('new_amenity_icon').value = iconName;
+              document.getElementById('amenity_selected_icon_display').className = iconName + ' me-2';
+              document.getElementById('amenity_selected_icon_text').textContent = iconName;
+          });
+      });
+
+      // Icon Picker Search (Booking Feature)
+      const bfIconSearch = document.getElementById('bfIconSearch');
+      if (bfIconSearch) {
+          bfIconSearch.addEventListener('input', function() {
+              const term = this.value.toLowerCase();
+              document.querySelectorAll('.bf-icon-option').forEach(opt => {
+                  const iconName = opt.getAttribute('data-icon').toLowerCase();
+                  opt.style.display = iconName.includes(term) ? 'flex' : 'none';
+              });
+          });
+      }
+      // Icon Selection (Booking Feature)
+      document.querySelectorAll('.bf-icon-option').forEach(opt => {
+          opt.addEventListener('click', function() {
+              const iconName = this.getAttribute('data-icon');
+              document.getElementById('new_bf_icon').value = iconName;
+              document.getElementById('bf_selected_icon_display').className = iconName + ' me-2';
+              document.getElementById('bf_selected_icon_text').textContent = iconName;
+          });
+      });
+      });
+
+    });
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function updateCount(inputId, countId) {
+        const input = document.getElementById(inputId);
+        const count = document.getElementById(countId);
+        if (input && count) {
+            const update = () => {
+                count.textContent = `(${input.value.length} / 160)`;
+            };
+            input.addEventListener('input', update);
+            update(); // Init on load
+        }
+    }
+    updateCount('meta_description', 'meta_desc_count');
+    updateCount('og_description', 'og_desc_count');
+});
+</script>
 
 @endsection
 
@@ -825,7 +979,7 @@
     const placeholder = document.getElementById('amenityPlaceholder');
     const countEl = document.getElementById('amenitySelectedCount');
 
-    tagsArea.innerHTML = '';
+    tagsArea.querySelectorAll('.amenity-tag').forEach(t => t.remove());
 
     if (cbs.length === 0) {
       tagsArea.appendChild(placeholder);
@@ -1083,14 +1237,38 @@
           <input type="text" class="form-control" id="new_amenity_name" />
         </div>
         <div class="mb-3">
-          <label class="form-label fw-semibold" for="new_amenity_icon">FontAwesome Icon Class</label>
-          <div class="input-group">
-            <span class="input-group-text"><i id="amenity-icon-preview" class="fas fa-star"></i></span>
-            <input type="text" class="form-control" id="new_amenity_icon" value="fa-star" oninput="updateAmenityIconPreview(this.value)" />
+          <label class="form-label fw-semibold" for="new_amenity_icon">Icon</label>
+          <div class="dropdown">
+            <button class="btn btn-outline-secondary w-100 text-start d-flex justify-content-between align-items-center" type="button" id="amenityIconDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false" style="background: #fff; border: 1px solid #d9dee3; padding: 8px 12px; height: 38px;">
+              <span><i id="amenity_selected_icon_display" class="fas fa-star me-2"></i> <span id="amenity_selected_icon_text">fas fa-star</span></span>
+              <i class="fas fa-chevron-down text-muted"></i>
+            </button>
+            <div class="dropdown-menu w-100 p-3" aria-labelledby="amenityIconDropdownBtn">
+              <input type="text" class="form-control mb-3" id="amenityIconSearch" placeholder="Search icons...">
+              <div class="d-flex flex-wrap gap-2 icon-picker-grid" id="amenityIconGrid" style="max-height: 200px; overflow-y: auto;">
+                @foreach($popularIcons as $ic)
+                  <div class="icon-option amenity-icon-option p-2 border rounded cursor-pointer text-center" data-icon="{{ $ic }}" style="width: 45px; height: 45px; display:flex; align-items:center; justify-content:center; cursor: pointer;" title="{{ $ic }}">
+                    <i class="{{ $ic }} fs-5"></i>
+                  </div>
+                @endforeach
+              </div>
+            </div>
           </div>
-          <div class="form-text">Enter any <a href="https://fontawesome.com/icons" target="_blank">FontAwesome 5</a> icon class. e.g. <code>fa-wifi</code>, <code>fa-dumbbell</code></div>
+          <input type="hidden" id="new_amenity_icon" value="fas fa-star">
+          <div class="form-text">Search and select an icon for the amenity.</div>
         </div>
       </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="saveNewAmenity()">
+          <span id="saveAmenityBtnText"><i class="fas fa-plus me-1"></i>Add Amenity</span>
+          <span id="saveAmenityBtnSpinner" class="d-none"><span class="spinner-border spinner-border-sm me-1"></span>Saving...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         <button type="button" class="btn btn-primary" id="saveAmenityBtn" onclick="saveNewAmenity()">
@@ -1103,33 +1281,7 @@
 </div>
 
   {{-- ===== Add Category Modal ===== --}}
-  <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addCategoryModalLabel"><i class="fas fa-plus-circle me-2 text-primary"></i>Add New Category</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div id="category-modal-alert" class="d-none"></div>
-          <div class="mb-3">
-            <label class="form-label fw-semibold" for="new_category_name">Category Name <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="new_category_name" onkeyup="document.getElementById('new_category_slug').value = this.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')" />
-          </div>
-          <div class="mb-3">
-            <label class="form-label fw-semibold" for="new_category_slug">Slug <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="new_category_slug" />
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-primary" onclick="saveNewCategory()">
-            <span id="saveCategoryBtnText"><i class="fas fa-plus me-1"></i>Add Category</span>
-            <span id="saveCategoryBtnSpinner" class="d-none"><span class="spinner-border spinner-border-sm me-1"></span>Saving...</span>
-          </button>
-        </div>
-      </div>
-    </div>
+  
   </div>
 
   <script>
@@ -1318,5 +1470,166 @@
       }
     });
   </script>
+
+<div class="modal fade" id="addBookingFeatureModal" tabindex="-1" aria-labelledby="addBookingFeatureModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addBookingFeatureModalLabel"><i class="fas fa-plus-circle me-2 text-primary"></i>Add New Booking Feature</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="bf-modal-alert" class="d-none"></div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="new_bf_name">Feature Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="new_bf_name" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="new_bf_icon">Icon</label>
+          <div class="dropdown">
+            <button class="btn btn-outline-secondary w-100 text-start d-flex justify-content-between align-items-center" type="button" id="bfIconDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false" style="background: #fff; border: 1px solid #d9dee3; padding: 8px 12px; height: 38px;">
+              <span><i id="bf_selected_icon_display" class="fas fa-check me-2"></i> <span id="bf_selected_icon_text">fas fa-check</span></span>
+              <i class="fas fa-chevron-down text-muted"></i>
+            </button>
+            <div class="dropdown-menu w-100 p-3" aria-labelledby="bfIconDropdownBtn">
+              <input type="text" class="form-control mb-3" id="bfIconSearch" placeholder="Search icons...">
+              <div class="d-flex flex-wrap gap-2 icon-picker-grid" id="bfIconGrid" style="max-height: 200px; overflow-y: auto;">
+                @foreach($popularBfIcons as $ic)
+                  <div class="icon-option bf-icon-option p-2 border rounded cursor-pointer text-center" data-icon="{{ $ic }}" style="width: 45px; height: 45px; display:flex; align-items:center; justify-content:center; cursor: pointer;" title="{{ $ic }}">
+                    <i class="{{ $ic }} fs-5"></i>
+                  </div>
+                @endforeach
+              </div>
+            </div>
+          </div>
+
+<div class="modal fade" id="addHotelPolicyModal" tabindex="-1" aria-labelledby="addHotelPolicyModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addHotelPolicyModalLabel"><i class="fas fa-plus-circle me-2 text-primary"></i>Add New Hotel Policy</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="policy-modal-alert" class="d-none"></div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="new_policy_name">Policy Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="new_policy_name" placeholder="e.g. Breakfast Schedule" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="new_policy_type">Input Type</label>
+          <select class="form-select" id="new_policy_type">
+            <option value="textarea">Large Text Area (Multiple Lines)</option>
+            <option value="text">Single Line Text</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="saveNewHotelPolicy()">
+          <span id="savePolicyBtnText">Save Policy</span>
+          <div id="savePolicyBtnSpinner" class="spinner-border spinner-border-sm d-none" role="status"></div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addCategoryModalLabel"><i class="fas fa-plus-circle me-2 text-primary"></i>Add New Category</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="category-modal-alert" class="d-none"></div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold" for="new_category_name">Category Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="new_category_name" onkeyup="document.getElementById('new_category_slug').value = this.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold" for="new_category_slug">Slug <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="new_category_slug" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="saveNewCategory()">
+            <span id="saveCategoryBtnText"><i class="fas fa-plus me-1"></i>Add Category</span>
+            <span id="saveCategoryBtnSpinner" class="d-none"><span class="spinner-border spinner-border-sm me-1"></span>Saving...</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+// Icon Picker Search (Amenity)
+      const amenityIconSearch = document.getElementById('amenityIconSearch');
+      if (amenityIconSearch) {
+          amenityIconSearch.addEventListener('input', function() {
+              const term = this.value.toLowerCase();
+              document.querySelectorAll('.amenity-icon-option').forEach(opt => {
+                  const iconName = opt.getAttribute('data-icon').toLowerCase();
+                  opt.style.display = iconName.includes(term) ? 'flex' : 'none';
+              });
+          });
+      }
+      // Icon Selection (Amenity)
+      document.querySelectorAll('.amenity-icon-option').forEach(opt => {
+          opt.addEventListener('click', function() {
+              const iconName = this.getAttribute('data-icon');
+              document.getElementById('new_amenity_icon').value = iconName;
+              document.getElementById('amenity_selected_icon_display').className = iconName + ' me-2';
+              document.getElementById('amenity_selected_icon_text').textContent = iconName;
+          });
+      });
+
+      // Icon Picker Search (Booking Feature)
+      const bfIconSearch = document.getElementById('bfIconSearch');
+      if (bfIconSearch) {
+          bfIconSearch.addEventListener('input', function() {
+              const term = this.value.toLowerCase();
+              document.querySelectorAll('.bf-icon-option').forEach(opt => {
+                  const iconName = opt.getAttribute('data-icon').toLowerCase();
+                  opt.style.display = iconName.includes(term) ? 'flex' : 'none';
+              });
+          });
+      }
+      // Icon Selection (Booking Feature)
+      document.querySelectorAll('.bf-icon-option').forEach(opt => {
+          opt.addEventListener('click', function() {
+              const iconName = this.getAttribute('data-icon');
+              document.getElementById('new_bf_icon').value = iconName;
+              document.getElementById('bf_selected_icon_display').className = iconName + ' me-2';
+              document.getElementById('bf_selected_icon_text').textContent = iconName;
+          });
+      });
+      });
+
+    });
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function updateCount(inputId, countId) {
+        const input = document.getElementById(inputId);
+        const count = document.getElementById(countId);
+        if (input && count) {
+            const update = () => {
+                count.textContent = `(${input.value.length} / 160)`;
+            };
+            input.addEventListener('input', update);
+            update(); // Init on load
+        }
+    }
+    updateCount('meta_description', 'meta_desc_count');
+    updateCount('og_description', 'og_desc_count');
+});
+</script>
+
 @endsection
+
 

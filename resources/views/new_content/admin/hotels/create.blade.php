@@ -207,68 +207,69 @@
               <input type="text" class="form-control" id="longitude" name="longitude" placeholder="e.g. -84.6178" />
             </div>
           </div>
-          <div class="mb-3 mt-3">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <label class="form-label fw-semibold mb-0">Amenities</label>
-              <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addAmenityModal">
-                <i class="fas fa-plus me-1"></i> Add Amenity
-              </button>
-            </div>
 
-            {{-- Custom Amenity Dropdown --}}
-            <div class="amenity-dropdown-wrapper" id="amenityDropdownWrapper">
-
-              {{-- Trigger Button --}}
-              <div class="amenity-dropdown-trigger" id="amenityTrigger" onclick="toggleAmenityDropdown()">
-                <div class="amenity-tags-area" id="amenityTagsArea">
-                  <span class="amenity-placeholder" id="amenityPlaceholder">
-                    <i class="fas fa-concierge-bell me-2 text-muted"></i>Click to select amenities...
-                  </span>
-                </div>
-                <i class="fas fa-chevron-down amenity-dropdown-arrow" id="amenityArrow"></i>
+          <div class="row mt-3">
+            <div class="col-md-6 mb-3">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <label class="form-label fw-semibold mb-0">Amenities</label>
+                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addAmenityModal">
+                  <i class="fas fa-plus me-1"></i> Add Amenity
+                </button>
               </div>
 
-              {{-- Dropdown Panel --}}
-              <div class="amenity-dropdown-panel" id="amenityDropdownPanel" style="display:none;">
-                <div class="amenity-search-wrap">
-                  <i class="fas fa-search amenity-search-icon"></i>
-                  <input type="text" class="amenity-search-input" id="amenitySearchInput"
-                         placeholder="Search amenities..." oninput="filterAmenities(this.value)" autocomplete="off" />
+              {{-- Custom Amenity Dropdown --}}
+              <div class="amenity-dropdown-wrapper" id="amenityDropdownWrapper">
+
+                {{-- Trigger Button --}}
+                <div class="amenity-dropdown-trigger" id="amenityTrigger" onclick="toggleAmenityDropdown()">
+                  <div class="amenity-tags-area" id="amenityTagsArea">
+                    <span class="amenity-placeholder" id="amenityPlaceholder">
+                      <i class="fas fa-concierge-bell me-2 text-muted"></i>Click to select amenities...
+                    </span>
+                  </div>
+                  <i class="fas fa-chevron-down amenity-dropdown-arrow" id="amenityArrow"></i>
                 </div>
-                <div class="amenity-divider"></div>
-                <div class="amenity-items-list" id="amenityItemsList">
-                  @foreach($amenities as $amenity)
-                  <label class="amenity-item" id="amenity-label-{{ $amenity->id }}">
-                    <input type="checkbox" name="amenities[]" value="{{ $amenity->id }}"
-                           id="amenity_cb_{{ $amenity->id }}"
-                           class="amenity-cb"
-                           data-name="{{ $amenity->name }}"
-                           data-id="{{ $amenity->id }}"
-                           onchange="onAmenityChange(this)" />
-                    <span class="amenity-item-icon"><i class="fas {{ $amenity->icon ?? 'fa-star' }}"></i></span>
-                    <span class="amenity-item-name">{{ $amenity->name }}</span>
-                    <span class="amenity-item-check"><i class="fas fa-check"></i></span>
-                  </label>
-                  @endforeach
-                  <div class="amenity-no-results d-none" id="amenityNoResults">
-                    <i class="fas fa-search-minus me-2"></i>No amenities found
+
+                {{-- Dropdown Panel --}}
+                <div class="amenity-dropdown-panel" id="amenityDropdownPanel" style="display:none;">
+                  <div class="amenity-search-wrap">
+                    <i class="fas fa-search amenity-search-icon"></i>
+                    <input type="text" class="amenity-search-input" id="amenitySearchInput"
+                           placeholder="Search amenities..." oninput="filterAmenities(this.value)" autocomplete="off" />
+                  </div>
+                  <div class="amenity-divider"></div>
+                  <div class="amenity-items-list" id="amenityItemsList">
+                    @foreach($amenities as $amenity)
+                    <label class="amenity-item" id="amenity-label-{{ $amenity->id }}">
+                      <input type="checkbox" name="amenities[]" value="{{ $amenity->id }}"
+                             id="amenity_cb_{{ $amenity->id }}"
+                             class="amenity-cb"
+                             data-name="{{ $amenity->name }}"
+                             data-id="{{ $amenity->id }}"
+                             onchange="onAmenityChange(this)" />
+                      <span class="amenity-item-icon"><i class="fas {{ $amenity->icon ?? 'fa-star' }}"></i></span>
+                      <span class="amenity-item-name">{{ $amenity->name }}</span>
+                      <span class="amenity-item-check"><i class="fas fa-check"></i></span>
+                    </label>
+                    @endforeach
+                    <div class="amenity-no-results d-none" id="amenityNoResults">
+                      <i class="fas fa-search-minus me-2"></i>No amenities found
+                    </div>
+                  </div>
+                  <div class="amenity-divider"></div>
+                  <div class="amenity-panel-footer">
+                    <button type="button" class="btn btn-sm btn-link p-0 text-primary fw-semibold"
+                            data-bs-toggle="modal" data-bs-target="#addAmenityModal" onclick="closeAmenityDropdown()">
+                      <i class="fas fa-plus-circle me-1"></i>Add New Amenity
+                    </button>
+                    <span class="amenity-selected-count" id="amenitySelectedCount">0 selected</span>
                   </div>
                 </div>
-                <div class="amenity-divider"></div>
-                <div class="amenity-panel-footer">
-                  <button type="button" class="btn btn-sm btn-link p-0 text-primary fw-semibold"
-                          data-bs-toggle="modal" data-bs-target="#addAmenityModal" onclick="closeAmenityDropdown()">
-                    <i class="fas fa-plus-circle me-1"></i>Add New Amenity
-                  </button>
-                  <span class="amenity-selected-count" id="amenitySelectedCount">0 selected</span>
-                </div>
               </div>
             </div>
-          </div>
 
-          <!-- Booking Features -->
-          <div class="row">
-            <div class="col-12 mt-4">
+            <!-- Booking Features -->
+            <div class="col-md-6 mb-3">
               <div class="d-flex justify-content-between align-items-center mb-2">
                 <label class="form-label fw-semibold mb-0">Booking Features</label>
                 <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addBookingFeatureModal">
@@ -330,7 +331,7 @@
             </div>
           </div>
 
-          <!-- Hotel Policies -->
+<!-- Hotel Policies -->
           <div class="row">
             <div class="col-12 mt-4">
               <div class="d-flex justify-content-between align-items-center mb-2">
@@ -401,25 +402,19 @@
         <div class="tab-pane fade" id="seo-pane" role="tabpanel" aria-labelledby="seo-tab">
           <div class="mb-3">
             <label class="form-label" for="meta_title">Meta Title</label>
-            <input type="text" class="form-control" id="meta_title" name="meta_title" />
+            <input type="text" class="form-control" id="meta_title" name="meta_title" placeholder="e.g. Best Hotel in Michigan | Michigan Explorer" />
           </div>
           <div class="mb-3">
-            <label class="form-label" for="meta_description">Meta Description</label>
-            <textarea class="form-control" id="meta_description" name="meta_description" rows="2"></textarea>
+            <label class="form-label" for="meta_description">Meta Description <span class="text-muted small ms-2 fw-normal" id="meta_desc_count">(0 / 160)</span></label>
+            <textarea class="form-control" id="meta_description" name="meta_description" placeholder="e.g. Discover the best hotel in Michigan..." maxlength="160" rows="2"></textarea>
           </div>
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label class="form-label" for="canonical_url">Canonical URL</label>
-              <input type="url" class="form-control" id="canonical_url" name="canonical_url" />
-            </div>
-            <div class="col-md-6 mb-3">
+          <div class="mb-3">
               <label class="form-label" for="og_title">OG Title</label>
-              <input type="text" class="form-control" id="og_title" name="og_title" />
+              <input type="text" class="form-control" id="og_title" name="og_title" placeholder="e.g. Best Hotel in Michigan" />
             </div>
-          </div>
           <div class="mb-3">
-            <label class="form-label" for="og_description">OG Description</label>
-            <textarea class="form-control" id="og_description" name="og_description" rows="2"></textarea>
+            <label class="form-label" for="og_description">OG Description <span class="text-muted small ms-2 fw-normal" id="og_desc_count">(0 / 160)</span></label>
+            <textarea class="form-control" id="og_description" name="og_description" placeholder="e.g. Discover the best hotel in Michigan..." maxlength="160" rows="2"></textarea>
           </div>
           <div class="mb-3">
             <label class="form-label" for="schema_markup">Schema Markup (JSON-LD) - <span class="text-info">Auto-generated</span></label>
@@ -443,6 +438,25 @@
     </form>
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function updateCount(inputId, countId) {
+        const input = document.getElementById(inputId);
+        const count = document.getElementById(countId);
+        if (input && count) {
+            const update = () => {
+                count.textContent = `(${input.value.length} / 160)`;
+            };
+            input.addEventListener('input', update);
+            update(); // Init on load
+        }
+    }
+    updateCount('meta_description', 'meta_desc_count');
+    updateCount('og_description', 'og_desc_count');
+});
+</script>
+
 @endsection
 
 @section('page-script')
@@ -592,7 +606,7 @@
     const tagsArea = document.getElementById('amenityTagsArea');
     const placeholder = document.getElementById('amenityPlaceholder');
     const countEl = document.getElementById('amenitySelectedCount');
-    tagsArea.innerHTML = '';
+    tagsArea.querySelectorAll('.amenity-tag').forEach(t => t.remove());
     if (cbs.length === 0) {
       tagsArea.appendChild(placeholder); placeholder.style.display = 'flex';
       countEl.textContent = '0 selected'; return;
@@ -705,6 +719,35 @@
 </script>
 
 {{-- ===== Add Amenity Modal ===== --}}
+@php
+    $popularIcons = [
+        'fas fa-wifi', 'fas fa-parking', 'fas fa-swimming-pool', 'fas fa-dumbbell', 
+        'fas fa-spa', 'fas fa-coffee', 'fas fa-utensils', 'fas fa-cocktail', 
+        'fas fa-concierge-bell', 'fas fa-paw', 'fas fa-tv', 'fas fa-snowflake', 
+        'fas fa-hot-tub', 'fas fa-wheelchair', 'fas fa-baby', 'fas fa-key', 
+        'fas fa-shield-alt', 'fas fa-tree', 'fas fa-star', 'fas fa-bed', 
+        'fas fa-clock', 'fas fa-wine-glass', 'fas fa-luggage-cart', 'fas fa-bicycle',
+        'fas fa-hiking', 'fas fa-campground', 'fas fa-map-marker-alt', 'fas fa-map-pin',
+        'fas fa-wind', 'fas fa-tshirt', 'fas fa-sink', 'fas fa-glass-martini-alt',
+    ];
+    $popularBfIcons = [
+        'fas fa-check', 'fas fa-check-circle', 'fas fa-times-circle', 'fas fa-dollar-sign',
+        'fas fa-credit-card', 'fas fa-calendar-alt', 'fas fa-calendar-check', 'fas fa-clock',
+        'fas fa-bolt', 'fas fa-coffee', 'fas fa-utensils', 'fas fa-ban',
+        'fas fa-shield-alt', 'fas fa-percent', 'fas fa-tags', 'fas fa-gift',
+        'fas fa-mobile-alt', 'fas fa-envelope', 'fas fa-info-circle', 'fas fa-star',
+        'fas fa-wallet', 'fas fa-receipt', 'fas fa-file-invoice-dollar', 'fas fa-user-check'
+    ];
+@endphp
+<style>
+    .icon-option:hover {
+        background-color: #f8f9fa;
+        border-color: #4f46e5 !important;
+    }
+    .icon-picker-grid {
+        scrollbar-width: thin;
+    }
+</style>
 <div class="modal fade" id="addAmenityModal" tabindex="-1" aria-labelledby="addAmenityModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -719,12 +762,25 @@
           <input type="text" class="form-control" id="new_amenity_name" />
         </div>
         <div class="mb-3">
-          <label class="form-label fw-semibold" for="new_amenity_icon">FontAwesome Icon Class</label>
-          <div class="input-group">
-            <span class="input-group-text"><i id="amenity-icon-preview" class="fas fa-star"></i></span>
-            <input type="text" class="form-control" id="new_amenity_icon" value="fa-star" oninput="updateAmenityIconPreview(this.value)" />
+          <label class="form-label fw-semibold" for="new_amenity_icon">Icon</label>
+          <div class="dropdown">
+            <button class="btn btn-outline-secondary w-100 text-start d-flex justify-content-between align-items-center" type="button" id="amenityIconDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false" style="background: #fff; border: 1px solid #d9dee3; padding: 8px 12px; height: 38px;">
+              <span><i id="amenity_selected_icon_display" class="fas fa-star me-2"></i> <span id="amenity_selected_icon_text">fas fa-star</span></span>
+              <i class="fas fa-chevron-down text-muted"></i>
+            </button>
+            <div class="dropdown-menu w-100 p-3" aria-labelledby="amenityIconDropdownBtn">
+              <input type="text" class="form-control mb-3" id="amenityIconSearch" placeholder="Search icons...">
+              <div class="d-flex flex-wrap gap-2 icon-picker-grid" id="amenityIconGrid" style="max-height: 200px; overflow-y: auto;">
+                @foreach($popularIcons as $ic)
+                  <div class="icon-option amenity-icon-option p-2 border rounded cursor-pointer text-center" data-icon="{{ $ic }}" style="width: 45px; height: 45px; display:flex; align-items:center; justify-content:center; cursor: pointer;" title="{{ $ic }}">
+                    <i class="{{ $ic }} fs-5"></i>
+                  </div>
+                @endforeach
+              </div>
+            </div>
           </div>
-          <div class="form-text">e.g. <code>fa-wifi</code>, <code>fa-dumbbell</code>, <code>fa-swimming-pool</code></div>
+          <input type="hidden" id="new_amenity_icon" value="fas fa-star">
+          <div class="form-text">Search and select an icon for the amenity.</div>
         </div>
       </div>
       <div class="modal-footer">
@@ -737,6 +793,7 @@
     </div>
   </div>
 </div>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js" referrerpolicy="origin"></script>
 <script>
@@ -1015,5 +1072,307 @@
         if (rb) { rb.checked = true; onCityChange(rb); }
       }
     });
-  </script>
+          document.addEventListener('DOMContentLoaded', function() {
+// Icon Picker Search (Amenity)
+      const amenityIconSearch = document.getElementById('amenityIconSearch');
+      if (amenityIconSearch) {
+          amenityIconSearch.addEventListener('input', function() {
+              const term = this.value.toLowerCase();
+              document.querySelectorAll('.amenity-icon-option').forEach(opt => {
+                  const iconName = opt.getAttribute('data-icon').toLowerCase();
+                  opt.style.display = iconName.includes(term) ? 'flex' : 'none';
+              });
+          });
+      }
+      // Icon Selection (Amenity)
+      document.querySelectorAll('.amenity-icon-option').forEach(opt => {
+          opt.addEventListener('click', function() {
+              const iconName = this.getAttribute('data-icon');
+              document.getElementById('new_amenity_icon').value = iconName;
+              document.getElementById('amenity_selected_icon_display').className = iconName + ' me-2';
+              document.getElementById('amenity_selected_icon_text').textContent = iconName;
+          });
+      });
+
+      // Icon Picker Search (Booking Feature)
+      const bfIconSearch = document.getElementById('bfIconSearch');
+      if (bfIconSearch) {
+          bfIconSearch.addEventListener('input', function() {
+              const term = this.value.toLowerCase();
+              document.querySelectorAll('.bf-icon-option').forEach(opt => {
+                  const iconName = opt.getAttribute('data-icon').toLowerCase();
+                  opt.style.display = iconName.includes(term) ? 'flex' : 'none';
+              });
+          });
+      }
+      // Icon Selection (Booking Feature)
+      document.querySelectorAll('.bf-icon-option').forEach(opt => {
+          opt.addEventListener('click', function() {
+              const iconName = this.getAttribute('data-icon');
+              document.getElementById('new_bf_icon').value = iconName;
+              document.getElementById('bf_selected_icon_display').className = iconName + ' me-2';
+              document.getElementById('bf_selected_icon_text').textContent = iconName;
+          });
+      });
+      });
+
+    // --- Booking Feature Dropdown Logic ---
+  let bookingFeatureDropdownOpen = false;
+  function toggleBookingFeatureDropdown() { bookingFeatureDropdownOpen ? closeBookingFeatureDropdown() : openBookingFeatureDropdown(); }
+  function openBookingFeatureDropdown() {
+    document.getElementById('bookingFeatureDropdownPanel').style.display = 'block';
+    document.getElementById('bookingFeatureTrigger').classList.add('open');
+    document.getElementById('bookingFeatureArrow').classList.add('rotated');
+    document.getElementById('bookingFeatureSearchInput').focus();
+    bookingFeatureDropdownOpen = true;
+  }
+  function closeBookingFeatureDropdown() {
+    document.getElementById('bookingFeatureDropdownPanel').style.display = 'none';
+    document.getElementById('bookingFeatureTrigger').classList.remove('open');
+    document.getElementById('bookingFeatureArrow').classList.remove('rotated');
+    document.getElementById('bookingFeatureSearchInput').value = '';
+    filterBookingFeatures('');
+    bookingFeatureDropdownOpen = false;
+  }
+  document.addEventListener('click', function(e) {
+    const w = document.getElementById('bookingFeatureDropdownWrapper');
+    if (w && !w.contains(e.target)) closeBookingFeatureDropdown();
+  });
+  function onBookingFeatureChange(cb) {
+    const label = document.getElementById('booking-feature-label-' + cb.dataset.id);
+    if(label) { cb.checked ? label.classList.add('amenity-item--checked') : label.classList.remove('amenity-item--checked'); }
+    renderBookingFeatureTags();
+  }
+  function renderBookingFeatureTags() {
+    const cbs = document.querySelectorAll('.booking-feature-cb:checked');
+    const tagsArea = document.getElementById('bookingFeatureTagsArea');
+    const placeholder = document.getElementById('bookingFeaturePlaceholder');
+    const countEl = document.getElementById('bookingFeatureSelectedCount');
+    
+    // Clear old tags
+    const oldTags = tagsArea.querySelectorAll('.amenity-tag');
+    oldTags.forEach(t => t.remove());
+
+    if (cbs.length === 0) {
+      placeholder.style.display = 'flex';
+      countEl.textContent = '0 selected';
+      return;
+    }
+    placeholder.style.display = 'none';
+    cbs.forEach(cb => {
+      const tag = document.createElement('span');
+      tag.className = 'amenity-tag';
+      tag.innerHTML = cb.dataset.name + ' <span class="tag-remove" onclick="removeBookingFeatureTag(event,\'' + cb.dataset.id + '\')"><i class="fas fa-times"></i></span>';
+      tagsArea.appendChild(tag);
+    });
+    countEl.textContent = cbs.length + ' selected';
+  }
+  function filterBookingFeatures(val) {
+    const term = val.toLowerCase();
+    const items = document.querySelectorAll('#bookingFeatureItemsList .amenity-item');
+    let found = 0;
+    items.forEach(item => {
+      const txt = item.querySelector('.amenity-item-name').textContent.toLowerCase();
+      if (txt.includes(term)) { item.style.display = 'flex'; found++; }
+      else { item.style.display = 'none'; }
+    });
+    document.getElementById('bookingFeatureNoResults').classList.toggle('d-none', found > 0);
+  }
+
+  function removeBookingFeatureTag(e, id) {
+    e.stopPropagation();
+    const cb = document.getElementById('booking_feature_cb_' + id);
+    if (cb) { cb.checked = false; cb.dispatchEvent(new Event('change')); }
+  }
+
+  function updateBookingFeatureIconPreview(val) { document.getElementById('booking-feature-icon-preview').className = 'fas ' + val.trim(); }
+
+  function saveNewBookingFeature() {
+    const name = document.getElementById('new_bf_name').value.trim();
+    const icon = document.getElementById('new_bf_icon').value.trim();
+    const alertBox = document.getElementById('bf-modal-alert');
+    if (!name) { alertBox.className = 'alert alert-danger'; alertBox.textContent = 'Please enter a name.'; return; }
+    alertBox.className = 'd-none';
+    document.getElementById('saveBfBtnText').classList.add('d-none');
+    document.getElementById('saveBfBtnSpinner').classList.remove('d-none');
+    $.ajax({
+      url: '{{ route("booking-features.store") }}', type: 'POST',
+      data: { _token: '{{ csrf_token() }}', name, icon: icon || 'fa-check', status: 1 },
+      success: function(response) {
+        if (response.success) {
+          const a = response.booking_feature;
+          const list = document.getElementById('bookingFeatureItemsList');
+          const noResults = document.getElementById('bookingFeatureNoResults');
+          const newLabel = document.createElement('label');
+          newLabel.className = 'amenity-item amenity-item--checked';
+          newLabel.id = 'booking-feature-label-' + a.id;
+          newLabel.innerHTML = '<input type="checkbox" name="booking_features[]" value="'+a.id+'" id="booking_feature_cb_'+a.id+'" class="booking-feature-cb" data-name="'+a.name+'" data-id="'+a.id+'" checked onchange="onBookingFeatureChange(this)" /><span class="amenity-item-icon"><i class="fas '+(a.icon || 'fa-check')+'"></i></span><span class="amenity-item-name">'+a.name+'</span><span class="amenity-item-check"><i class="fas fa-check"></i></span>';
+          list.insertBefore(newLabel, noResults);
+          renderBookingFeatureTags();
+          document.getElementById('new_bf_name').value = '';
+          document.getElementById('new_bf_icon').value = 'fa-check';
+          updateBookingFeatureIconPreview('fa-check');
+          bootstrap.Modal.getInstance(document.getElementById('addBookingFeatureModal')).hide();
+        } else { alertBox.className = 'alert alert-danger'; alertBox.textContent = response.message || 'Failed.'; }
+      },
+      error: function(xhr) {
+        alertBox.className = 'alert alert-danger';
+        const errors = xhr.responseJSON?.errors;
+        alertBox.textContent = errors ? Object.values(errors).flat().join(' ') : 'An error occurred.';
+      },
+      complete: function() {
+        document.getElementById('saveBfBtnText').classList.remove('d-none');
+        document.getElementById('saveBfBtnSpinner').classList.add('d-none');
+      }
+    });
+  }
+
+  function saveNewHotelPolicy() {
+    const name = document.getElementById('new_policy_name').value.trim();
+    const type = document.getElementById('new_policy_type').value;
+    const alertBox = document.getElementById('policy-modal-alert');
+    if (!name) { alertBox.className = 'alert alert-danger'; alertBox.textContent = 'Please enter a policy name.'; return; }
+    alertBox.className = 'd-none';
+    document.getElementById('savePolicyBtnText').classList.add('d-none');
+    document.getElementById('savePolicyBtnSpinner').classList.remove('d-none');
+    $.ajax({
+      url: '{{ route("hotel-policies.store") }}', type: 'POST',
+      data: { _token: '{{ csrf_token() }}', name, input_type: type, status: 1 },
+      success: function(response) {
+        if (response.success) {
+          const p = response.hotel_policy;
+          const container = document.querySelector('label:contains("Hotel Policies")').closest('.row.g-3') || document.querySelector('.row.g-3').lastElementChild.parentElement;
+          const div = document.createElement('div');
+          div.className = 'col-md-6';
+          let inputHtml = type === 'textarea' ? '<textarea class="form-control" name="hotel_policies['+p.id+']" id="policy_'+p.id+'" rows="2"></textarea>' : '<input type="text" class="form-control" name="hotel_policies['+p.id+']" id="policy_'+p.id+'" />';
+          div.innerHTML = '<label class="form-label" for="policy_'+p.id+'">'+p.name+'</label>' + inputHtml;
+          container.appendChild(div);
+          
+          document.getElementById('new_policy_name').value = '';
+          bootstrap.Modal.getInstance(document.getElementById('addHotelPolicyModal')).hide();
+        } else { alertBox.className = 'alert alert-danger'; alertBox.textContent = response.message || 'Failed.'; }
+      },
+      error: function(xhr) {
+        alertBox.className = 'alert alert-danger';
+        const errors = xhr.responseJSON?.errors;
+        alertBox.textContent = errors ? Object.values(errors).flat().join(' ') : 'An error occurred.';
+      },
+      complete: function() {
+        document.getElementById('savePolicyBtnText').classList.remove('d-none');
+        document.getElementById('savePolicyBtnSpinner').classList.add('d-none');
+      }
+    });
+  }
+
+  // Pre-load tags on edit
+  document.addEventListener('DOMContentLoaded', () => {
+    // If not edit page, render empty tags
+    if (document.querySelectorAll('.booking-feature-cb').length > 0) {
+      renderBookingFeatureTags();
+    }
+  });
+
+</script>
+
+{{-- ===== Add Booking Feature Modal ===== --}}
+<div class="modal fade" id="addBookingFeatureModal" tabindex="-1" aria-labelledby="addBookingFeatureModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addBookingFeatureModalLabel"><i class="fas fa-plus-circle me-2 text-primary"></i>Add New Booking Feature</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="bf-modal-alert" class="d-none"></div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="new_bf_name">Feature Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="new_bf_name" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="new_bf_icon">Icon</label>
+          <div class="dropdown">
+            <button class="btn btn-outline-secondary w-100 text-start d-flex justify-content-between align-items-center" type="button" id="bfIconDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false" style="background: #fff; border: 1px solid #d9dee3; padding: 8px 12px; height: 38px;">
+              <span><i id="bf_selected_icon_display" class="fas fa-check me-2"></i> <span id="bf_selected_icon_text">fas fa-check</span></span>
+              <i class="fas fa-chevron-down text-muted"></i>
+            </button>
+            <div class="dropdown-menu w-100 p-3" aria-labelledby="bfIconDropdownBtn">
+              <input type="text" class="form-control mb-3" id="bfIconSearch" placeholder="Search icons...">
+              <div class="d-flex flex-wrap gap-2 icon-picker-grid" id="bfIconGrid" style="max-height: 200px; overflow-y: auto;">
+                @foreach($popularBfIcons as $ic)
+                  <div class="icon-option bf-icon-option p-2 border rounded cursor-pointer text-center" data-icon="{{ $ic }}" style="width: 45px; height: 45px; display:flex; align-items:center; justify-content:center; cursor: pointer;" title="{{ $ic }}">
+                    <i class="{{ $ic }} fs-5"></i>
+                  </div>
+                @endforeach
+              </div>
+            </div>
+          </div>
+          <input type="hidden" id="new_bf_icon" value="fas fa-check">
+          <div class="form-text">Search and select an icon for the booking feature.</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="saveNewBookingFeature()">
+          <span id="saveBfBtnText">Save Feature</span>
+          <div id="saveBfBtnSpinner" class="spinner-border spinner-border-sm d-none" role="status"></div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{-- ===== Add Hotel Policy Modal ===== --}}
+<div class="modal fade" id="addHotelPolicyModal" tabindex="-1" aria-labelledby="addHotelPolicyModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addHotelPolicyModalLabel"><i class="fas fa-plus-circle me-2 text-primary"></i>Add New Hotel Policy</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="policy-modal-alert" class="d-none"></div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="new_policy_name">Policy Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="new_policy_name" placeholder="e.g. Breakfast Schedule" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="new_policy_type">Input Type</label>
+          <select class="form-select" id="new_policy_type">
+            <option value="textarea">Large Text Area (Multiple Lines)</option>
+            <option value="text">Single Line Text</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="saveNewHotelPolicy()">
+          <span id="savePolicyBtnText">Save Policy</span>
+          <div id="savePolicyBtnSpinner" class="spinner-border spinner-border-sm d-none" role="status"></div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function updateCount(inputId, countId) {
+        const input = document.getElementById(inputId);
+        const count = document.getElementById(countId);
+        if (input && count) {
+            const update = () => {
+                count.textContent = `(${input.value.length} / 160)`;
+            };
+            input.addEventListener('input', update);
+            update(); // Init on load
+        }
+    }
+    updateCount('meta_description', 'meta_desc_count');
+    updateCount('og_description', 'og_desc_count');
+});
+</script>
+
 @endsection
+
+

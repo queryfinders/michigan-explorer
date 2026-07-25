@@ -19,28 +19,46 @@
     <form action="{{ route('restaurant-categories.update', $restaurantCategory->id) }}" method="POST">
       @csrf
       @method('PUT')
-      <div class="mb-3">
-        <label class="form-label" for="name">Name</label>
-        <input type="text" class="form-control" id="name" name="name" value="{{ $restaurantCategory->name }}" required />
-      </div>
-      <div class="mb-3">
-        <label class="form-label" for="slug">Slug</label>
-        <input type="text" class="form-control" id="slug" name="slug" value="{{ $restaurantCategory->slug }}" required />
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label" for="name">Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="name" name="name" value="{{ $restaurantCategory->name }}" placeholder="e.g. Fine Dining" required />
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label" for="slug">Slug <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="slug" name="slug" value="{{ $restaurantCategory->slug }}" placeholder="e.g. fine-dining" required />
+        </div>
       </div>
       <div class="mb-3">
         <label class="form-label" for="description">Description</label>
-        <textarea class="form-control" id="description" name="description">{{ $restaurantCategory->description }}</textarea>
+        <textarea class="form-control tinymce-editor" id="description" name="description">{{ $restaurantCategory->description }}</textarea>
       </div>
-      <div class="mb-3">
-        <label class="form-label" for="status">Status</label>
-        <select class="form-select" id="status" name="status">
-          <option value="1" {{ $restaurantCategory->status == 1 ? 'selected' : '' }}>Active</option>
-          <option value="0" {{ $restaurantCategory->status == 0 ? 'selected' : '' }}>Inactive</option>
-        </select>
-      </div>
+      <input type="hidden" name="status" value="{{ $restaurantCategory->status ?? 1 }}">
       <button type="submit" class="btn btn-primary">Update</button>
       <a href="{{ route('restaurant-categories.index') }}" class="btn btn-secondary">Cancel</a>
     </form>
   </div>
 </div>
+@endsection
+
+
+@section('page-script')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+  tinymce.init({
+    selector: '.tinymce-editor',
+    height: 300,
+    menubar: false,
+    plugins: [
+      'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+      'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+    ],
+    toolbar: 'undo redo | blocks | ' +
+    'bold italic forecolor | alignleft aligncenter ' +
+    'alignright alignjustify | bullist numlist outdent indent | ' +
+    'removeformat | help',
+    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+  });
+</script>
 @endsection

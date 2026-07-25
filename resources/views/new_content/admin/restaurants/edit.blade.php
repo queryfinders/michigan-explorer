@@ -434,25 +434,19 @@
         <div class="tab-pane fade" id="seo-pane" role="tabpanel" aria-labelledby="seo-tab">
           <div class="mb-3">
             <label class="form-label" for="meta_title">Meta Title</label>
-            <input type="text" class="form-control" id="meta_title" name="meta_title" value="{{ old('meta_title', $restaurant->seo->meta_title ?? '') }}" />
+            <input type="text" class="form-control" id="meta_title" name="meta_title" placeholder="e.g. Best Restaurant in Michigan | Michigan Explorer" value="{{ old('meta_title', $restaurant->seo->meta_title ?? '') }}" />
           </div>
           <div class="mb-3">
-            <label class="form-label" for="meta_description">Meta Description</label>
-            <textarea class="form-control" id="meta_description" name="meta_description" rows="2">{{ old('meta_description', $restaurant->seo->meta_description ?? '') }}</textarea>
+            <label class="form-label" for="meta_description">Meta Description <span class="text-muted small ms-2 fw-normal" id="meta_desc_count">(0 / 160)</span></label>
+            <textarea class="form-control" id="meta_description" name="meta_description" placeholder="e.g. Discover the best restaurant in Michigan..." maxlength="160" rows="2">{{ old('meta_description', $restaurant->seo->meta_description ?? '') }}</textarea>
           </div>
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label class="form-label" for="canonical_url">Canonical URL</label>
-              <input type="url" class="form-control" id="canonical_url" name="canonical_url" value="{{ old('canonical_url', $restaurant->seo->canonical_url ?? '') }}" />
-            </div>
-            <div class="col-md-6 mb-3">
+          <div class="mb-3">
               <label class="form-label" for="og_title">OG Title</label>
-              <input type="text" class="form-control" id="og_title" name="og_title" value="{{ old('og_title', $restaurant->seo->og_title ?? '') }}" />
+              <input type="text" class="form-control" id="og_title" name="og_title" placeholder="e.g. Best Restaurant in Michigan" value="{{ old('og_title', $restaurant->seo->og_title ?? '') }}" />
             </div>
-          </div>
           <div class="mb-3">
-            <label class="form-label" for="og_description">OG Description</label>
-            <textarea class="form-control" id="og_description" name="og_description" rows="2">{{ old('og_description', $restaurant->seo->og_description ?? '') }}</textarea>
+            <label class="form-label" for="og_description">OG Description <span class="text-muted small ms-2 fw-normal" id="og_desc_count">(0 / 160)</span></label>
+            <textarea class="form-control" id="og_description" name="og_description" placeholder="e.g. Discover the best restaurant in Michigan..." maxlength="160" rows="2">{{ old('og_description', $restaurant->seo->og_description ?? '') }}</textarea>
           </div>
           <div class="mb-3">
             <label class="form-label" for="schema_markup">Schema Markup (JSON-LD) - <span class="text-info">Auto-generated</span></label>
@@ -468,6 +462,25 @@
     </form>
   </div>
 </div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function updateCount(inputId, countId) {
+        const input = document.getElementById(inputId);
+        const count = document.getElementById(countId);
+        if (input && count) {
+            const update = () => {
+                count.textContent = `(${input.value.length} / 160)`;
+            };
+            input.addEventListener('input', update);
+            update(); // Init on load
+        }
+    }
+    updateCount('meta_description', 'meta_desc_count');
+    updateCount('og_description', 'og_desc_count');
+});
+</script>
 
 @endsection
 
@@ -1152,6 +1165,25 @@
     const wrapper = document.getElementById('categoryDropdownWrapper');
     if (wrapper && !wrapper.contains(e.target)) closeCategoryDropdown();
   });
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function updateCount(inputId, countId) {
+        const input = document.getElementById(inputId);
+        const count = document.getElementById(countId);
+        if (input && count) {
+            const update = () => {
+                count.textContent = `(${input.value.length} / 160)`;
+            };
+            input.addEventListener('input', update);
+            update(); // Init on load
+        }
+    }
+    updateCount('meta_description', 'meta_desc_count');
+    updateCount('og_description', 'og_desc_count');
+});
 </script>
 
 @endsection
