@@ -53,8 +53,9 @@
 <!-- 2. Browse by Category -->
 <section class="category-filter-bar-sticky py-4 border-bottom bg-white shadow-sm position-relative z-index-1">
     <div class="container">
-        <h6 class="text-uppercase text-muted fw-bold small mb-3 tracking-wider">Browse by Category</h6>
-        <div class="category-filter-wrapper d-flex align-items-center gap-2 pb-2">
+        <div class="category-bar-inner d-flex flex-column align-items-start gap-2">
+            <h6 class="text-uppercase text-muted fw-bold small mb-0 tracking-wider text-nowrap">Browse by Category</h6>
+            <div class="category-filter-wrapper d-flex align-items-center flex-wrap gap-2">
             
             <a href="{{ route('web.restaurants.index') }}" class="category-pill {{ !isset($currentCategory) ? 'active' : '' }}">
                 <span class="cat-name">All</span>
@@ -80,8 +81,8 @@
                     $displayCategories[count($displayCategories) - 1] = $currentCategory->toArray();
                 }
                 
-                // Show up to 8 categories
-                $displayCategories = array_slice($displayCategories, 0, 7);
+                // Show up to 6 categories followed by More... pill
+                $displayCategories = array_slice($displayCategories, 0, 6);
             @endphp
 
             @foreach($displayCategories as $cat)

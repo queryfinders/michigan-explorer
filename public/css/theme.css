@@ -2857,14 +2857,37 @@ font-size: 0.85rem;
     position: sticky;
     top: 75px;
     z-index: 999;
-    transition: box-shadow 0.2s ease;
+    transition: all 0.25s ease;
 }
 
+.category-bar-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    transition: all 0.25s ease;
+}
+
+.category-filter-bar-sticky.is-sticky,
 .category-filter-bar-sticky.pills-collapsed {
-    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.10) !important;
+}
+
+.category-filter-bar-sticky.is-sticky .category-bar-inner,
+.category-filter-bar-sticky.pills-collapsed .category-bar-inner {
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 1rem !important;
 }
 
 /* Smooth hide/show of pills during collapse */
 .category-filter-bar-sticky .category-filter-wrapper .category-pill {
     transition: opacity 0.2s ease;
+}
+
+/* More pill is ALWAYS visible - never hide it */
+.more-pill {
+    display: inline-flex !important;
 }

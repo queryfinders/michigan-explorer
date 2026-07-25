@@ -209,40 +209,58 @@ function shareCurrentPage(title) {
 </script>
 
 <script>
-// Collapse category pills when sticky bar touches navbar
+// Collapse category pills when sticky bar sticks to navbar on scroll
 (function() {
     const categoryBar = document.querySelector('.category-filter-bar-sticky');
     if (!categoryBar) return;
 
-    const navbar = document.getElementById('mainNav');
-    const pills = categoryBar.querySelectorAll('.category-filter-wrapper .category-pill');
+    // Only select pills that are NOT the More... button
+    const allPills = Array.from(categoryBar.querySelectorAll('.category-filter-wrapper .category-pill'));
+    const regularPills = allPills.filter(function(pill) { return !pill.classList.contains('more-pill'); });
+    const morePill = categoryBar.querySelector('.more-pill');
+
+    // Calculate hero height to determine collapse threshold
+    function getCollapseThreshold() {
+        const hero = document.querySelector('.hero-premium, .inner-hero, section.position-relative.overflow-hidden');
+        if (hero) return Math.max(hero.offsetHeight - 100, 200);
+        return 300;
+    }
 
     function updatePillVisibility() {
-        const navbarBottom = navbar ? navbar.getBoundingClientRect().bottom : 75;
-        const barTop = categoryBar.getBoundingClientRect().top;
+        const rect = categoryBar.getBoundingClientRect();
+        const isStuck = rect.top <= 76 && window.scrollY > 50;
+        const w = window.innerWidth;
 
-        // When bar is at or above navbar bottom (i.e. it has scrolled up and is now stuck)
-        if (barTop <= navbarBottom + 5) {
-            // Collapsed: show only first 5 pills (index 0 = All, 1-5 = categories)
-            pills.forEach(function(pill, i) {
-                // pills[0] is "All", pills[1..5] are categories, pills[6..] are hidden
-                if (i >= 5) {
-                    pill.style.display = 'none';
-                } else {
-                    pill.style.display = '';
-                }
-            });
-            categoryBar.classList.add('pills-collapsed');
+        // Calculate max visible regular pills so More... button NEVER overflows on any screen size
+        let maxPills = 7;
+        if (w < 576) {
+            maxPills = 2;
+        } else if (w < 768) {
+            maxPills = 3;
+        } else if (w < 992) {
+            maxPills = 4;
+        } else if (w < 1200) {
+            maxPills = 5;
+        } else if (isStuck) {
+            maxPills = 6;
+        }
+
+        regularPills.forEach(function(pill, i) {
+            pill.style.display = (i >= maxPills) ? 'none' : '';
+        });
+
+        if (isStuck) {
+            categoryBar.classList.add('is-sticky', 'pills-collapsed');
         } else {
-            // Expanded: show all pills
-            pills.forEach(function(pill) {
-                pill.style.display = '';
-            });
-            categoryBar.classList.remove('pills-collapsed');
+            categoryBar.classList.remove('is-sticky', 'pills-collapsed');
         }
     }
 
     window.addEventListener('scroll', updatePillVisibility, { passive: true });
-    updatePillVisibility(); // run on load
+    window.addEventListener('resize', updatePillVisibility, { passive: true });
+    // Wait for layout before initial check
+    requestAnimationFrame(function() {
+        requestAnimationFrame(updatePillVisibility);
+    });
 })();
 </script>

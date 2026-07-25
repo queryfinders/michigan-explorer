@@ -61,7 +61,7 @@
 <!-- 2. Browse by Category -->
 <section class="category-filter-bar-sticky py-4 border-bottom bg-white shadow-sm position-relative z-index-1">
     <div class="container">
-        <div class="d-flex align-items-center flex-wrap gap-3">
+        <div class="category-bar-inner d-flex flex-column align-items-start gap-2">
             <h6 class="text-uppercase text-muted fw-bold small mb-0 tracking-wider text-nowrap">Browse by Category</h6>
             <div class="category-filter-wrapper d-flex align-items-center flex-wrap gap-2">
                 
@@ -89,8 +89,8 @@
                         $displayCategories[count($displayCategories) - 1] = $currentCategory->toArray();
                     }
                     
-                    // Limit to 5 categories to ensure it fills reasonable space without wrapping on desktop
-                    $displayCategories = array_slice($displayCategories, 0, 8);
+                    // Limit to 6 categories so Budget Hotels is followed by More...
+                    $displayCategories = array_slice($displayCategories, 0, 6);
                 @endphp
 
                 @foreach($displayCategories as $cat)
@@ -102,7 +102,7 @@
                 @endforeach
 
                 <!-- More Categories Button -->
-                <a href="#" class="category-pill bg-light" data-bs-toggle="modal" data-bs-target="#categoriesModal">
+                <a href="#" class="category-pill bg-light more-pill" data-bs-toggle="modal" data-bs-target="#categoriesModal">
                     <span class="cat-name">More...</span>
                 </a>
 
