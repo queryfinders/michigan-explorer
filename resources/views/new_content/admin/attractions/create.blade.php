@@ -51,7 +51,7 @@
               <label class="form-label fw-semibold" for="attraction_category_id">Category <span class="text-danger">*</span></label>
               {{-- Hidden input that holds the selected category id --}}
               <input type="hidden" name="attraction_category_id" id="attraction_category_id"
-                     value="{{ old('attraction_category_id') }}" required />
+                     value="{{ old('attraction_category_id', $attraction->attraction_category_id ?? '') }}" required />
               @error('attraction_category_id') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
 
               <div class="cuisine-dropdown-wrapper" id="categoryDropdownWrapper">
@@ -100,12 +100,12 @@
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="name">Name <span class="text-danger">*</span></label>
-              <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required placeholder="e.g. The Grand Attraction" />
+              <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $attraction->name ?? '') }}" required placeholder="e.g. The Grand Attraction" />
               @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="slug">Slug <span class="text-danger">*</span></label>
-              <input type="text" class="form-control @error('slug') is-invalid @enderror" id="slug" name="slug" value="{{ old('slug') }}" required placeholder="e.g. the-grand-attraction" />
+              <input type="text" class="form-control @error('slug') is-invalid @enderror" id="slug" name="slug" value="{{ old('slug', $attraction->slug ?? '') }}" required placeholder="e.g. the-grand-attraction" />
               @error('slug') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
           </div>
@@ -115,11 +115,11 @@
           </div> -->
           <div class="mb-3">
             <label class="form-label" for="description">Description</label>
-            <textarea class="form-control tinymce" id="description" name="description" rows="6"></textarea>
+            <textarea class="form-control tinymce" id="description" name="description" rows="6">{{ old('description', $attraction->description ?? '') }}</textarea>
           </div>
           <div class="mb-3">
             <div class="form-check form-switch mt-2">
-              <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" value="1">
+              <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" value="1" {{ old('is_featured', $attraction->is_featured ?? 0) ? 'checked' : '' }}>
               <label class="form-check-label fw-semibold" for="is_featured">Featured Attraction (Shows on Home Page)</label>
             </div>
           </div>
@@ -130,7 +130,7 @@
           <div class="row">
             <div class="col-md-4 mb-3">
               <label class="form-label" for="city">City</label>
-              <input type="hidden" name="city" id="city_hidden" value="{{ old('city') }}" />
+              <input type="hidden" name="city" id="city_hidden" value="{{ old('city', $attraction->city ?? '') }}" />
               <div class="cuisine-dropdown-wrapper" id="cityDropdownWrapper">
                 <div class="cuisine-dropdown-trigger" id="cityTrigger" onclick="toggleCityDropdown()">
                   <div class="cuisine-tags-area" id="cityTagsArea">
@@ -166,45 +166,31 @@
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="zip">Zip Code</label>
-              <input type="text" class="form-control" id="zip" name="zip" placeholder="e.g. 49757" />
+              <input type="text" class="form-control" id="zip" name="zip" placeholder="e.g. 49757" value="{{ old('zip', $attraction->zip ?? '') }}" />
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="address">Street Address</label>
-              <input type="text" class="form-control" id="address" name="address" placeholder="e.g. 286 Grand Avenue" />
+              <input type="text" class="form-control" id="address" name="address" placeholder="e.g. 286 Grand Avenue" value="{{ old('address', $attraction->address ?? '') }}" />
             </div>
           </div>
           <div class="row">
             <div class="col-md-4 mb-3">
               <label class="form-label" for="phone">Phone Number</label>
-              <input type="text" class="form-control" id="phone" name="phone" placeholder="e.g. +1 555-123-4567" />
+              <input type="text" class="form-control" id="phone" name="phone" placeholder="e.g. +1 555-123-4567" value="{{ old('phone', $attraction->phone ?? '') }}" />
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="email">Email</label>
-              <input type="email" class="form-control" id="email" name="email" placeholder="e.g. info@example.com" />
+              <input type="email" class="form-control" id="email" name="email" placeholder="e.g. info@example.com" value="{{ old('email', $attraction->email ?? '') }}" />
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="website">Website URL</label>
-              <input type="url" class="form-control" id="website" name="website" placeholder="e.g. https://www.example.com" />
+              <input type="url" class="form-control" id="website" name="website" placeholder="e.g. https://www.example.com" value="{{ old('website', $attraction->website ?? '') }}" />
             </div>
           </div>
           <div class="row">
-            <div class="col-md-6 mb-3">
-              <label class="form-label" for="starting_price">Starting Price ($)</label>
-              <input type="number" class="form-control" id="starting_price" name="starting_price" placeholder="e.g. 199" />
-            </div>
-            <div class="col-md-6 mb-3">
-              <label class="form-label" for="affiliate_url">Booking Affiliate URL</label>
-              <input type="url" class="form-control" id="affiliate_url" name="affiliate_url" placeholder="e.g. https://booking.com/..." />
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label class="form-label" for="latitude">Latitude</label>
-              <input type="text" class="form-control" id="latitude" name="latitude" placeholder="e.g. 45.8500" />
-            </div>
-            <div class="col-md-6 mb-3">
-              <label class="form-label" for="longitude">Longitude</label>
-              <input type="text" class="form-control" id="longitude" name="longitude" placeholder="e.g. -84.6178" />
+            <div class="col-md-12 mb-3">
+              <label class="form-label" for="map_iframe">Map Iframe Code</label>
+              <textarea class="form-control" id="map_iframe" name="map_iframe" rows="3" placeholder="Paste Google Maps iframe code here">{{ old('map_iframe', $attraction->map_iframe ?? '') }}</textarea>
             </div>
           </div>
 
@@ -214,7 +200,7 @@
           <div class="mb-3">
             <label class="form-label fw-semibold" for="featured_image_file">Featured Image</label>
             <input type="file" class="form-control" id="featured_image_file" name="featured_image_file" accept="image/*" onchange="previewFeaturedImage(event)" />
-            <div class="form-text">Recommended: 1200×800px, JPG/PNG/WebP, max 2MB. This is the main image shown in listings.</div>
+            <div class="form-text">Recommended: 1200Ã—800px, JPG/PNG/WebP, max 2MB. This is the main image shown in listings.</div>
           </div>
           <div class="mb-3" id="featured-preview-new" style="display:none;">
             <label class="form-label text-muted small">Preview</label>
@@ -222,7 +208,7 @@
           </div>
           <div class="mb-3">
             <label class="form-label" for="featured_image_alt">Image Alt Text (SEO)</label>
-            <input type="text" class="form-control" id="featured_image_alt" name="featured_image_alt" />
+            <input type="text" class="form-control" id="featured_image_alt" name="featured_image_alt" value="{{ old('featured_image_alt', $attraction->featured_image_alt ?? '') }}" />
             <div class="form-text">Describe the image clearly for search engines and accessibility.</div>
           </div>
           <div class="mb-3 border-top pt-3">
@@ -232,15 +218,78 @@
           </div>
           <div class="mb-3">
             <label class="form-label fw-semibold" for="video_url">OR YouTube Video URL</label>
-            <input type="url" class="form-control" id="video_url" name="video_url" />
+            <input type="url" class="form-control" id="video_url" name="video_url" value="{{ old('video_url', isset($attraction) ? (str_starts_with($attraction->video ?? '', 'http') ? $attraction->video : '') : '') }}" />
             <div class="form-text">Paste a YouTube link directly instead of uploading a video file.</div>
           </div>
         </div>
 
         <!-- Tab 4: Gallery -->
         <div class="tab-pane fade" id="gallery-pane" role="tabpanel" aria-labelledby="gallery-tab">
+          
+          <!-- Existing Gallery Images -->
+          @if(isset($attraction) && ($attraction->images->count() > 0 || !empty($attraction->video)))
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Current Gallery & Video</label>
+            <div class="row g-3" id="existing-gallery-grid">
+              @if(!empty($attraction->video))
+              <div class="col-md-3 col-sm-4 col-6" id="gallery-video-container">
+                <div class="card border position-relative bg-light">
+                  <div class="card-img-top d-flex align-items-center justify-content-center bg-dark text-white position-relative" style="height:140px;overflow:hidden;">
+                    @php
+                      $isYoutube = preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $attraction->video, $matches);
+                      $youtubeId = $isYoutube ? $matches[1] : null;
+                    @endphp
+                    @if($isYoutube)
+                      <img src="https://img.youtube.com/vi/{{ $youtubeId }}/mqdefault.jpg" class="w-100 h-100 object-fit-cover" style="object-fit: cover; height: 140px;" alt="YouTube Thumbnail" />
+                    @else
+                      <video class="w-100 h-100 object-fit-cover" muted style="object-fit: cover;">
+                        <source src="{{ asset($attraction->video) }}" type="video/mp4">
+                      </video>
+                    @endif
+                    <div class="position-absolute d-flex align-items-center justify-content-center text-white bg-dark bg-opacity-50 rounded-circle" style="width: 40px; height: 40px; pointer-events: none; top:50%; left:50%; transform:translate(-50%, -50%);">
+                      <i class="fas fa-play"></i>
+                    </div>
+                  </div>
+                  <div class="card-body p-2 text-center">
+                    <small class="fw-bold text-success"><i class="fas fa-video me-1"></i> Attraction Video</small>
+                  </div>
+                  <div class="position-absolute top-0 end-0 m-1">
+                    <input type="checkbox" name="delete_video" value="1" id="del_video" class="form-check-input gallery-delete-cb" onchange="toggleVideoDeleteOverlay(this)" />
+                    <label for="del_video" class="btn btn-danger btn-sm py-0 px-1" title="Mark for deletion">
+                      <i class="fa fa-trash"></i>
+                    </label>
+                  </div>
+                  <div id="overlay-video" class="position-absolute top-0 start-0 w-100 h-100 bg-danger bg-opacity-50 d-none align-items-center justify-content-center rounded">
+                    <span class="text-white fw-bold small">Will be deleted</span>
+                  </div>
+                </div>
+              </div>
+              @endif
+              @foreach($attraction->images as $img)
+              <div class="col-md-3 col-sm-4 col-6" id="gallery-item-{{ $img->id }}">
+                <div class="card border position-relative">
+                  <img src="{{ asset($img->image) }}" alt="{{ $img->alt_text ?? 'Gallery' }}" class="card-img-top" style="height:140px;object-fit:cover;" />
+                  <div class="card-body p-2">
+                    <small class="text-muted">{{ $img->alt_text ?: 'No alt text' }}</small>
+                  </div>
+                  <div class="position-absolute top-0 end-0 m-1">
+                    <input type="checkbox" name="delete_gallery_ids[]" value="{{ $img->id }}" id="del_img_{{ $img->id }}" class="form-check-input gallery-delete-cb" onchange="toggleDeleteOverlay(this, {{ $img->id }})" />
+                    <label for="del_img_{{ $img->id }}" class="btn btn-danger btn-sm py-0 px-1" title="Mark for deletion">
+                      <i class="fa fa-trash"></i>
+                    </label>
+                  </div>
+                  <div id="overlay-{{ $img->id }}" class="position-absolute top-0 start-0 w-100 h-100 bg-danger bg-opacity-50 d-none align-items-center justify-content-center rounded">
+                    <span class="text-white fw-bold small">Will be deleted</span>
+                  </div>
+                </div>
+              </div>
+              @endforeach
+            </div>
+            <div class="form-text mt-2 text-danger">Check the trash icon on images to mark them for deletion. They will be removed when you save.</div>
+          </div>
+          @endif
           <div class="mb-3">
-            <label class="form-label fw-semibold" for="gallery_images">Gallery Images</label>
+            <label class="form-label fw-semibold" for="gallery_images">Add New Gallery Images</label>
             <input type="file" class="form-control" id="gallery_images" name="gallery_images[]" accept="image/*" multiple onchange="previewGalleryImages(event)" />
             <div class="form-text">Select multiple images at once. Max 4MB each. JPG/PNG/WebP supported. These will appear in the attraction detail page gallery.</div>
           </div>
@@ -256,29 +305,50 @@
         <div class="tab-pane fade" id="seo-pane" role="tabpanel" aria-labelledby="seo-tab">
           <div class="mb-3">
             <label class="form-label" for="meta_title">Meta Title</label>
-            <input type="text" class="form-control" id="meta_title" name="meta_title" placeholder="e.g. Best Attraction in Michigan | Michigan Explorer" />
+            <input type="text" class="form-control" id="meta_title" name="meta_title" placeholder="e.g. Best Attraction in Michigan | Michigan Explorer" value="{{ old('meta_title', $attraction->seo->meta_title ?? '') }}" value="{{ old('meta_title', $attraction->meta_title ?? '') }}" />
           </div>
           <div class="mb-3">
             <label class="form-label" for="meta_description">Meta Description <span class="text-muted small ms-2 fw-normal" id="meta_desc_count">(0 / 160)</span></label>
-            <textarea class="form-control" id="meta_description" name="meta_description" placeholder="e.g. Discover the best attraction in Michigan..." maxlength="160" rows="2"></textarea>
+            <textarea class="form-control" id="meta_description" name="meta_description" placeholder="e.g. Discover the best attraction in Michigan..." maxlength="160" rows="2">{{ old('meta_description', $attraction->seo->meta_description ?? '') }}</textarea>
           </div>
           <div class="mb-3">
               <label class="form-label" for="og_title">OG Title</label>
-              <input type="text" class="form-control" id="og_title" name="og_title" placeholder="e.g. Best Attraction in Michigan" />
+              <input type="text" class="form-control" id="og_title" name="og_title" placeholder="e.g. Best Attraction in Michigan" value="{{ old('og_title', $attraction->seo->og_title ?? '') }}" value="{{ old('og_title', $attraction->og_title ?? '') }}" />
             </div>
           <div class="mb-3">
             <label class="form-label" for="og_description">OG Description <span class="text-muted small ms-2 fw-normal" id="og_desc_count">(0 / 160)</span></label>
-            <textarea class="form-control" id="og_description" name="og_description" placeholder="e.g. Discover the best attraction in Michigan..." maxlength="160" rows="2"></textarea>
+            <textarea class="form-control" id="og_description" name="og_description" placeholder="e.g. Discover the best attraction in Michigan..." maxlength="160" rows="2">{{ old('og_description', $attraction->seo->og_description ?? '') }}</textarea>
           </div>
           <div class="mb-3">
             <label class="form-label" for="schema_markup">Schema Markup (JSON-LD) - <span class="text-info">Auto-generated</span></label>
-            <textarea class="form-control" id="schema_markup" name="schema_markup" rows="8" placeholder="Auto-generated on save" readonly disabled></textarea>
+            <textarea class="form-control" id="schema_markup" name="schema_markup" rows="8" placeholder="Auto-generated on save" readonly disabled>{{ $attraction->seo->schema_markup ?? '' }}</textarea>
           </div>
         </div>
 
         <!-- Tab 6: FAQs -->
         <div class="tab-pane fade" id="faqs-pane" role="tabpanel" aria-labelledby="faqs-tab">
           <div id="faqs-container">
+            @if(isset($attraction) && $attraction->faqs)
+              @foreach($attraction->faqs as $index => $faq)
+              <div class="card mb-3 faq-item border-info" id="faq_{{ $index }}">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="card-title mb-0 text-info fw-bold"><i class="fas fa-question-circle me-1"></i> FAQ</h6>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeFaq('faq_{{ $index }}')"><i class="fas fa-trash me-1"></i> Remove</button>
+                  </div>
+                  <input type="hidden" name="faqs[{{ $index }}][id]" value="{{ $faq->id }}">
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold">Question</label>
+                    <input type="text" class="form-control" name="faqs[{{ $index }}][question]" value="{{ old('faqs.'.$index.'.question', $faq->question) }}" required>
+                  </div>
+                  <div class="mb-2">
+                    <label class="form-label fw-semibold">Answer</label>
+                    <textarea class="form-control tinymce-faq" id="faq_answer_{{ $index }}" name="faqs[{{ $index }}][answer]">{{ old('faqs.'.$index.'.answer', $faq->answer) }}</textarea>
+                  </div>
+                </div>
+              </div>
+              @endforeach
+            @endif
             <!-- FAQs will be appended here -->
           </div>
           <button type="button" class="btn btn-outline-primary mt-3" onclick="addFaq()">+ Add FAQ</button>
@@ -542,6 +612,19 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  
+  // ===== Gallery delete overlay =====
+  function toggleDeleteOverlay(cb, id) {
+    const overlay = document.getElementById('overlay-' + id);
+    if (cb.checked) { overlay.classList.remove('d-none'); overlay.classList.add('d-flex'); }
+    else { overlay.classList.remove('d-flex'); overlay.classList.add('d-none'); }
+  }
+
+  function toggleVideoDeleteOverlay(cb) {
+    const overlay = document.getElementById('overlay-video');
+    if (cb.checked) { overlay.classList.remove('d-none'); overlay.classList.add('d-flex'); }
+    else { overlay.classList.remove('d-flex'); overlay.classList.add('d-none'); }
+  }
   function previewGalleryImages(event) {
     const files = Array.from(event.target.files);
     const previewGrid = document.getElementById('gallery-new-preview');
@@ -663,9 +746,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
       }
     });
+    tinymce.init({
+      selector: 'textarea.tinymce-faq',
+      plugins: 'advlist autolink lists link image charmap preview anchor pagebreak',
+      toolbar_mode: 'floating',
+      height: 200,
+      setup: function (editor) {
+        editor.on('change', function () {
+          editor.save();
+        });
+      }
+    });
   });
 
-  let faqIndex = 0;
+  let faqIndex = Date.now();
   function addFaq() {
     const container = document.getElementById('faqs-container');
     const id = 'faq_' + faqIndex;
@@ -1016,7 +1110,7 @@ document.addEventListener('DOMContentLoaded', function() {
     cbs.forEach(cb => {
       const tag = document.createElement('span');
       tag.className = 'amenity-tag';
-      tag.innerHTML = cb.dataset.name + ' <span class="tag-remove" onclick="removeBookingFeatureTag(event,\'' + cb.dataset.id + '\')"><i class="fas fa-times"></i></span>';
+      tag.innerHTML = `${cb.dataset.name} <span class="tag-remove" onclick="removeBookingFeatureTag(event, '${cb.dataset.id}')"><i class="fas fa-times"></i></span>`;
       tagsArea.appendChild(tag);
     });
     countEl.textContent = cbs.length + ' selected';

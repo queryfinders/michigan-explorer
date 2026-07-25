@@ -44,7 +44,12 @@
           <td>{{ $attraction->name }}</td>
           <td>{{ $attraction->category ? $attraction->category->name : 'N/A' }}</td>
           <td>{{ $attraction->city }}</td>
-          <td>{{ $attraction->status ? 'Active' : 'Inactive' }}</td>
+          <td>
+            <label class="switch">
+              <input type="checkbox" class="switch-input attraction-status-switch" data-id="{{ $attraction->id }}" data-status="{{ $attraction->status }}" {{ $attraction->status == 1 ? 'checked' : '' }}>
+              <span class="switch-toggle-slider"></span>
+            </label>
+          </td>
           <td>
             <a href="{{ route('attractions.edit', $attraction->id) }}" class="btn btn-sm btn-primary"><i class="fa fa-edit"></i></a>
             <form action="{{ route('attractions.destroy', $attraction->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure?');">
@@ -69,4 +74,28 @@
 </div>
 @endsection
 
-
+@section('page-script')
+<script>
+  $(document).ready(function() {
+      $(document).on('change', '.attraction-status-switch', function (e) {
+          e.preventDefault();
+          var id = $(this).data('id');
+          var status = $(this).data('status');
+          var $switch = $(this);
+          
+          var newStatus = status == 1 ? 0 : 1;
+          
+          $.ajax({
+              url: '{{ url("admin/attractions/status") }}/' + id + '/' + newStatus,
+              type: 'GET',
+              success: function (response) {
+                  $switch.data('status', newStatus);
+              },
+              error: function (xhr, status, error) {
+                  console.error(error);
+              }
+          });
+      });
+  });
+</script>
+@endsection

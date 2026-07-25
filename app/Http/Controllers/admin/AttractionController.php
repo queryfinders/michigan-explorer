@@ -205,4 +205,13 @@ class AttractionController extends Controller
         $attraction->delete();
         return redirect()->route('attractions.index')->with('success', 'Attraction deleted successfully.');
     }
+
+    public function changeStatus($id, $status)
+    {
+        $attraction = \App\Models\Attraction::findOrFail($id);
+        $attraction->status = $status;
+        $attraction->save();
+
+        return redirect()->back()->with('success', 'Status updated successfully.');
+    }
 }

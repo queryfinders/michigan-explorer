@@ -203,11 +203,11 @@
                         </ul>
 
                         @if($attraction->visitor_information)
-                        <hr class="my-4 text-muted opacity-25">
-                        <h6 class="fw-bold mb-3">Additional Details</h6>
+                        <!-- <hr class="my-4 text-muted opacity-25"> -->
+                        <!-- <h6 class="fw-bold mb-3">Additional Details</h6>
                         <div class="text-muted small">
                             {!! $attraction->visitor_information !!}
-                        </div>
+                        </div> -->
                         @endif
 
                         <hr class="my-4 text-muted opacity-25">

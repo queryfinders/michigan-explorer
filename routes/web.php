@@ -122,7 +122,9 @@ Route::group(['middleware' => 'admin_auth'], function () {
 
     // Attractions Module
     Route::post('/admin/attraction-categories/quick-store', [\App\Http\Controllers\Admin\AttractionCategoryController::class, 'quickStore'])->name('attraction-categories.quick-store');
+    Route::get('/admin/attraction-categories/status/{id}/{status}', [\App\Http\Controllers\Admin\AttractionCategoryController::class, 'changeStatus'])->name('attraction-categories.status');
     Route::resource('/admin/attraction-categories', \App\Http\Controllers\Admin\AttractionCategoryController::class);
+    Route::get('/admin/attractions/status/{id}/{status}', [\App\Http\Controllers\Admin\AttractionController::class, 'changeStatus'])->name('attractions.status');
     Route::resource('/admin/attractions', \App\Http\Controllers\Admin\AttractionController::class);
 
     // Events Module

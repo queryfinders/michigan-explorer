@@ -68,4 +68,13 @@ class AttractionCategoryController extends Controller
         $attractionCategory->delete();
         return redirect()->route('attraction-categories.index')->with('success', 'Category deleted successfully.');
     }
+
+    public function changeStatus($id, $status)
+    {
+        $category = \App\Models\AttractionCategory::findOrFail($id);
+        $category->status = $status;
+        $category->save();
+
+        return redirect()->back()->with('success', 'Status updated successfully.');
+    }
 }
