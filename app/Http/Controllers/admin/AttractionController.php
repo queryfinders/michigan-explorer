@@ -30,7 +30,8 @@ class AttractionController extends Controller
             'video_url' => 'nullable|url',
         ]);
 
-        $data = $request->except('_token', '_method', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'video_file', 'video_url');
+        $data = $request->except('_token', '_method', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'video_file', 'video_url', 'faqs', 'images');
+        
         if ($request->hasFile('video_file')) {
             $path = $request->file('video_file')->store('attractions/videos', 'public');
             $data['video'] = 'storage/' . $path;
@@ -38,7 +39,43 @@ class AttractionController extends Controller
             $data['video'] = $request->input('video_url');
         }
 
+        if ($request->hasFile('featured_image')) {
+            $path = $request->file('featured_image')->store('attractions/images', 'public');
+            $data['featured_image'] = 'storage/' . $path;
+        }
+
         $attraction = \App\Models\Attraction::create($data);
+        
+        // Handle FAQs
+        if ($request->has('faqs') && is_array($request->faqs)) {
+            $faqs = [];
+            foreach ($request->faqs as $faq) {
+                if (!empty($faq['question']) && !empty($faq['answer'])) {
+                    $faqs[] = new \App\Models\AttractionFaq([
+                        'question' => $faq['question'],
+                        'answer' => $faq['answer'],
+                        'sort_order' => $faq['sort_order'] ?? 0,
+                    ]);
+                }
+            }
+            if (count($faqs) > 0) {
+                $attraction->faqs()->saveMany($faqs);
+            }
+        }
+
+        // Handle Gallery Images
+        if ($request->has('images') && is_array($request->images)) {
+            foreach ($request->images as $index => $image) {
+                if (isset($image['file']) && $image['file']->isValid()) {
+                    $path = $image['file']->store('attractions/gallery', 'public');
+                    $attraction->images()->create([
+                        'image' => 'storage/' . $path,
+                        'alt_text' => $image['alt_text'] ?? null,
+                        'sort_order' => $image['sort_order'] ?? $index,
+                    ]);
+                }
+            }
+        }
         
         $seoData = $request->only(['meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup']);
         $attraction->seo()->create($seoData);
@@ -65,7 +102,8 @@ class AttractionController extends Controller
             'delete_video' => 'nullable|boolean',
         ]);
 
-        $data = $request->except('_token', '_method', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'video_file', 'video_url', 'delete_video');
+        $data = $request->except('_token', '_method', 'meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup', 'video_file', 'video_url', 'delete_video', 'faqs', 'images');
+        
         // Handle video deletion
         if ($request->input('delete_video') == '1') {
             if ($attraction->video && !str_starts_with($attraction->video, 'http')) {
@@ -87,7 +125,70 @@ class AttractionController extends Controller
             }
         }
 
+        // Handle hero image upload if exists (assuming it uses 'featured_image' input, not validated but might be there)
+        if ($request->hasFile('featured_image')) {
+            if ($attraction->featured_image) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete(str_replace('storage/', '', $attraction->featured_image));
+            }
+            $path = $request->file('featured_image')->store('attractions/images', 'public');
+            $data['featured_image'] = 'storage/' . $path;
+        }
+
         $attraction->update($data);
+
+        // Handle FAQs
+        $attraction->faqs()->delete();
+        if ($request->has('faqs') && is_array($request->faqs)) {
+            $faqs = [];
+            foreach ($request->faqs as $faq) {
+                if (!empty($faq['question']) && !empty($faq['answer'])) {
+                    $faqs[] = new \App\Models\AttractionFaq([
+                        'question' => $faq['question'],
+                        'answer' => $faq['answer'],
+                        'sort_order' => $faq['sort_order'] ?? 0,
+                    ]);
+                }
+            }
+            if (count($faqs) > 0) {
+                $attraction->faqs()->saveMany($faqs);
+            }
+        }
+
+        // Handle Gallery Images
+        if ($request->has('images') && is_array($request->images)) {
+            foreach ($request->images as $index => $image) {
+                if (isset($image['file']) && $image['file']->isValid()) {
+                    $path = $image['file']->store('attractions/gallery', 'public');
+                    $attraction->images()->create([
+                        'image' => 'storage/' . $path,
+                        'alt_text' => $image['alt_text'] ?? null,
+                        'sort_order' => $image['sort_order'] ?? $index,
+                    ]);
+                } else if (isset($image['id'])) {
+                    // Update existing image alt/sort
+                    $existing = $attraction->images()->find($image['id']);
+                    if ($existing) {
+                        $existing->update([
+                            'alt_text' => $image['alt_text'] ?? null,
+                            'sort_order' => $image['sort_order'] ?? $index,
+                        ]);
+                    }
+                }
+            }
+        }
+
+        // Handle Image Deletions
+        if ($request->has('deleted_images')) {
+            $deletedIds = explode(',', $request->input('deleted_images'));
+            foreach ($deletedIds as $id) {
+                if (empty($id)) continue;
+                $img = $attraction->images()->find($id);
+                if ($img) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete(str_replace('storage/', '', $img->image));
+                    $img->delete();
+                }
+            }
+        }
         
         $seoData = $request->only(['meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup']);
         if ($attraction->seo) {

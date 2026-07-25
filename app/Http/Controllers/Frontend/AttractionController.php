@@ -50,6 +50,11 @@ class AttractionController extends Controller
                 'phone' => '(231) 326-4700',
                 'website' => 'https://www.nps.gov/slbe/index.htm',
                 'visitor_information' => '<strong>Hours:</strong> Open 24 hours year-round.<br><strong>Fees:</strong> $25 per vehicle for a 7-day pass.',
+                'images' => collect([]),
+                'faqs' => collect([]),
+                'video' => null,
+                'video_url' => null,
+                'video_file' => null,
                 'category' => (object)['name' => 'Parks & Nature']
             ];
         }

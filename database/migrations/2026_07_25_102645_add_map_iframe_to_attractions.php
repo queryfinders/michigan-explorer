@@ -1,0 +1,31 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('attractions', function (Blueprint $table) {
+            $table->text('map_iframe')->nullable()->after('website');
+            $table->dropColumn(['latitude', 'longitude']);
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('attractions', function (Blueprint $table) {
+            $table->dropColumn('map_iframe');
+            $table->string('latitude')->nullable();
+            $table->string('longitude')->nullable();
+        });
+    }
+};

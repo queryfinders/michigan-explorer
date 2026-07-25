@@ -33,24 +33,13 @@
     <!-- Card Body -->
     <div class="listing-card-body p-4 d-flex flex-column flex-grow-1 bg-white">
         
-        <div class="listing-location text-muted small mb-2 d-flex align-items-center gap-1 fw-bold">
-            <i class="fas fa-route text-primary"></i> 
-            {{ $attraction->distance ?? '2.5 miles away' }}
-        </div>
-        
         <h3 class="listing-title fw-bold text-heading mb-3 fs-5 font-heading">
             {{ $attraction->name ?? 'Sleeping Bear Dunes' }}
         </h3>
         
-        <p class="listing-desc text-muted mb-4 text-truncate-2 lh-16 transition-base fs-095rem">
-            {{ Str::limit($attraction->description ?? 'Experience towering sand dunes and spectacular views of Lake Michigan at this national lakeshore.', 150) }}
+        <p class="listing-desc text-muted mb-4 lh-16 transition-base fs-095rem" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+            {{ Str::limit(strip_tags($attraction->description ?? 'Experience towering sand dunes and spectacular views of Lake Michigan at this national lakeshore.'), 150) }}
         </p>
-        
-        <!-- Travel Time Row -->
-        <div class="listing-amenities d-flex align-items-center gap-3 mb-4 mt-auto text-secondary fs-sm">
-            <span><i class="fas fa-car text-primary opacity-75 me-1"></i> {{ $attraction->travel_time_car ?? '10 min drive' }}</span>
-            <span><i class="fas fa-walking text-primary opacity-75 me-1"></i> {{ $attraction->travel_time_walk ?? '45 min walk' }}</span>
-        </div>
         
         <!-- Footer -->
         <div class="hotel-card-footer pt-3 border-top d-flex flex-column gap-3">

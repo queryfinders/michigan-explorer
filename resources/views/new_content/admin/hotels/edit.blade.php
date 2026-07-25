@@ -2,6 +2,36 @@
 
 @section('title', 'Edit Hotel')
 
+@php
+    $popularIcons = [
+        'fas fa-wifi', 'fas fa-parking', 'fas fa-swimming-pool', 'fas fa-dumbbell', 
+        'fas fa-spa', 'fas fa-coffee', 'fas fa-utensils', 'fas fa-cocktail', 
+        'fas fa-concierge-bell', 'fas fa-paw', 'fas fa-tv', 'fas fa-snowflake', 
+        'fas fa-hot-tub', 'fas fa-wheelchair', 'fas fa-baby', 'fas fa-key', 
+        'fas fa-shield-alt', 'fas fa-tree', 'fas fa-star', 'fas fa-bed', 
+        'fas fa-clock', 'fas fa-wine-glass', 'fas fa-luggage-cart', 'fas fa-bicycle',
+        'fas fa-hiking', 'fas fa-campground', 'fas fa-map-marker-alt', 'fas fa-map-pin',
+        'fas fa-wind', 'fas fa-tshirt', 'fas fa-sink', 'fas fa-glass-martini-alt',
+    ];
+    $popularBfIcons = [
+        'fas fa-check', 'fas fa-check-circle', 'fas fa-times-circle', 'fas fa-dollar-sign',
+        'fas fa-credit-card', 'fas fa-calendar-alt', 'fas fa-calendar-check', 'fas fa-clock',
+        'fas fa-bolt', 'fas fa-coffee', 'fas fa-utensils', 'fas fa-ban',
+        'fas fa-shield-alt', 'fas fa-percent', 'fas fa-tags', 'fas fa-gift',
+        'fas fa-mobile-alt', 'fas fa-envelope', 'fas fa-info-circle', 'fas fa-star',
+        'fas fa-wallet', 'fas fa-receipt', 'fas fa-file-invoice-dollar', 'fas fa-user-check'
+    ];
+@endphp
+<style>
+    .icon-option:hover {
+        background-color: #f8f9fa;
+        border-color: #4f46e5 !important;
+    }
+    .icon-picker-grid {
+        scrollbar-width: thin;
+    }
+</style>
+
 @section('content')
 <nav aria-label="breadcrumb" class="mb-4">
   <ol class="breadcrumb">

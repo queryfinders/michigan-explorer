@@ -29,6 +29,22 @@ class AttractionCategoryController extends Controller
         \App\Models\AttractionCategory::create($request->all());
         return redirect()->route('attraction-categories.index')->with('success', 'Category created successfully.');
     }
+    
+    public function quickStore(\Illuminate\Http\Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:attraction_categories'
+        ]);
+
+        $category = \App\Models\AttractionCategory::create([
+            'name' => $request->name,
+            'slug' => $request->slug,
+            'status' => $request->status ?? 1
+        ]);
+
+        return response()->json(['success' => true, 'category' => $category]);
+    }
 
     public function edit(\App\Models\AttractionCategory $attractionCategory)
     {

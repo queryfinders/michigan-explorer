@@ -27,7 +27,7 @@
 @section('webLayoutContent')
 
 <!-- 1. Hero Banner -->
-<section class="hotel-detail-hero position-relative" style="height: 500px; background-image: linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.3) 100%), url('{{ $heroImage }}'); background-size: cover; background-position: center; background-attachment: fixed;">
+<section class="hotel-detail-hero position-relative" style="height: 500px; background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.5)), url('{{ $heroImage }}'); background-size: cover; background-position: center; background-attachment: fixed;">
     <div class="container h-100 d-flex flex-column justify-content-center align-items-center text-center pt-5">
         <nav aria-label="breadcrumb" class="mb-3">
             <ol class="breadcrumb justify-content-center">
@@ -111,63 +111,57 @@
                         </div>
                         <div class="col-md-4">
                             <div class="row g-2 h-100">
-                                <div class="col-12 h-50 cursor-pointer" onclick="openCustomGallery({{ !empty($attraction->video) ? 2 : 1 }})" class="auto-style-13">
-                                    <img src="{{ asset('images/attraction_nature_1783508280642.png') }}" class="img-fluid rounded-3 w-100 h-100 object-fit-cover shadow-sm transition-hover" alt="Gallery 2">
-                                </div>
-                                <div class="col-12 h-50 cursor-pointer" onclick="openCustomGallery({{ !empty($attraction->video) ? 3 : 2 }})" class="auto-style-15">
-                                    <img src="{{ asset('storage/demo/michigan_lighthouse_1783683652511.png') }}" class="img-fluid rounded-3 w-100 h-100 object-fit-cover shadow-sm transition-hover" alt="Gallery 3">
-                                    <div class="position-absolute top-0 start-0 w-100 rounded-3 d-flex justify-content-center align-items-center text-white fw-bold fs-4 transition-hover">
-                                        +3
+                                @if($attraction->images->count() > 0)
+                                    <div class="col-12 h-50 cursor-pointer position-relative" onclick="openCustomGallery({{ !empty($attraction->video) ? 1 : 0 }})">
+                                        <img src="{{ asset($attraction->images[0]->image) }}" class="img-fluid rounded-3 w-100 h-100 object-fit-cover shadow-sm transition-hover" alt="{{ $attraction->images[0]->alt_text ?? 'Gallery 1' }}">
                                     </div>
-                                </div>
+                                    @if($attraction->images->count() > 1)
+                                    <div class="col-12 h-50 cursor-pointer position-relative" onclick="openCustomGallery({{ !empty($attraction->video) ? 2 : 1 }})">
+                                        <img src="{{ asset($attraction->images[1]->image) }}" class="img-fluid rounded-3 w-100 h-100 object-fit-cover shadow-sm transition-hover" alt="{{ $attraction->images[1]->alt_text ?? 'Gallery 2' }}">
+                                        @if($attraction->images->count() > 2)
+                                        <div class="position-absolute top-0 start-0 w-100 h-100 rounded-3 d-flex justify-content-center align-items-center text-white fw-bold fs-4 transition-hover" style="background: rgba(0,0,0,0.4);">
+                                            +{{ $attraction->images->count() - 2 }}
+                                        </div>
+                                        @endif
+                                    </div>
+                                    @endif
+                                @else
+                                    <div class="col-12 h-50 cursor-pointer" onclick="openCustomGallery({{ !empty($attraction->video) ? 1 : 0 }})" class="auto-style-13">
+                                        <img src="{{ $heroImage }}" class="img-fluid rounded-3 w-100 h-100 object-fit-cover shadow-sm transition-hover" alt="Gallery">
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- FAQ Section -->
+                @if($attraction->faqs && $attraction->faqs->count() > 0)
                 <div class="bg-white rounded-4 shadow-sm p-4 p-md-5 mb-4">
                     <h3 class="fw-bold mb-4 auto-style-7">Frequently Asked Questions</h3>
                     <div class="accordion accordion-flush" id="attractionFaq">
+                        @foreach($attraction->faqs as $index => $faq)
                         <div class="accordion-item border rounded-3 mb-2 overflow-hidden">
                             <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-                                    What are the operating hours?
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq{{ $faq->id }}">
+                                    {{ $faq->question }}
                                 </button>
                             </h2>
-                            <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#attractionFaq">
-                                <div class="accordion-body text-muted lh-18">Operating hours vary by season. Typically, the attraction is open from 9:00 AM to 5:00 PM daily. Please check the official website for holiday hours and special closures.</div>
+                            <div id="faq{{ $faq->id }}" class="accordion-collapse collapse" data-bs-parent="#attractionFaq">
+                                <div class="accordion-body text-muted lh-18">{!! nl2br(e($faq->answer)) !!}</div>
                             </div>
                         </div>
-                        <div class="accordion-item border rounded-3 mb-2 overflow-hidden">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
-                                    Is parking available on-site?
-                                </button>
-                            </h2>
-                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#attractionFaq">
-                                <div class="accordion-body text-muted lh-18">Yes, ample parking is available for visitors. A daily vehicle pass or annual park pass may be required for entry depending on the specific location.</div>
-                            </div>
-                        </div>
-                        <div class="accordion-item border rounded-3 overflow-hidden">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
-                                    Are pets allowed?
-                                </button>
-                            </h2>
-                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#attractionFaq">
-                                <div class="accordion-body text-muted lh-18">Pets are welcome in designated outdoor areas but must be kept on a leash at all times. Please clean up after your pet and follow all posted guidelines.</div>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
+                @endif
             </div>
             
             <!-- Right Column: Sidebar Information -->
             <div class="col-lg-4">
                 
                 <!-- Visitor Information Card -->
-                <div class="card border-0 shadow-sm rounded-4 mb-4 sticky-top auto-style-16">
+                <div class="card border-0 shadow-sm rounded-4 mb-4 sticky-top" style="top: 100px; z-index: 10;">
                     <div class="card-body p-4">
                         <h4 class="fw-bold mb-4 auto-style-7">Visitor Information</h4>
                         
@@ -226,23 +220,50 @@
             </div>
         </div>
         
-        <!-- Full-Width Location & Map -->
-        <div class="bg-white rounded-4 shadow-sm p-4 p-md-5 mt-4">
-            <h3 class="fw-bold mb-4 auto-style-7">Location</h3>
-            <p class="text-muted mb-4"><i class="fas fa-map-marker-alt me-2 text-primary"></i> {{ $attraction->address }}, {{ $attraction->city }}, {{ $attraction->state }} {{ $attraction->zip }}</p>
-            <div class="rounded-3 overflow-hidden bg-light auto-style-18">
-                <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q={{ urlencode(($attraction->address ?? 'Main Street') . ' ' . ($attraction->city ?? 'Michigan')) }}&t=&z=13&ie=UTF8&iwloc=&output=embed"></iframe>
-            </div>
-        </div>
+          <div class="bg-white rounded-4 shadow-sm p-4 p-md-5 mb-5" id="location-map">
+              <h3 class="fw-bold mb-4">Location</h3>
+              <p class="text-muted mb-3"><i class="fas fa-map-marker-alt text-primary me-2"></i> {{ $attraction->address ?? 'Main Street' }}, {{ $attraction->city ?? '' }} {{ $attraction->zip ?? '' }}</p>
+              
+              <div class="rounded-3 overflow-hidden bg-light w-100 map-wrapper" style="height: 400px;">
+                <style>
+                    .map-wrapper iframe {
+                        width: 100% !important;
+                        height: 100% !important;
+                        border: 0;
+                    }
+                </style>
+                @if(!empty($attraction->map_iframe))
+                    @if(str_contains($attraction->map_iframe, '<iframe'))
+                        {!! $attraction->map_iframe !!}
+                    @else
+                        <iframe width="100%" height="100%" frameborder="0" style="border:0;" src="{{ $attraction->map_iframe }}"></iframe>
+                    @endif
+                @else
+                    <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q={{ urlencode(($attraction->address ?? 'Main Street') . ' ' . ($attraction->city ?? 'Michigan')) }}&t=&z=13&ie=UTF8&iwloc=&output=embed"></iframe>
+                @endif
+              </div>
+
+              <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mt-4 pt-3 border-top gap-3">
+                  <div>
+                      <h6 class="fw-bold mb-1">Contact Info</h6>
+                      <p class="mb-0 text-muted small"><i class="fas fa-phone-alt me-2 text-primary"></i> {{ $attraction->phone ?? '(555) 123-4567' }}</p>
+                  </div>
+                  <a href="https://maps.google.com/?q={{ urlencode(($attraction->address ?? '') . ' ' . ($attraction->city ?? '') . ' ' . ($attraction->zip ?? '')) }}" target="_blank" class="btn btn-outline-primary rounded-pill px-4 py-2 fw-bold shadow-sm d-inline-flex align-items-center">
+                      Get Directions <i class="fas fa-external-link-alt ms-2"></i>
+                  </a>
+              </div>
+          </div>
 
     </div>
 </section>
 
 <!-- Nearby Places Sections -->
+@if((isset($nearbyHotels) && count($nearbyHotels) > 0) || (isset($nearbyRestaurants) && count($nearbyRestaurants) > 0))
 <section class="py-5 border-top">
     <div class="container py-3">
         
         <!-- Nearby Hotels -->
+        @if(isset($nearbyHotels) && count($nearbyHotels) > 0)
         <div class="mb-5 pb-4 border-bottom">
             <div class="d-flex justify-content-between align-items-end mb-4">
                 <div>
@@ -252,28 +273,17 @@
                 <a href="{{ route('web.hotels.index') }}" class="btn btn-outline-primary rounded-pill px-4">View All Hotels</a>
             </div>
             <div class="row g-4">
-                @forelse($nearbyHotels as $hotel)
+                @foreach($nearbyHotels as $hotel)
                 <div class="col-lg-4 col-md-6">
                     <x-hotel-card :hotel="$hotel" />
                 </div>
-                @empty
-                <!-- Fallback Hotel Cards -->
-                @for($i=1; $i<=3; $i++)
-                <div class="col-lg-4 col-md-6">
-                    <x-hotel-card :hotel="(object)[
-                        'name' => 'Grand Hotel ' . $i,
-                        'slug' => 'demo',
-                        'city' => $attraction->city,
-                        'description' => 'A wonderful place to stay during your visit.',
-                        'starting_price' => '149'
-                    ]" />
-                </div>
-                @endfor
-                @endforelse
+                @endforeach
             </div>
         </div>
+        @endif
 
         <!-- Nearby Restaurants -->
+        @if(isset($nearbyRestaurants) && count($nearbyRestaurants) > 0)
         <div>
             <div class="d-flex justify-content-between align-items-end mb-4">
                 <div>
@@ -283,29 +293,18 @@
                 <a href="{{ route('web.restaurants.index') }}" class="btn btn-outline-primary rounded-pill px-4">View All Restaurants</a>
             </div>
             <div class="row g-4">
-                @forelse($nearbyRestaurants as $restaurant)
+                @foreach($nearbyRestaurants as $restaurant)
                 <div class="col-lg-4 col-md-6">
                     <x-restaurant-card :restaurant="$restaurant" />
                 </div>
-                @empty
-                <!-- Fallback Restaurant Cards -->
-                @for($i=1; $i<=3; $i++)
-                <div class="col-lg-4 col-md-6">
-                    <x-restaurant-card :restaurant="(object)[
-                        'name' => 'Local Dining ' . $i,
-                        'slug' => 'demo',
-                        'city' => $attraction->city,
-                        'description' => 'A fantastic place to grab a bite.',
-                        'starting_price' => '25'
-                    ]" />
-                </div>
-                @endfor
-                @endforelse
+                @endforeach
             </div>
         </div>
+        @endif
 
     </div>
 </section>
+@endif
 
 <!-- Custom Fullscreen Gallery Lightbox -->
 <div id="customGalleryLightbox" class="custom-lightbox" style="display: none;">
@@ -342,11 +341,13 @@
                 { type: 'video', src: "{{ asset($attraction->video) }}" },
             @endif
         @endif
-        { type: 'image', src: "{{ $heroImage }}" },
-        { type: 'image', src: "{{ asset('images/attraction_nature_1783508280642.png') }}" },
-        { type: 'image', src: "{{ asset('storage/demo/michigan_lighthouse_1783683652511.png') }}" },
-        { type: 'image', src: "{{ asset('storage/demo/michigan_sleeping_bear_1783683642640.png') }}" },
-        { type: 'image', src: "{{ asset('storage/demo/michigan_hotel_pool_1783683632041.png') }}" }
+        @if($attraction->images && $attraction->images->count() > 0)
+            @foreach($attraction->images as $img)
+                { type: 'image', src: "{{ asset($img->image) }}" },
+            @endforeach
+        @else
+            { type: 'image', src: "{{ $heroImage }}" },
+        @endif
     ];
     let currentGalleryIndex = 0;
 
