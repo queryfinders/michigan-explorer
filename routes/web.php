@@ -93,6 +93,7 @@ Route::group(['middleware' => 'admin_auth'], function () {
     })->name('logout');
     
     // Hotels Module
+    Route::post('/admin/hotel-categories/quick-store', [\App\Http\Controllers\Admin\HotelCategoryController::class, 'quickStore'])->name('hotel-categories.quick-store');
     Route::get('/admin/hotel-categories/status/{id}/{status}', [\App\Http\Controllers\Admin\HotelCategoryController::class, 'changeStatus'])->name('hotel-categories.status');
     Route::resource('/admin/hotel-categories', \App\Http\Controllers\Admin\HotelCategoryController::class);
     Route::get('/admin/hotels/status/{id}/{status}', [\App\Http\Controllers\Admin\HotelController::class, 'changeStatus'])->name('hotels.status');
@@ -103,6 +104,7 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::resource('/admin/hotel-policies', \App\Http\Controllers\Admin\HotelPolicyController::class);
 
     // Restaurants Module
+    Route::post('/admin/restaurant-categories/quick-store', [\App\Http\Controllers\Admin\RestaurantCategoryController::class, 'quickStore'])->name('restaurant-categories.quick-store');
     Route::get('/admin/restaurant-categories/status/{id}/{status}', [\App\Http\Controllers\Admin\RestaurantCategoryController::class, 'changeStatus'])->name('restaurant-categories.status');
     Route::resource('/admin/restaurant-categories', \App\Http\Controllers\Admin\RestaurantCategoryController::class);
     Route::get('/admin/restaurants/status/{id}/{status}', [\App\Http\Controllers\Admin\RestaurantController::class, 'changeStatus'])->name('restaurants.status');

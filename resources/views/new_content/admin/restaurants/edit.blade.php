@@ -3,6 +3,14 @@
 @section('title', 'Edit Restaurant: ' . $restaurant->name)
 
 @section('content')
+<nav aria-label="breadcrumb" class="mb-4">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="{{ route('restaurants.index') }}">Restaurants</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+  </ol>
+</nav>
+
 <div class="card mb-4">
   <div class="card-header d-flex justify-content-between align-items-center">
     <h5 class="mb-0">Edit Restaurant: {{ $restaurant->name }}</h5>
@@ -41,26 +49,63 @@
         <div class="tab-pane fade show active" id="basic-pane" role="tabpanel" aria-labelledby="basic-tab">
           <div class="row">
             <div class="col-md-4 mb-3">
-              <div class="d-flex justify-content-between align-items-center mb-1">
-                <label class="form-label mb-0" for="restaurant_category_id">Category <span class="text-danger">*</span></label>
-                <a href="{{ route('restaurant-categories.create') }}" target="_blank" class="btn btn-sm btn-link p-0 text-primary fw-semibold"><i class="fas fa-plus-circle me-1"></i>Add Category</a>
+              <label class="form-label fw-semibold" for="restaurant_category_id">Category <span class="text-danger">*</span></label>
+              <input type="hidden" name="restaurant_category_id" id="restaurant_category_id"
+                     value="{{ old('restaurant_category_id', $restaurant->restaurant_category_id) }}" required />
+              @error('restaurant_category_id') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+
+              <div class="cuisine-dropdown-wrapper" id="categoryDropdownWrapper">
+                <div class="cuisine-dropdown-trigger" id="categoryTrigger" onclick="toggleCategoryDropdown()">
+                  <div class="cuisine-tags-area" id="categoryTagsArea">
+                    <span class="cuisine-placeholder" id="categoryPlaceholder">
+                      <i class="fas fa-layer-group me-2 text-muted"></i>Click to select category...
+                    </span>
+                  </div>
+                  <i class="fas fa-chevron-down cuisine-dropdown-arrow" id="categoryArrow"></i>
+                </div>
+                <div class="cuisine-dropdown-panel" id="categoryDropdownPanel" style="display:none;">
+                  <div class="cuisine-search-wrap">
+                    <i class="fas fa-search cuisine-search-icon"></i>
+                    <input type="text" class="cuisine-search-input" id="categorySearchInput"
+                           placeholder="Search categories..." oninput="filterCategories(this.value)" autocomplete="off" />
+                  </div>
+                  <div class="cuisine-divider"></div>
+                  <div class="cuisine-items-list" id="categoryItemsList">
+                    @foreach($categories as $cat)
+                    <label class="cuisine-item" id="cat-label-{{ $cat->id }}">
+                      <input type="radio" name="_cat_radio" value="{{ $cat->id }}"
+                             id="cat_rb_{{ $cat->id }}"
+                             class="cat-rb d-none"
+                             data-name="{{ $cat->name }}"
+                             data-id="{{ $cat->id }}"
+                             {{ old('restaurant_category_id', $restaurant->restaurant_category_id) == $cat->id ? 'checked' : '' }}
+                             onchange="onCategoryChange(this)" />
+                      <span class="cuisine-item-name">{{ $cat->name }}</span>
+                      <span class="cuisine-item-check"><i class="fas fa-check"></i></span>
+                    </label>
+                    @endforeach
+                    <div class="cuisine-no-results d-none" id="categoryNoResults">
+                      <i class="fas fa-search-minus me-2"></i>No categories found
+                    </div>
+                  </div>
+                  <div class="cuisine-divider"></div>
+                  <div class="cuisine-panel-footer">
+                    <button type="button" class="btn btn-sm btn-link p-0 text-primary fw-semibold"
+                            data-bs-toggle="modal" data-bs-target="#addCategoryModal" onclick="closeCategoryDropdown()">
+                      <i class="fas fa-plus-circle me-1"></i>Add New Category
+                    </button>
+                  </div>
+                </div>
               </div>
-              <select class="form-select select2 @error('restaurant_category_id') is-invalid @enderror" id="restaurant_category_id" name="restaurant_category_id" required>
-                  <option value="">Select Category</option>
-                  @foreach($categories as $category)
-                  <option value="{{ $category->id }}" {{ old('restaurant_category_id', $restaurant->restaurant_category_id) == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
-                  @endforeach
-              </select>
-              @error('restaurant_category_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="name">Name <span class="text-danger">*</span></label>
-              <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $restaurant->name) }}" required />
+              <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $restaurant->name) }}" required placeholder="e.g. The Grand Hotel" />
               @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="slug">Slug <span class="text-danger">*</span></label>
-              <input type="text" class="form-control @error('slug') is-invalid @enderror" id="slug" name="slug" value="{{ old('slug', $restaurant->slug) }}" required />
+              <input type="text" class="form-control @error('slug') is-invalid @enderror" id="slug" name="slug" value="{{ old('slug', $restaurant->slug) }}" required placeholder="e.g. the-grand-hotel" />
               @error('slug') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
           </div>
@@ -195,7 +240,7 @@
           <div class="row">
             <div class="col-md-4 mb-3">
               <label class="form-label" for="starting_price">Average Cost ($)</label>
-              <input type="number" class="form-control" id="starting_price" name="starting_price" placeholder="e.g. 45" value="{{ old('starting_price', $restaurant->starting_price) }}" />
+              <input type="number" class="form-control" id="starting_price" name="starting_price" value="{{ old('starting_price', $restaurant->starting_price) }}" placeholder="e.g. 199" />
             </div>
           </div>
 
@@ -260,33 +305,33 @@
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="zip">Zip Code</label>
-              <input type="text" class="form-control" id="zip" name="zip" value="{{ old('zip', $restaurant->zip) }}" />
+              <input type="text" class="form-control" id="zip" name="zip" value="{{ old('zip', $restaurant->zip) }}" placeholder="e.g. 49757" />
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="address">Street Address</label>
-              <input type="text" class="form-control" id="address" name="address" value="{{ old('address', $restaurant->address) }}" />
+              <input type="text" class="form-control" id="address" name="address" value="{{ old('address', $restaurant->address) }}" placeholder="e.g. 286 Grand Avenue" />
             </div>
           </div>
           <div class="row">
             <div class="col-md-4 mb-3">
               <label class="form-label" for="phone">Phone Number</label>
-              <input type="text" class="form-control" id="phone" name="phone" value="{{ old('phone', $restaurant->phone) }}" />
+              <input type="text" class="form-control" id="phone" name="phone" value="{{ old('phone', $restaurant->phone) }}" placeholder="e.g. +1 555-123-4567" />
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="email">Email</label>
-              <input type="email" class="form-control" id="email" name="email" value="{{ old('email', $restaurant->email) }}" />
+              <input type="email" class="form-control" id="email" name="email" value="{{ old('email', $restaurant->email) }}" placeholder="e.g. info@example.com" />
             </div>
             {{--
             <div class="col-md-4 mb-3">
               <label class="form-label" for="website">Website URL</label>
-              <input type="url" class="form-control" id="website" name="website" value="{{ old('website', $restaurant->website) }}" />
+              <input type="url" class="form-control" id="website" name="website" value="{{ old('website', $restaurant->website) }}" placeholder="e.g. https://www.example.com" />
             </div>
             --}}
           </div>
           <div class="row">
             <div class="col-md-6 mb-3">
               <label class="form-label" for="affiliate_url">Booking Affiliate URL</label>
-              <input type="url" class="form-control" id="affiliate_url" name="affiliate_url" placeholder="e.g. OpenTable or Resy link" value="{{ old('affiliate_url', $restaurant->affiliate_url) }}" />
+              <input type="url" class="form-control" id="affiliate_url" name="affiliate_url" value="{{ old('affiliate_url', $restaurant->affiliate_url) }}" placeholder="e.g. https://booking.com/..." />
             </div>
             <div class="col-md-6 mb-3">
               <label class="form-label" for="map_iframe">Google Maps Embed Code (Iframe Link)</label>
@@ -314,14 +359,14 @@
           </div>
           <div class="mb-3">
             <label class="form-label" for="featured_image_alt">Image Alt Text (SEO)</label>
-            <input type="text" class="form-control" id="featured_image_alt" name="featured_image_alt" value="{{ old('featured_image_alt', $restaurant->featured_image_alt) }}" placeholder="e.g. Fine dining room interior view" />
+            <input type="text" class="form-control" id="featured_image_alt" name="featured_image_alt" value="{{ old('featured_image_alt', $restaurant->featured_image_alt) }}" />
           </div>
           
           <hr class="my-4">
           <h5 class="fw-bold mb-3">Video Details</h5>
           <div class="mb-3">
             <label class="form-label fw-semibold" for="video">Video URL (YouTube/Vimeo)</label>
-            <input type="url" class="form-control" id="video" name="video" placeholder="e.g. https://youtube.com/watch?v=..." value="{{ old('video', $restaurant->video) }}" />
+            <input type="url" class="form-control" id="video" name="video" value="{{ old('video', $restaurant->video) }}" />
             <div class="form-text">Paste a Youtube or Vimeo link here. This will display as the first item in the media gallery.</div>
           </div>
         </div>
@@ -423,17 +468,19 @@
     </form>
   </div>
 </div>
+
 @endsection
 
 @section('page-script')
 <style>
   /* Cuisines dropdown styles */
-  .cuisine-dropdown-wrapper { position: relative; }
+  .cuisine-dropdown-wrapper { position: relative; width: 100%; }
   .cuisine-dropdown-trigger {
     display: flex; align-items: center; justify-content: space-between;
-    min-height: 48px; padding: 8px 14px; border: 1.5px solid #d5d9e0;
-    border-radius: 8px; background: #fff; cursor: pointer;
-    transition: border-color 0.2s, box-shadow 0.2s; gap: 10px; user-select: none;
+    min-height: 38px; padding: 6px 12px; border: 1px solid #dee2e6;
+    border-radius: 6px; background: #fff; cursor: pointer;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out; gap: 10px; user-select: none;
+    width: 100%;
   }
   .cuisine-dropdown-trigger:hover { border-color: #7367f0; }
   .cuisine-dropdown-trigger.open { border-color: #7367f0; box-shadow: 0 0 0 3px rgba(115,103,240,.15); }
@@ -479,12 +526,13 @@
   .cuisine-selected-count { font-size: .8rem; color: #7367f0; font-weight: 700; background: #ede9ff; border-radius: 20px; padding: 2px 10px; }
 
   /* Features dropdown styles */
-  .feature-dropdown-wrapper { position: relative; }
+  .feature-dropdown-wrapper { position: relative; width: 100%; }
   .feature-dropdown-trigger {
     display: flex; align-items: center; justify-content: space-between;
-    min-height: 48px; padding: 8px 14px; border: 1.5px solid #d5d9e0;
-    border-radius: 8px; background: #fff; cursor: pointer;
-    transition: border-color 0.2s, box-shadow 0.2s; gap: 10px; user-select: none;
+    min-height: 38px; padding: 6px 12px; border: 1px solid #dee2e6;
+    border-radius: 6px; background: #fff; cursor: pointer;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out; gap: 10px; user-select: none;
+    width: 100%;
   }
   .feature-dropdown-trigger:hover { border-color: #7367f0; }
   .feature-dropdown-trigger.open { border-color: #7367f0; box-shadow: 0 0 0 3px rgba(115,103,240,.15); }
@@ -712,7 +760,7 @@
           previewContainer.appendChild(col);
           const altDiv = document.createElement('div');
           altDiv.className = 'mb-3 mt-2';
-          altDiv.innerHTML = `<label class="form-label text-muted small">Alt Text for New Image #${index + 1}</label><input type="text" class="form-control form-control-sm" name="gallery_alts[${index}]" placeholder="e.g. Dining area table setting" />`;
+          altDiv.innerHTML = `<label class="form-label text-muted small">Alt Text for New Image #${index + 1}</label><input type="text" class="form-control form-control-sm" name="gallery_alts[${index}]" />`;
           altFieldsContainer.appendChild(altDiv);
         }
         reader.readAsDataURL(file);
@@ -734,11 +782,11 @@
           </div>
           <div class="mb-3">
             <label class="form-label fw-semibold">Question</label>
-            <input type="text" class="form-control" name="faqs[${faqIndex}][question]" required placeholder="e.g. Do you offer vegetarian options?">
+            <input type="text" class="form-control" name="faqs[${faqIndex}][question]" required>
           </div>
           <div class="mb-2">
             <label class="form-label fw-semibold">Answer</label>
-            <textarea class="form-control tinymce" id="faq_answer_${faqIndex}" name="faqs[${faqIndex}][answer]" rows="3" required placeholder="e.g. Yes, we have a variety of vegetarian and vegan dishes on our menu."></textarea>
+            <textarea class="form-control tinymce" id="faq_answer_${faqIndex}" name="faqs[${faqIndex}][answer]" rows="3" required></textarea>
           </div>
         </div>
       </div>
@@ -883,11 +931,11 @@
         <div id="cuisine-modal-alert" class="d-none"></div>
         <div class="mb-3">
           <label class="form-label fw-semibold" for="new_cuisine_name">Cuisine Name <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" id="new_cuisine_name" placeholder="e.g. Italian" />
+          <input type="text" class="form-control" id="new_cuisine_name" />
         </div>
         <div class="mb-3">
           <label class="form-label fw-semibold" for="new_cuisine_slug">Slug <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" id="new_cuisine_slug" placeholder="e.g. italian" />
+          <input type="text" class="form-control" id="new_cuisine_slug" />
         </div>
       </div>
       <div class="modal-footer">
@@ -913,19 +961,19 @@
         <div id="feature-modal-alert" class="d-none"></div>
         <div class="mb-3">
           <label class="form-label fw-semibold" for="new_feature_name">Feature Name <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" id="new_feature_name" placeholder="e.g. Outdoor Seating" />
+          <input type="text" class="form-control" id="new_feature_name" />
         </div>
         <div class="mb-3">
           <label class="form-label fw-semibold" for="new_feature_slug">Slug <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" id="new_feature_slug" placeholder="e.g. outdoor-seating" />
+          <input type="text" class="form-control" id="new_feature_slug" />
         </div>
         <div class="mb-3">
           <label class="form-label fw-semibold" for="new_feature_icon">Icon Class</label>
-          <input type="text" class="form-control" id="new_feature_icon" placeholder="e.g. fas fa-chair" value="fas fa-star" />
+          <input type="text" class="form-control" id="new_feature_icon" value="fas fa-star" />
         </div>
         <div class="mb-3">
           <label class="form-label fw-semibold" for="new_feature_desc">Description</label>
-          <textarea class="form-control" id="new_feature_desc" rows="2" placeholder="e.g. Outdoor patio seating with view"></textarea>
+          <textarea class="form-control" id="new_feature_desc" rows="2"></textarea>
         </div>
       </div>
       <div class="modal-footer">
@@ -1105,4 +1153,6 @@
     if (wrapper && !wrapper.contains(e.target)) closeCategoryDropdown();
   });
 </script>
+
 @endsection
+

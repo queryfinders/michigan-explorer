@@ -30,6 +30,18 @@ class RestaurantCategoryController extends Controller
         return redirect()->route('restaurant-categories.index')->with('success', 'Category created successfully.');
     }
 
+    public function quickStore(\Illuminate\Http\Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:restaurant_categories',
+            'status' => 'boolean'
+        ]);
+
+        $category = \App\Models\RestaurantCategory::create($request->all());
+        return response()->json(['success' => true, 'category' => $category]);
+    }
+
     public function edit(\App\Models\RestaurantCategory $restaurantCategory)
     {
         return view('new_content.admin.restaurant_categories.edit', compact('restaurantCategory'));

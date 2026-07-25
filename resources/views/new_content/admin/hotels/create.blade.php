@@ -3,6 +3,14 @@
 @section('title', 'Add Hotel')
 
 @section('content')
+<nav aria-label="breadcrumb" class="mb-4">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="{{ route('hotels.index') }}">Hotels</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Add Hotel</li>
+  </ol>
+</nav>
+
 <div class="card mb-4">
   <div class="card-header d-flex justify-content-between align-items-center">
     <h5 class="mb-0">Add Hotel</h5>
@@ -40,33 +48,71 @@
         <div class="tab-pane fade show active" id="basic-pane" role="tabpanel" aria-labelledby="basic-tab">
           <div class="row">
             <div class="col-md-4 mb-3">
-              <div class="d-flex justify-content-between align-items-center mb-1">
-                <label class="form-label mb-0" for="hotel_category_id">Category <span class="text-danger">*</span></label>
-                <a href="{{ route('hotel-categories.create') }}" target="_blank" class="btn btn-sm btn-link p-0 text-primary fw-semibold"><i class="fas fa-plus-circle me-1"></i>Add Category</a>
+              <label class="form-label fw-semibold" for="hotel_category_id">Category <span class="text-danger">*</span></label>
+              {{-- Hidden input that holds the selected category id --}}
+              <input type="hidden" name="hotel_category_id" id="hotel_category_id"
+                     value="{{ old('hotel_category_id') }}" required />
+              @error('hotel_category_id') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+
+              <div class="cuisine-dropdown-wrapper" id="categoryDropdownWrapper">
+                <div class="cuisine-dropdown-trigger" id="categoryTrigger" onclick="toggleCategoryDropdown()">
+                  <div class="cuisine-tags-area" id="categoryTagsArea">
+                    <span class="cuisine-placeholder" id="categoryPlaceholder">
+                      <i class="fas fa-layer-group me-2 text-muted"></i>Click to select category...
+                    </span>
+                  </div>
+                  <i class="fas fa-chevron-down cuisine-dropdown-arrow" id="categoryArrow"></i>
+                </div>
+                <div class="cuisine-dropdown-panel" id="categoryDropdownPanel" style="display:none;">
+                  <div class="cuisine-search-wrap">
+                    <i class="fas fa-search cuisine-search-icon"></i>
+                    <input type="text" class="cuisine-search-input" id="categorySearchInput"
+                           placeholder="Search categories..." oninput="filterCategories(this.value)" autocomplete="off" />
+                  </div>
+                  <div class="cuisine-divider"></div>
+                  <div class="cuisine-items-list" id="categoryItemsList">
+                    @foreach($categories as $cat)
+                    <label class="cuisine-item" id="cat-label-{{ $cat->id }}">
+                      <input type="radio" name="_cat_radio" value="{{ $cat->id }}"
+                             id="cat_rb_{{ $cat->id }}"
+                             class="cat-rb d-none"
+                             data-name="{{ $cat->name }}"
+                             data-id="{{ $cat->id }}"
+                             {{ old('hotel_category_id') == $cat->id ? 'checked' : '' }}
+                             onchange="onCategoryChange(this)" />
+                      <span class="cuisine-item-name">{{ $cat->name }}</span>
+                      <span class="cuisine-item-check"><i class="fas fa-check"></i></span>
+                    </label>
+                    @endforeach
+                    <div class="cuisine-no-results d-none" id="categoryNoResults">
+                      <i class="fas fa-search-minus me-2"></i>No categories found
+                    </div>
+                  </div>
+                  <div class="cuisine-divider"></div>
+                  <div class="cuisine-panel-footer">
+                    <button type="button" class="btn btn-sm btn-link p-0 text-primary fw-semibold"
+                            data-bs-toggle="modal" data-bs-target="#addCategoryModal" onclick="closeCategoryDropdown()">
+                      <i class="fas fa-plus-circle me-1"></i>Add New Category
+                    </button>
+                  </div>
+                </div>
               </div>
-              <select class="form-select select2 @error('hotel_category_id') is-invalid @enderror" id="hotel_category_id" name="hotel_category_id" required>
-                  <option value="">Select Category</option>
-                  @foreach($categories as $category)
-                  <option value="{{ $category->id }}" {{ old('hotel_category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
-                  @endforeach
-              </select>
-              @error('hotel_category_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="name">Name <span class="text-danger">*</span></label>
-              <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required />
+              <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required placeholder="e.g. The Grand Hotel" />
               @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="slug">Slug <span class="text-danger">*</span></label>
-              <input type="text" class="form-control @error('slug') is-invalid @enderror" id="slug" name="slug" value="{{ old('slug') }}" required />
+              <input type="text" class="form-control @error('slug') is-invalid @enderror" id="slug" name="slug" value="{{ old('slug') }}" required placeholder="e.g. the-grand-hotel" />
               @error('slug') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
           </div>
-          <div class="mb-3">
+          <!-- <div class="mb-3">
             <label class="form-label" for="short_description">Short Description</label>
             <textarea class="form-control" id="short_description" name="short_description" rows="2"></textarea>
-          </div>
+          </div> -->
           <div class="mb-3">
             <label class="form-label" for="description">Description</label>
             <textarea class="form-control tinymce" id="description" name="description" rows="6"></textarea>
@@ -84,34 +130,61 @@
           <div class="row">
             <div class="col-md-4 mb-3">
               <label class="form-label" for="city">City</label>
-              <select class="form-select select2" id="city" name="city">
-                <option value="">Select a city</option>
-                @foreach(config('michigan_cities') as $m_city)
-                  <option value="{{ $m_city }}" {{ old('city') == $m_city ? 'selected' : '' }}>{{ $m_city }}</option>
-                @endforeach
-              </select>
+              <input type="hidden" name="city" id="city_hidden" value="{{ old('city') }}" />
+              <div class="cuisine-dropdown-wrapper" id="cityDropdownWrapper">
+                <div class="cuisine-dropdown-trigger" id="cityTrigger" onclick="toggleCityDropdown()">
+                  <div class="cuisine-tags-area" id="cityTagsArea">
+                    <span class="cuisine-placeholder" id="cityPlaceholder">
+                      Click to select city...
+                    </span>
+                  </div>
+                  <div class="cuisine-dropdown-arrow" id="cityArrow">
+                    <i class="fas fa-chevron-down"></i>
+                  </div>
+                </div>
+                <div class="cuisine-dropdown-panel" id="cityDropdownPanel" style="display: none;">
+                  <div class="cuisine-search-wrap">
+                    <i class="fas fa-search cuisine-search-icon"></i>
+                    <input type="text" class="cuisine-search-input" id="citySearchInput" placeholder="Search city..." onkeyup="filterCities(this.value)">
+                  </div>
+                  <div class="cuisine-divider"></div>
+                  <div class="cuisine-items-list" id="cityItemsList">
+                    @foreach(config('michigan_cities') as $m_city)
+                      @php $m_city_slug = Str::slug($m_city); @endphp
+                      <label class="cuisine-item" id="city-label-{{ $m_city_slug }}">
+                        <input type="radio" name="_city_radio" value="{{ $m_city }}" id="city_rb_{{ $m_city_slug }}" class="city-rb d-none" data-name="{{ $m_city }}" onchange="onCityChange(this)" />
+                        <span class="cuisine-item-name">{{ $m_city }}</span>
+                        <span class="cuisine-item-check"><i class="fas fa-check"></i></span>
+                      </label>
+                    @endforeach
+                  </div>
+                  <div class="cuisine-no-results d-none" id="cityNoResults">
+                    No cities found.
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="zip">Zip Code</label>
-              <input type="text" class="form-control" id="zip" name="zip" />
+              <input type="text" class="form-control" id="zip" name="zip" placeholder="e.g. 49757" />
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="address">Street Address</label>
-              <input type="text" class="form-control" id="address" name="address" />
+              <input type="text" class="form-control" id="address" name="address" placeholder="e.g. 286 Grand Avenue" />
             </div>
           </div>
           <div class="row">
             <div class="col-md-4 mb-3">
               <label class="form-label" for="phone">Phone Number</label>
-              <input type="text" class="form-control" id="phone" name="phone" />
+              <input type="text" class="form-control" id="phone" name="phone" placeholder="e.g. +1 555-123-4567" />
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="email">Email</label>
-              <input type="email" class="form-control" id="email" name="email" />
+              <input type="email" class="form-control" id="email" name="email" placeholder="e.g. info@example.com" />
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="website">Website URL</label>
-              <input type="url" class="form-control" id="website" name="website" />
+              <input type="url" class="form-control" id="website" name="website" placeholder="e.g. https://www.example.com" />
             </div>
           </div>
           <div class="row">
@@ -121,7 +194,7 @@
             </div>
             <div class="col-md-6 mb-3">
               <label class="form-label" for="affiliate_url">Booking Affiliate URL</label>
-              <input type="url" class="form-control" id="affiliate_url" name="affiliate_url" />
+              <input type="url" class="form-control" id="affiliate_url" name="affiliate_url" placeholder="e.g. https://booking.com/..." />
             </div>
           </div>
           <div class="row">
@@ -196,23 +269,61 @@
           <!-- Booking Features -->
           <div class="row">
             <div class="col-12 mt-4">
-              <h6 class="fw-semibold">Booking Features</h6>
-              <div class="card bg-light border-0 shadow-none">
-                <div class="card-body p-3">
-                  <div class="row g-3">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <label class="form-label fw-semibold mb-0">Booking Features</label>
+                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addBookingFeatureModal">
+                  <i class="fas fa-plus me-1"></i> Add Booking Feature
+                </button>
+              </div>
+
+              {{-- Custom Booking Feature Dropdown --}}
+              <div class="amenity-dropdown-wrapper" id="bookingFeatureDropdownWrapper">
+                
+                {{-- Trigger Button --}}
+                <div class="amenity-dropdown-trigger" id="bookingFeatureTrigger" onclick="toggleBookingFeatureDropdown()">
+                  <div class="amenity-tags-area" id="bookingFeatureTagsArea">
+                    <span class="amenity-placeholder" id="bookingFeaturePlaceholder">
+                      <i class="fas fa-check-circle me-2 text-muted"></i>Click to select booking features...
+                    </span>
+                  </div>
+                  <i class="fas fa-chevron-down amenity-dropdown-arrow" id="bookingFeatureArrow"></i>
+                </div>
+
+                {{-- Dropdown Panel --}}
+                <div class="amenity-dropdown-panel" id="bookingFeatureDropdownPanel" style="display:none;">
+                  <div class="amenity-search-wrap">
+                    <i class="fas fa-search amenity-search-icon"></i>
+                    <input type="text" class="amenity-search-input" id="bookingFeatureSearchInput"
+                           placeholder="Search booking features..." oninput="filterBookingFeatures(this.value)" autocomplete="off" />
+                  </div>
+                  <div class="amenity-divider"></div>
+                  <div class="amenity-items-list" id="bookingFeatureItemsList">
                     @foreach($bookingFeatures as $feature)
-                    <div class="col-md-4 col-sm-6">
-                      <div class="form-check custom-checkbox">
-                        <input class="form-check-input" type="checkbox" name="booking_features[]" value="{{ $feature->id }}" id="bf_{{ $feature->id }}">
-                        <label class="form-check-label d-flex align-items-center" for="bf_{{ $feature->id }}">
-                          @if($feature->icon)
-                            <i class="{{ $feature->icon }} text-primary me-2"></i>
-                          @endif
-                          {{ $feature->name }}
-                        </label>
-                      </div>
-                    </div>
+                    <label class="amenity-item" id="booking-feature-label-{{ $feature->id }}">
+                      <input type="checkbox" name="booking_features[]" value="{{ $feature->id }}"
+                             id="booking_feature_cb_{{ $feature->id }}"
+                             class="booking-feature-cb"
+                             data-name="{{ $feature->name }}"
+                             data-id="{{ $feature->id }}"
+                             onchange="onBookingFeatureChange(this)" />
+                      @if($feature->icon)
+                      <span class="amenity-item-icon"><i class="fas {{ $feature->icon }}"></i></span>
+                      @endif
+                      <span class="amenity-item-name">{{ $feature->name }}</span>
+                      <span class="amenity-item-check"><i class="fas fa-check"></i></span>
+                    </label>
                     @endforeach
+                    <div class="amenity-no-results d-none" id="bookingFeatureNoResults">
+                      <i class="fas fa-search-minus me-2"></i>No booking features found
+                    </div>
+                  </div>
+                  <div class="amenity-divider"></div>
+                  <div class="amenity-panel-footer">
+                    <button type="button" class="btn btn-sm btn-link p-0 text-primary fw-semibold"
+                            data-bs-toggle="modal" data-bs-target="#addBookingFeatureModal" onclick="closeBookingFeatureDropdown()">
+                      <i class="fas fa-plus-circle me-1"></i>Add New Booking Feature
+                    </button>
+                    <span class="amenity-selected-count" id="bookingFeatureSelectedCount">0 selected</span>
                   </div>
                 </div>
               </div>
@@ -222,22 +333,23 @@
           <!-- Hotel Policies -->
           <div class="row">
             <div class="col-12 mt-4">
-              <h6 class="fw-semibold">Hotel Policies</h6>
-              <div class="card bg-light border-0 shadow-none">
-                <div class="card-body p-3">
-                  <div class="row g-3">
-                    @foreach($hotelPolicies as $policy)
-                    <div class="col-md-6">
-                      <label class="form-label" for="policy_{{ $policy->id }}">{{ $policy->name }}</label>
-                      @if($policy->input_type === 'textarea')
-                        <textarea class="form-control" name="hotel_policies[{{ $policy->id }}]" id="policy_{{ $policy->id }}" rows="2"></textarea>
-                      @else
-                        <input type="text" class="form-control" name="hotel_policies[{{ $policy->id }}]" id="policy_{{ $policy->id }}" />
-                      @endif
-                    </div>
-                    @endforeach
-                  </div>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <label class="form-label fw-semibold mb-0">Hotel Policies</label>
+                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addHotelPolicyModal">
+                  <i class="fas fa-plus me-1"></i> Add Hotel Policy
+                </button>
+              </div>
+              <div class="row g-3">
+                @foreach($hotelPolicies as $policy)
+                <div class="col-md-6">
+                  <label class="form-label" for="policy_{{ $policy->id }}">{{ $policy->name }}</label>
+                  @if($policy->input_type === 'textarea')
+                    <textarea class="form-control" name="hotel_policies[{{ $policy->id }}]" id="policy_{{ $policy->id }}" rows="2"></textarea>
+                  @else
+                    <input type="text" class="form-control" name="hotel_policies[{{ $policy->id }}]" id="policy_{{ $policy->id }}" />
+                  @endif
                 </div>
+                @endforeach
               </div>
             </div>
           </div>
@@ -255,7 +367,7 @@
           </div>
           <div class="mb-3">
             <label class="form-label" for="featured_image_alt">Image Alt Text (SEO)</label>
-            <input type="text" class="form-control" id="featured_image_alt" name="featured_image_alt" placeholder="e.g. Exterior view of Grand Hotel Resort in Mackinac Island" />
+            <input type="text" class="form-control" id="featured_image_alt" name="featured_image_alt" />
             <div class="form-text">Describe the image clearly for search engines and accessibility.</div>
           </div>
           <div class="mb-3 border-top pt-3">
@@ -265,7 +377,7 @@
           </div>
           <div class="mb-3">
             <label class="form-label fw-semibold" for="video_url">OR YouTube Video URL</label>
-            <input type="url" class="form-control" id="video_url" name="video_url" placeholder="e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ" />
+            <input type="url" class="form-control" id="video_url" name="video_url" />
             <div class="form-text">Paste a YouTube link directly instead of uploading a video file.</div>
           </div>
         </div>
@@ -335,6 +447,57 @@
 
 @section('page-script')
 <style>
+  /* Cuisines dropdown styles */
+  .cuisine-dropdown-wrapper { position: relative; width: 100%; }
+  .cuisine-dropdown-trigger {
+    display: flex; align-items: center; justify-content: space-between;
+    min-height: 38px; padding: 6px 12px; border: 1px solid #dee2e6;
+    border-radius: 6px; background: #fff; cursor: pointer;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out; gap: 10px; user-select: none;
+    width: 100%;
+  }
+  .cuisine-dropdown-trigger:hover { border-color: #7367f0; }
+  .cuisine-dropdown-trigger.open { border-color: #7367f0; box-shadow: 0 0 0 3px rgba(115,103,240,.15); }
+  .cuisine-tags-area { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; align-items: center; min-height: 28px; }
+  .cuisine-placeholder { color: #9ea5b1; font-size: .92rem; display: flex; align-items: center; }
+  .cuisine-tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: #ede9ff; color: #5a50d6; border-radius: 20px;
+    padding: 3px 10px 3px 8px; font-size: .8rem; font-weight: 600; white-space: nowrap;
+  }
+  .cuisine-tag .tag-remove { cursor: pointer; color: #8b82e0; font-size: .75rem; margin-left: 2px; transition: color .15s; }
+  .cuisine-tag .tag-remove:hover { color: #dc3545; }
+  .cuisine-dropdown-arrow { font-size: .8rem; color: #9ea5b1; transition: transform .25s; flex-shrink: 0; }
+  .cuisine-dropdown-arrow.rotated { transform: rotate(180deg); }
+  .cuisine-dropdown-panel {
+    position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+    background: #fff; border: 1.5px solid #d5d9e0; border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0,0,0,.12); z-index: 1055; overflow: hidden;
+    animation: dropdownFade .18s ease;
+  }
+  .cuisine-search-wrap { display: flex; align-items: center; padding: 10px 14px; gap: 10px; background: #f8f7ff; }
+  .cuisine-search-icon { color: #9ea5b1; font-size: .9rem; flex-shrink: 0; }
+  .cuisine-search-input { border: none; outline: none; background: transparent; font-size: .9rem; width: 100%; color: #3a3a3a; }
+  .cuisine-search-input::placeholder { color: #b0b8c9; }
+  .cuisine-divider { height: 1px; background: #eeedf5; }
+  .cuisine-items-list { max-height: 240px; overflow-y: auto; padding: 6px 0; }
+  .cuisine-items-list::-webkit-scrollbar { width: 4px; }
+  .cuisine-items-list::-webkit-scrollbar-thumb { background: #d5d9e0; border-radius: 4px; }
+  .cuisine-item {
+    display: flex; align-items: center; gap: 10px; padding: 9px 16px;
+    cursor: pointer; margin: 0; font-weight: 400; transition: background .13s;
+  }
+  .cuisine-item:hover { background: #f4f2ff; }
+  .cuisine-item.selected { background: #ede9ff; }
+  .cuisine-item.selected:hover { background: #e4dfff; }
+  .cuisine-item input[type="radio"] { display: none; }
+  .cuisine-item-name { flex: 1; font-size: .9rem; color: #3a3a3a; }
+  .cuisine-item.selected .cuisine-item-name { color: #5a50d6; font-weight: 600; }
+  .cuisine-item-check { font-size: .8rem; color: #7367f0; display: none; }
+  .cuisine-item.selected .cuisine-item-check { display: block; }
+  .cuisine-no-results { padding: 16px; text-align: center; color: #9ea5b1; font-size: .88rem; }
+  .cuisine-panel-footer { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: #f8f7ff; }
+
   .amenity-dropdown-wrapper { position: relative; }
   .amenity-dropdown-trigger {
     display: flex; align-items: center; justify-content: space-between;
@@ -525,7 +688,7 @@
       };
       reader.readAsDataURL(file);
       const altWrap = document.createElement('div'); altWrap.className = 'mb-2';
-      altWrap.innerHTML = `<label class="form-label small">Alt Text for Image ${index+1} (SEO)</label><input type="text" class="form-control form-control-sm" name="gallery_alts[${index}]" placeholder="e.g. Hotel lobby interior view" />`;
+      altWrap.innerHTML = `<label class="form-label small">Alt Text for Image ${index+1} (SEO)</label><input type="text" class="form-control form-control-sm" name="gallery_alts[${index}]" />`;
       altFields.appendChild(altWrap);
     });
     if (files.length > 0) {
@@ -553,13 +716,13 @@
         <div id="amenity-modal-alert" class="d-none"></div>
         <div class="mb-3">
           <label class="form-label fw-semibold" for="new_amenity_name">Amenity Name <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" id="new_amenity_name" placeholder="e.g. Rooftop Pool" />
+          <input type="text" class="form-control" id="new_amenity_name" />
         </div>
         <div class="mb-3">
           <label class="form-label fw-semibold" for="new_amenity_icon">FontAwesome Icon Class</label>
           <div class="input-group">
             <span class="input-group-text"><i id="amenity-icon-preview" class="fas fa-star"></i></span>
-            <input type="text" class="form-control" id="new_amenity_icon" placeholder="e.g. fa-swimming-pool" value="fa-star" oninput="updateAmenityIconPreview(this.value)" />
+            <input type="text" class="form-control" id="new_amenity_icon" value="fa-star" oninput="updateAmenityIconPreview(this.value)" />
           </div>
           <div class="form-text">e.g. <code>fa-wifi</code>, <code>fa-dumbbell</code>, <code>fa-swimming-pool</code></div>
         </div>
@@ -604,7 +767,7 @@
           </div>
           <div class="mb-3">
             <label class="form-label fw-semibold">Question</label>
-            <input type="text" class="form-control" name="faqs[${faqIndex}][question]" required placeholder="e.g. What time is check-in?">
+            <input type="text" class="form-control" name="faqs[${faqIndex}][question]" required>
           </div>
           <div class="mb-2">
             <label class="form-label fw-semibold">Answer</label>
@@ -637,4 +800,220 @@
 </script>
 
 
+  {{-- ===== Add Category Modal ===== --}}
+  <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addCategoryModalLabel"><i class="fas fa-plus-circle me-2 text-primary"></i>Add New Category</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="category-modal-alert" class="d-none"></div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold" for="new_category_name">Category Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="new_category_name" onkeyup="document.getElementById('new_category_slug').value = this.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold" for="new_category_slug">Slug <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="new_category_slug" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="saveNewCategory()">
+            <span id="saveCategoryBtnText"><i class="fas fa-plus me-1"></i>Add Category</span>
+            <span id="saveCategoryBtnSpinner" class="d-none"><span class="spinner-border spinner-border-sm me-1"></span>Saving...</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function saveNewCategory() {
+      const name = document.getElementById('new_category_name').value.trim();
+      const slug = document.getElementById('new_category_slug').value.trim();
+      const alertBox = document.getElementById('category-modal-alert');
+      if (!name || !slug) { alertBox.className = 'alert alert-danger'; alertBox.textContent = 'Please enter name and slug.'; return; }
+      alertBox.className = 'd-none';
+      document.getElementById('saveCategoryBtnText').classList.add('d-none');
+      document.getElementById('saveCategoryBtnSpinner').classList.remove('d-none');
+      $.ajax({
+        url: '{{ route("hotel-categories.quick-store") }}', type: 'POST',
+        data: { _token: '{{ csrf_token() }}', name, slug, status: 1 },
+        success: function(response) {
+          if (response.success) {
+            const cat = response.category;
+            const list = document.getElementById('categoryItemsList');
+            const lbl = document.createElement('label');
+            lbl.className = 'cuisine-item';
+            lbl.id = 'cat-label-' + cat.id;
+            lbl.innerHTML = `
+              <input type="radio" name="_cat_radio" value="${cat.id}" id="cat_rb_${cat.id}" class="cat-rb d-none" data-name="${cat.name}" data-id="${cat.id}" onchange="onCategoryChange(this)" />
+              <span class="cuisine-item-name">${cat.name}</span>
+              <span class="cuisine-item-check"><i class="fas fa-check"></i></span>
+            `;
+            list.insertBefore(lbl, list.firstChild);
+            
+            const newRb = lbl.querySelector('input[type="radio"]');
+            newRb.checked = true;
+            onCategoryChange(newRb);
+
+            document.getElementById('new_category_name').value = '';
+            document.getElementById('new_category_slug').value = '';
+            alertBox.className = 'alert alert-success'; alertBox.textContent = 'Category added!';
+            bootstrap.Modal.getInstance(document.getElementById('addCategoryModal')).hide();
+          } else { alertBox.className = 'alert alert-danger'; alertBox.textContent = response.message || 'Failed.'; }
+        },
+        error: function(xhr) {
+          alertBox.className = 'alert alert-danger';
+          const errors = xhr.responseJSON?.errors;
+          alertBox.textContent = errors ? Object.values(errors).flat().join(' ') : 'An error occurred.';
+        },
+        complete: function() {
+          document.getElementById('saveCategoryBtnText').classList.remove('d-none');
+          document.getElementById('saveCategoryBtnSpinner').classList.add('d-none');
+        }
+      });
+    }
+
+    function toggleCategoryDropdown() {
+      const panel  = document.getElementById('categoryDropdownPanel');
+      const arrow  = document.getElementById('categoryArrow');
+      const isOpen = panel.style.display !== 'none';
+      panel.style.display = isOpen ? 'none' : 'block';
+      arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+      if (!isOpen) document.getElementById('categorySearchInput').focus();
+    }
+    function closeCategoryDropdown() {
+      const panel = document.getElementById('categoryDropdownPanel');
+      if(panel) { panel.style.display = 'none'; document.getElementById('categoryArrow').style.transform = 'rotate(0deg)'; }
+    }
+    function filterCategories(val) {
+      const term  = val.toLowerCase();
+      const items = document.querySelectorAll('#categoryItemsList .cuisine-item');
+      let   found = 0;
+      items.forEach(item => {
+        const name = item.querySelector('.cuisine-item-name').textContent.toLowerCase();
+        const show = name.includes(term);
+        item.style.display = show ? '' : 'none';
+        if (show) found++;
+      });
+      document.getElementById('categoryNoResults').classList.toggle('d-none', found > 0);
+    }
+    function onCategoryChange(rb) {
+      const id    = rb.dataset.id;
+      const name  = rb.dataset.name;
+      const hidden= document.getElementById('hotel_category_id');
+      const tags  = document.getElementById('categoryTagsArea');
+      const ph    = document.getElementById('categoryPlaceholder');
+
+      hidden.value = id;
+      document.querySelectorAll('#categoryItemsList .cuisine-item').forEach(l => l.classList.remove('selected'));
+      const label = document.getElementById('cat-label-' + id);
+      if(label) label.classList.add('selected');
+
+      ph.style.display = 'none';
+      let existing = tags.querySelector('.category-selected-text');
+      if (!existing) {
+        existing = document.createElement('span');
+        existing.className = 'category-selected-text';
+        existing.style.cssText = 'font-size:0.9rem; font-weight:500; color:#333;';
+        tags.insertBefore(existing, ph);
+      }
+      existing.textContent = name;
+      closeCategoryDropdown();
+    }
+
+    document.addEventListener('click', function(e) {
+      const wrapper = document.getElementById('categoryDropdownWrapper');
+      if (wrapper && !wrapper.contains(e.target)) closeCategoryDropdown();
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const preselectedCat = document.getElementById('hotel_category_id').value;
+      if (preselectedCat) {
+        const rb = document.getElementById('cat_rb_' + preselectedCat);
+        if (rb) { rb.checked = true; onCategoryChange(rb); }
+      }
+    });
+  </script>
+  <script>
+    function toggleCityDropdown() {
+      const panel  = document.getElementById('cityDropdownPanel');
+      const arrow  = document.getElementById('cityArrow');
+      const isOpen = panel.style.display !== 'none';
+      panel.style.display = isOpen ? 'none' : 'block';
+      arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+      if (!isOpen) document.getElementById('citySearchInput').focus();
+    }
+    function closeCityDropdown() {
+      const panel = document.getElementById('cityDropdownPanel');
+      if(panel) { panel.style.display = 'none'; document.getElementById('cityArrow').style.transform = 'rotate(0deg)'; }
+    }
+    function filterCities(val) {
+      const term  = val.toLowerCase();
+      const items = document.querySelectorAll('#cityItemsList .cuisine-item');
+      let   found = 0;
+      items.forEach(item => {
+        const name = item.querySelector('.cuisine-item-name').textContent.toLowerCase();
+        const show = name.includes(term);
+        item.style.display = show ? '' : 'none';
+        if (show) found++;
+      });
+      document.getElementById('cityNoResults').classList.toggle('d-none', found > 0);
+    }
+    function onCityChange(rb) {
+      const val   = rb.value;
+      const name  = rb.dataset.name;
+      const hidden= document.getElementById('city_hidden');
+      const tags  = document.getElementById('cityTagsArea');
+      const ph    = document.getElementById('cityPlaceholder');
+
+      hidden.value = val;
+      document.querySelectorAll('#cityItemsList .cuisine-item').forEach(l => l.classList.remove('selected'));
+      const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+      const label = document.getElementById('city-label-' + slug);
+      if(label) label.classList.add('selected');
+
+      ph.style.display = 'none';
+      let existing = tags.querySelector('.city-selected-text');
+      if (!existing) {
+        existing = document.createElement('span');
+        existing.className = 'city-selected-text';
+        existing.style.cssText = 'font-size:0.9rem; font-weight:500; color:#333;';
+        tags.insertBefore(existing, ph);
+      }
+      existing.textContent = name;
+      closeCityDropdown();
+    }
+
+    document.addEventListener('click', function(e) {
+      const wrapper = document.getElementById('cityDropdownWrapper');
+      if (wrapper && !wrapper.contains(e.target)) closeCityDropdown();
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const preselectedCity = document.getElementById('city_hidden').value;
+      if (preselectedCity) {
+        const slug = preselectedCity.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+        let rb = document.getElementById('city_rb_' + slug);
+        if (!rb) {
+          const list = document.getElementById('cityItemsList');
+          const lbl = document.createElement('label');
+          lbl.className = 'cuisine-item';
+          lbl.id = 'city-label-' + slug;
+          lbl.innerHTML = `
+            <input type="radio" name="_city_radio" value="${preselectedCity}" id="city_rb_${slug}" class="city-rb d-none" data-name="${preselectedCity}" onchange="onCityChange(this)" />
+            <span class="cuisine-item-name">${preselectedCity}</span>
+            <span class="cuisine-item-check"><i class="fas fa-check"></i></span>
+          `;
+          list.insertBefore(lbl, list.firstChild);
+          rb = lbl.querySelector('input[type="radio"]');
+        }
+        if (rb) { rb.checked = true; onCityChange(rb); }
+      }
+    });
+  </script>
 @endsection

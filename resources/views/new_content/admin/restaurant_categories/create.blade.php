@@ -3,6 +3,14 @@
 @section('title', 'Add Restaurant Category')
 
 @section('content')
+<nav aria-label="breadcrumb" class="mb-4">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="{{ route('restaurant-categories.index') }}">Restaurant Categories</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Add Restaurant Category</li>
+  </ol>
+</nav>
+
 <div class="card mb-4">
   <div class="card-header d-flex justify-content-between align-items-center">
     <h5 class="mb-0">Add Restaurant Category</h5>

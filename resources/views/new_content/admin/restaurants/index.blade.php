@@ -41,7 +41,7 @@
         @foreach($restaurants as $restaurant)
         <tr>
           <td>{{ $loop->iteration }}</td>
-          <td>{{ $restaurant->name }}</td>
+          <td><strong>{{ $restaurant->name }}</strong></td>
           <td>{{ $restaurant->category ? $restaurant->category->name : 'N/A' }}</td>
           <td>{{ $restaurant->city }}</td>
           <td>

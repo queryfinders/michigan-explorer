@@ -30,6 +30,18 @@ class HotelCategoryController extends Controller
         return redirect()->route('hotel-categories.index')->with('success', 'Category created successfully.');
     }
 
+    public function quickStore(\Illuminate\Http\Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255|unique:hotel_categories,name',
+            'slug' => 'required|string|max:255|unique:hotel_categories,slug',
+            'status' => 'boolean'
+        ]);
+
+        $category = \App\Models\HotelCategory::create($request->all());
+        return response()->json(['success' => true, 'category' => $category]);
+    }
+
     public function edit(\App\Models\HotelCategory $hotelCategory)
     {
         return view('new_content.admin.hotel_categories.edit', compact('hotelCategory'));

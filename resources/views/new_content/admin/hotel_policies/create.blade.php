@@ -5,7 +5,15 @@
 @section('content')
 <div class="row">
   <div class="col-md-12">
-    <div class="card mb-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="{{ route('hotel-policies.index') }}">Hotel Policies</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Add Hotel Policy</li>
+  </ol>
+</nav>
+
+<div class="card mb-4">
       <h5 class="card-header">Add Hotel Policy</h5>
       <div class="card-body">
         <form action="{{ route('hotel-policies.store') }}" method="POST">
