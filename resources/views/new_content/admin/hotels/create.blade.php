@@ -16,7 +16,7 @@
     <h5 class="mb-0">Add Hotel</h5>
   </div>
   <div class="card-body">
-    <form action="{{ route('hotels.store') }}" method="POST" enctype="multipart/form-data">
+    <form id="hotelCreateForm" action="{{ route('hotels.store') }}" method="POST" enctype="multipart/form-data">
       @csrf
 
       <!-- Tabs Navigation -->
@@ -48,7 +48,13 @@
         <div class="tab-pane fade show active" id="basic-pane" role="tabpanel" aria-labelledby="basic-tab">
           <div class="row">
             <div class="col-md-4 mb-3">
-              <label class="form-label fw-semibold" for="hotel_category_id">Category <span class="text-danger">*</span></label>
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label class="form-label fw-semibold mb-0" for="hotel_category_id">Category <span class="text-danger">*</span></label>
+                <button type="button" class="btn btn-sm btn-link p-0 text-primary fw-semibold"
+                        data-bs-toggle="modal" data-bs-target="#addCategoryModal" style="text-decoration: none; font-size: 0.85rem;">
+                  <i class="fas fa-plus-circle me-1"></i>Add Category
+                </button>
+              </div>
               {{-- Hidden input that holds the selected category id --}}
               <input type="hidden" name="hotel_category_id" id="hotel_category_id"
                      value="{{ old('hotel_category_id') }}" required />
@@ -130,39 +136,12 @@
           <div class="row">
             <div class="col-md-4 mb-3">
               <label class="form-label" for="city">City</label>
-              <input type="hidden" name="city" id="city_hidden" value="{{ old('city') }}" />
-              <div class="cuisine-dropdown-wrapper" id="cityDropdownWrapper">
-                <div class="cuisine-dropdown-trigger" id="cityTrigger" onclick="toggleCityDropdown()">
-                  <div class="cuisine-tags-area" id="cityTagsArea">
-                    <span class="cuisine-placeholder" id="cityPlaceholder">
-                      Click to select city...
-                    </span>
-                  </div>
-                  <div class="cuisine-dropdown-arrow" id="cityArrow">
-                    <i class="fas fa-chevron-down"></i>
-                  </div>
-                </div>
-                <div class="cuisine-dropdown-panel" id="cityDropdownPanel" style="display: none;">
-                  <div class="cuisine-search-wrap">
-                    <i class="fas fa-search cuisine-search-icon"></i>
-                    <input type="text" class="cuisine-search-input" id="citySearchInput" placeholder="Search city..." onkeyup="filterCities(this.value)">
-                  </div>
-                  <div class="cuisine-divider"></div>
-                  <div class="cuisine-items-list" id="cityItemsList">
-                    @foreach(config('michigan_cities') as $m_city)
-                      @php $m_city_slug = Str::slug($m_city); @endphp
-                      <label class="cuisine-item" id="city-label-{{ $m_city_slug }}">
-                        <input type="radio" name="_city_radio" value="{{ $m_city }}" id="city_rb_{{ $m_city_slug }}" class="city-rb d-none" data-name="{{ $m_city }}" onchange="onCityChange(this)" />
-                        <span class="cuisine-item-name">{{ $m_city }}</span>
-                        <span class="cuisine-item-check"><i class="fas fa-check"></i></span>
-                      </label>
-                    @endforeach
-                  </div>
-                  <div class="cuisine-no-results d-none" id="cityNoResults">
-                    No cities found.
-                  </div>
-                </div>
-              </div>
+              <select class="form-select select2" id="city" name="city">
+                <option value="">Select a city</option>
+                @foreach(config('michigan_cities') as $m_city)
+                  <option value="{{ $m_city }}" {{ old('city') == $m_city ? 'selected' : '' }}>{{ $m_city }}</option>
+                @endforeach
+              </select>
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="zip">Zip Code</label>
@@ -198,13 +177,9 @@
             </div>
           </div>
           <div class="row">
-            <div class="col-md-6 mb-3">
-              <label class="form-label" for="latitude">Latitude</label>
-              <input type="text" class="form-control" id="latitude" name="latitude" placeholder="e.g. 45.8500" />
-            </div>
-            <div class="col-md-6 mb-3">
-              <label class="form-label" for="longitude">Longitude</label>
-              <input type="text" class="form-control" id="longitude" name="longitude" placeholder="e.g. -84.6178" />
+            <div class="col-md-12 mb-3">
+              <label class="form-label" for="map_iframe">Google Maps Embed Code (Iframe Link)</label>
+              <textarea class="form-control" id="map_iframe" name="map_iframe" rows="1" placeholder="Paste the <iframe src='...'></iframe> embed code here">{{ old('map_iframe') }}</textarea>
             </div>
           </div>
 
@@ -796,6 +771,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js" referrerpolicy="origin"></script>
+
 <script>
   $(document).ready(function() {
     tinymce.init({
@@ -828,7 +804,7 @@ document.addEventListener('DOMContentLoaded', function() {
           </div>
           <div class="mb-2">
             <label class="form-label fw-semibold">Answer</label>
-            <textarea class="form-control tinymce-faq" id="faq_answer_${faqIndex}" name="faqs[${faqIndex}][answer]"></textarea>
+            <textarea class="form-control tinymce" id="faq_answer_${faqIndex}" name="faqs[${faqIndex}][answer]"></textarea>
           </div>
         </div>
       </div>
@@ -997,82 +973,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   </script>
   <script>
-    function toggleCityDropdown() {
-      const panel  = document.getElementById('cityDropdownPanel');
-      const arrow  = document.getElementById('cityArrow');
-      const isOpen = panel.style.display !== 'none';
-      panel.style.display = isOpen ? 'none' : 'block';
-      arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
-      if (!isOpen) document.getElementById('citySearchInput').focus();
-    }
-    function closeCityDropdown() {
-      const panel = document.getElementById('cityDropdownPanel');
-      if(panel) { panel.style.display = 'none'; document.getElementById('cityArrow').style.transform = 'rotate(0deg)'; }
-    }
-    function filterCities(val) {
-      const term  = val.toLowerCase();
-      const items = document.querySelectorAll('#cityItemsList .cuisine-item');
-      let   found = 0;
-      items.forEach(item => {
-        const name = item.querySelector('.cuisine-item-name').textContent.toLowerCase();
-        const show = name.includes(term);
-        item.style.display = show ? '' : 'none';
-        if (show) found++;
-      });
-      document.getElementById('cityNoResults').classList.toggle('d-none', found > 0);
-    }
-    function onCityChange(rb) {
-      const val   = rb.value;
-      const name  = rb.dataset.name;
-      const hidden= document.getElementById('city_hidden');
-      const tags  = document.getElementById('cityTagsArea');
-      const ph    = document.getElementById('cityPlaceholder');
-
-      hidden.value = val;
-      document.querySelectorAll('#cityItemsList .cuisine-item').forEach(l => l.classList.remove('selected'));
-      const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-      const label = document.getElementById('city-label-' + slug);
-      if(label) label.classList.add('selected');
-
-      ph.style.display = 'none';
-      let existing = tags.querySelector('.city-selected-text');
-      if (!existing) {
-        existing = document.createElement('span');
-        existing.className = 'city-selected-text';
-        existing.style.cssText = 'font-size:0.9rem; font-weight:500; color:#333;';
-        tags.insertBefore(existing, ph);
-      }
-      existing.textContent = name;
-      closeCityDropdown();
-    }
-
-    document.addEventListener('click', function(e) {
-      const wrapper = document.getElementById('cityDropdownWrapper');
-      if (wrapper && !wrapper.contains(e.target)) closeCityDropdown();
-    });
-
     document.addEventListener('DOMContentLoaded', function() {
-      const preselectedCity = document.getElementById('city_hidden').value;
-      if (preselectedCity) {
-        const slug = preselectedCity.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-        let rb = document.getElementById('city_rb_' + slug);
-        if (!rb) {
-          const list = document.getElementById('cityItemsList');
-          const lbl = document.createElement('label');
-          lbl.className = 'cuisine-item';
-          lbl.id = 'city-label-' + slug;
-          lbl.innerHTML = `
-            <input type="radio" name="_city_radio" value="${preselectedCity}" id="city_rb_${slug}" class="city-rb d-none" data-name="${preselectedCity}" onchange="onCityChange(this)" />
-            <span class="cuisine-item-name">${preselectedCity}</span>
-            <span class="cuisine-item-check"><i class="fas fa-check"></i></span>
-          `;
-          list.insertBefore(lbl, list.firstChild);
-          rb = lbl.querySelector('input[type="radio"]');
-        }
-        if (rb) { rb.checked = true; onCityChange(rb); }
-      }
-    });
-          document.addEventListener('DOMContentLoaded', function() {
 // Icon Picker Search (Amenity)
       const amenityIconSearch = document.getElementById('amenityIconSearch');
       if (amenityIconSearch) {
@@ -1370,6 +1271,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     updateCount('meta_description', 'meta_desc_count');
     updateCount('og_description', 'og_desc_count');
+
+    // Trigger TinyMCE save on submit
+    const form = document.getElementById('hotelCreateForm');
+    if (form) {
+        form.addEventListener('submit', function() {
+            if (typeof tinymce !== 'undefined') {
+                tinymce.triggerSave();
+            }
+        });
+    }
 });
 </script>
 

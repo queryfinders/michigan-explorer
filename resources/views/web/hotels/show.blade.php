@@ -303,14 +303,22 @@
             <p class="text-muted mb-3"><i class="fas fa-map-marker-alt text-primary me-2"></i> {{ $hotel->address ?? 'Main Street' }}, {{ $hotel->city ?? 'Mackinac Island' }}, {{ $hotel->state ?? 'MI' }}</p>
             <div class="map-container bg-light h-500px">
                 <!-- Google Maps Iframe Placeholder -->
-                <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q={{ $hotel->latitude && $hotel->longitude ? $hotel->latitude . ',' . $hotel->longitude : urlencode(($hotel->address ?? 'Main Street') . ' ' . ($hotel->city ?? 'Mackinac Island')) }}&t=&z=13&ie=UTF8&iwloc=&output=embed"></iframe>
+                @if(!empty($hotel->map_iframe))
+                    @if(str_contains($hotel->map_iframe, '<iframe'))
+                        {!! $hotel->map_iframe !!}
+                    @else
+                        <iframe width="100%" height="100%" frameborder="0" style="border:0;" src="{{ $hotel->map_iframe }}"></iframe>
+                    @endif
+                @else
+                    <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q={{ urlencode(($hotel->address ?? 'Main Street') . ' ' . ($hotel->city ?? 'Mackinac Island')) }}&t=&z=13&ie=UTF8&iwloc=&output=embed"></iframe>
+                @endif
             </div>
             <div class="d-flex justify-content-between align-items-center mt-3">
                 <div>
                     <h6 class="fw-bold mb-1">Contact Info</h6>
                     <p class="mb-0 text-muted small"><i class="fas fa-phone-alt me-2"></i> {{ $hotel->phone ?? '(555) 123-4567' }}</p>
                 </div>
-                <a href="https://maps.google.com/?q={{ $hotel->latitude && $hotel->longitude ? $hotel->latitude . ',' . $hotel->longitude : urlencode(($hotel->address ?? 'Main Street') . ' ' . ($hotel->city ?? 'Mackinac Island')) }}" target="_blank" class="btn btn-outline-primary rounded-pill px-4">Get Directions</a>
+                <a href="https://maps.google.com/?q={{ urlencode(($hotel->address ?? 'Main Street') . ' ' . ($hotel->city ?? 'Mackinac Island')) }}" target="_blank" class="btn btn-outline-primary rounded-pill px-4">Get Directions</a>
             </div>
         </div>
 
@@ -511,14 +519,7 @@
         }
     });
 
-    // Auto-open video popup on page load if video is present
-    document.addEventListener('DOMContentLoaded', function() {
-        @if(!empty($hotel->video))
-            setTimeout(() => {
-                openCustomGallery(0);
-            }, 600);
-        @endif
-    });
+
 </script>
 
 @endsection

@@ -38,8 +38,7 @@ class HotelController extends Controller
             'email'                 => 'nullable|email',
             'website'               => 'nullable|url',
             'affiliate_url'         => 'nullable|url',
-            'latitude'              => 'nullable|numeric',
-            'longitude'             => 'nullable|numeric',
+            'map_iframe'            => 'nullable|string',
             'amenities'             => 'nullable|array',
             'booking_features'      => 'nullable|array',
             'hotel_policies'        => 'nullable|array',
@@ -167,17 +166,17 @@ class HotelController extends Controller
             'email'                 => 'nullable|email',
             'website'               => 'nullable|url',
             'affiliate_url'         => 'nullable|url',
-            'latitude'              => 'nullable|numeric',
-            'longitude'             => 'nullable|numeric',
+            'map_iframe'            => 'nullable|string',
             'amenities'             => 'nullable|array',
             'booking_features'      => 'nullable|array',
             'hotel_policies'        => 'nullable|array',
-            'gallery_images.*'      => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
-            'gallery_alts.*'        => 'nullable|string|max:255',
-            'delete_gallery_ids'    => 'nullable|array',
+            'gallery_images.*'          => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
+            'gallery_alts.*'            => 'nullable|string|max:255',
+            'delete_gallery_ids'        => 'nullable|array',
+            'existing_gallery_alts.*'   => 'nullable|string|max:255',
         ]);
 
-        $data = $request->except('_token', '_method', 'featured_image_file', 'video_file', 'video_url', 'delete_video', 'meta_title', 'meta_description', 'og_title', 'og_description', 'schema_markup', 'amenities', 'booking_features', 'hotel_policies', 'gallery_images', 'gallery_alts', 'delete_gallery_ids', 'faqs');
+        $data = $request->except('_token', '_method', 'featured_image_file', 'video_file', 'video_url', 'delete_video', 'meta_title', 'meta_description', 'og_title', 'og_description', 'schema_markup', 'amenities', 'booking_features', 'hotel_policies', 'gallery_images', 'gallery_alts', 'delete_gallery_ids', 'existing_gallery_alts', 'faqs');
         $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
 
         if ($request->hasFile('featured_image_file')) {
@@ -231,6 +230,16 @@ class HotelController extends Controller
                 if ($img && $img->hotel_id == $hotel->id) {
                     \Illuminate\Support\Facades\Storage::disk('public')->delete(str_replace('storage/', '', $img->image));
                     $img->delete();
+                }
+            }
+        }
+
+        // Update alt text for existing gallery images
+        if ($request->filled('existing_gallery_alts')) {
+            foreach ($request->input('existing_gallery_alts') as $imgId => $altText) {
+                $img = \App\Models\HotelImage::find($imgId);
+                if ($img && $img->hotel_id == $hotel->id) {
+                    $img->update(['alt_text' => $altText]);
                 }
             }
         }

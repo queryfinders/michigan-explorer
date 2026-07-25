@@ -49,7 +49,13 @@
         <div class="tab-pane fade show active" id="basic-pane" role="tabpanel" aria-labelledby="basic-tab">
           <div class="row">
             <div class="col-md-4 mb-3">
-              <label class="form-label fw-semibold" for="restaurant_category_id">Category <span class="text-danger">*</span></label>
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label class="form-label fw-semibold mb-0" for="restaurant_category_id">Category <span class="text-danger">*</span></label>
+                <button type="button" class="btn btn-sm btn-link p-0 text-primary fw-semibold"
+                        data-bs-toggle="modal" data-bs-target="#addCategoryModal" style="text-decoration: none; font-size: 0.85rem;">
+                  <i class="fas fa-plus-circle me-1"></i>Add Category
+                </button>
+              </div>
               <input type="hidden" name="restaurant_category_id" id="restaurant_category_id"
                      value="{{ old('restaurant_category_id', $restaurant->restaurant_category_id) }}" required />
               @error('restaurant_category_id') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
@@ -932,6 +938,36 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 </script>
 
+{{-- ===== Add Category Modal ===== --}}
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addCategoryModalLabel"><i class="fas fa-plus-circle me-2 text-primary"></i>Add New Category</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="category-modal-alert" class="d-none"></div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="new_category_name">Category Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="new_category_name" onkeyup="document.getElementById('new_category_slug').value = this.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="new_category_slug">Slug <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="new_category_slug" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="saveNewCategory()">
+          <span id="saveCategoryBtnText"><i class="fas fa-plus me-1"></i>Add Category</span>
+          <span id="saveCategoryBtnSpinner" class="d-none"><span class="spinner-border spinner-border-sm me-1"></span>Saving...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {{-- ===== Add Cuisine Modal ===== --}}
 <div class="modal fade" id="addCuisineModal" tabindex="-1" aria-labelledby="addCuisineModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -1069,6 +1105,53 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     existing.textContent = name;
     closeCategoryDropdown();
+  }
+
+  function saveNewCategory() {
+    const name = document.getElementById('new_category_name').value.trim();
+    const slug = document.getElementById('new_category_slug').value.trim();
+    const alertBox = document.getElementById('category-modal-alert');
+    if (!name || !slug) { alertBox.className = 'alert alert-danger'; alertBox.textContent = 'Please enter name and slug.'; return; }
+    alertBox.className = 'd-none';
+    document.getElementById('saveCategoryBtnText').classList.add('d-none');
+    document.getElementById('saveCategoryBtnSpinner').classList.remove('d-none');
+    $.ajax({
+      url: '{{ route("restaurant-categories.quick-store") }}', type: 'POST',
+      data: { _token: '{{ csrf_token() }}', name, slug, status: 1 },
+      success: function(response) {
+        if (response.success) {
+          const cat = response.category;
+          const list = document.getElementById('categoryItemsList');
+          const lbl = document.createElement('label');
+          lbl.className = 'cuisine-item';
+          lbl.id = 'cat-label-' + cat.id;
+          lbl.innerHTML = `
+            <input type="radio" name="_cat_radio" value="${cat.id}" id="cat_rb_${cat.id}" class="cat-rb d-none" data-name="${cat.name}" data-id="${cat.id}" onchange="onCategoryChange(this)" />
+            <span class="cuisine-item-name">${cat.name}</span>
+            <span class="cuisine-item-check"><i class="fas fa-check"></i></span>
+          `;
+          list.insertBefore(lbl, list.firstChild);
+          
+          const newRb = lbl.querySelector('input[type="radio"]');
+          newRb.checked = true;
+          onCategoryChange(newRb);
+
+          document.getElementById('new_category_name').value = '';
+          document.getElementById('new_category_slug').value = '';
+          alertBox.className = 'alert alert-success'; alertBox.textContent = 'Category added!';
+          bootstrap.Modal.getInstance(document.getElementById('addCategoryModal')).hide();
+        } else { alertBox.className = 'alert alert-danger'; alertBox.textContent = response.message || 'Failed.'; }
+      },
+      error: function(xhr) {
+        alertBox.className = 'alert alert-danger';
+        const errors = xhr.responseJSON?.errors;
+        alertBox.textContent = errors ? Object.values(errors).flat().join(' ') : 'An error occurred.';
+      },
+      complete: function() {
+        document.getElementById('saveCategoryBtnText').classList.remove('d-none');
+        document.getElementById('saveCategoryBtnSpinner').classList.add('d-none');
+      }
+    });
   }
 
   // Opening Hours JavaScript

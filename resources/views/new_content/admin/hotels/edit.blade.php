@@ -46,7 +46,7 @@
     <h5 class="mb-0">Edit Hotel</h5>
   </div>
   <div class="card-body">
-    <form action="{{ route('hotels.update', $hotel->id) }}" method="POST" enctype="multipart/form-data">
+    <form id="hotelEditForm" action="{{ route('hotels.update', $hotel->id) }}" method="POST" enctype="multipart/form-data">
       @csrf
       @method('PUT')
 
@@ -79,7 +79,13 @@
         <div class="tab-pane fade show active" id="basic-pane" role="tabpanel" aria-labelledby="basic-tab">
           <div class="row">
             <div class="col-md-4 mb-3">
-              <label class="form-label fw-semibold" for="hotel_category_id">Category <span class="text-danger">*</span></label>
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label class="form-label fw-semibold mb-0" for="hotel_category_id">Category <span class="text-danger">*</span></label>
+                <button type="button" class="btn btn-sm btn-link p-0 text-primary fw-semibold"
+                        data-bs-toggle="modal" data-bs-target="#addCategoryModal" style="text-decoration: none; font-size: 0.85rem;">
+                  <i class="fas fa-plus-circle me-1"></i>Add Category
+                </button>
+              </div>
               {{-- Hidden input that holds the selected category id --}}
               <input type="hidden" name="hotel_category_id" id="hotel_category_id"
                      value="{{ old('hotel_category_id', $hotel->hotel_category_id) }}" required />
@@ -128,15 +134,18 @@
                   </div>
                 </div>
               </div>
+              <div class="text-danger small mt-1 d-none" id="category-error-msg">The category field is required.</div>
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="name">Name <span class="text-danger">*</span></label>
-              <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') ?? $hotel->name }}" required placeholder="e.g. The Grand Hotel" />
+              <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') ?? $hotel->name }}"  placeholder="e.g. The Grand Hotel" />
+              <div class="invalid-feedback">The name field is required.</div>
               @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="slug">Slug <span class="text-danger">*</span></label>
-              <input type="text" class="form-control @error('slug') is-invalid @enderror" id="slug" name="slug" value="{{ old('slug') ?? $hotel->slug }}" required placeholder="e.g. the-grand-hotel" />
+              <input type="text" class="form-control @error('slug') is-invalid @enderror" id="slug" name="slug" value="{{ old('slug') ?? $hotel->slug }}"    placeholder="e.g. the-grand-hotel" />
+              <div class="invalid-feedback">The slug field is required.</div>
               @error('slug') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
           </div>
@@ -162,39 +171,12 @@
           <div class="row">
             <div class="col-md-4 mb-3">
               <label class="form-label" for="city">City</label>
-              <input type="hidden" name="city" id="city_hidden" value="{{ old('city', $hotel->city) }}" />
-              <div class="cuisine-dropdown-wrapper" id="cityDropdownWrapper">
-                <div class="cuisine-dropdown-trigger" id="cityTrigger" onclick="toggleCityDropdown()">
-                  <div class="cuisine-tags-area" id="cityTagsArea">
-                    <span class="cuisine-placeholder" id="cityPlaceholder">
-                      Click to select city...
-                    </span>
-                  </div>
-                  <div class="cuisine-dropdown-arrow" id="cityArrow">
-                    <i class="fas fa-chevron-down"></i>
-                  </div>
-                </div>
-                <div class="cuisine-dropdown-panel" id="cityDropdownPanel" style="display: none;">
-                  <div class="cuisine-search-wrap">
-                    <i class="fas fa-search cuisine-search-icon"></i>
-                    <input type="text" class="cuisine-search-input" id="citySearchInput" placeholder="Search city..." onkeyup="filterCities(this.value)">
-                  </div>
-                  <div class="cuisine-divider"></div>
-                  <div class="cuisine-items-list" id="cityItemsList">
-                    @foreach(config('michigan_cities') as $m_city)
-                      @php $m_city_slug = Str::slug($m_city); @endphp
-                      <label class="cuisine-item" id="city-label-{{ $m_city_slug }}">
-                        <input type="radio" name="_city_radio" value="{{ $m_city }}" id="city_rb_{{ $m_city_slug }}" class="city-rb d-none" data-name="{{ $m_city }}" onchange="onCityChange(this)" />
-                        <span class="cuisine-item-name">{{ $m_city }}</span>
-                        <span class="cuisine-item-check"><i class="fas fa-check"></i></span>
-                      </label>
-                    @endforeach
-                  </div>
-                  <div class="cuisine-no-results d-none" id="cityNoResults">
-                    No cities found.
-                  </div>
-                </div>
-              </div>
+              <select class="form-select select2" id="city" name="city">
+                <option value="">Select a city</option>
+                @foreach(config('michigan_cities') as $m_city)
+                  <option value="{{ $m_city }}" {{ old('city', $hotel->city) == $m_city ? 'selected' : '' }}>{{ $m_city }}</option>
+                @endforeach
+              </select>
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="zip">Zip Code</label>
@@ -214,10 +196,10 @@
               <label class="form-label" for="email">Email</label>
               <input type="email" class="form-control" id="email" name="email" value="{{ $hotel->email }}" placeholder="e.g. info@example.com" />
             </div>
-            <div class="col-md-4 mb-3">
+            <!-- <div class="col-md-4 mb-3">
               <label class="form-label" for="website">Website URL</label>
               <input type="url" class="form-control" id="website" name="website" value="{{ $hotel->website }}" placeholder="e.g. https://www.example.com" />
-            </div>
+            </div> -->
           </div>
           <div class="row">
             <div class="col-md-6 mb-3">
@@ -230,13 +212,9 @@
             </div>
           </div>
           <div class="row">
-            <div class="col-md-6 mb-3">
-              <label class="form-label" for="latitude">Latitude</label>
-              <input type="text" class="form-control" id="latitude" name="latitude" value="{{ $hotel->latitude }}" placeholder="e.g. 45.8500" />
-            </div>
-            <div class="col-md-6 mb-3">
-              <label class="form-label" for="longitude">Longitude</label>
-              <input type="text" class="form-control" id="longitude" name="longitude" value="{{ $hotel->longitude }}" placeholder="e.g. -84.6178" />
+            <div class="col-md-12 mb-3">
+              <label class="form-label" for="map_iframe">Google Maps Embed Code (Iframe Link)</label>
+              <textarea class="form-control" id="map_iframe" name="map_iframe" rows="1" placeholder="Paste the <iframe src='...'></iframe> embed code here">{{ old('map_iframe', $hotel->map_iframe) }}</textarea>
             </div>
           </div>
           <div class="mb-3 mt-3">
@@ -504,7 +482,12 @@
                 <div class="card border position-relative">
                   <img src="{{ asset($img->image) }}" alt="{{ $img->alt_text ?? 'Gallery' }}" class="card-img-top" style="height:140px;object-fit:cover;" />
                   <div class="card-body p-2">
-                    <small class="text-muted">{{ $img->alt_text ?: 'No alt text' }}</small>
+                    <label class="form-label small text-muted mb-1" style="font-size:0.75rem;"><i class="fas fa-tag me-1"></i>Alt Text (SEO)</label>
+                    <input type="text"
+                           class="form-control form-control-sm"
+                           name="existing_gallery_alts[{{ $img->id }}]"
+                           value="{{ $img->alt_text }}"
+                           placeholder="e.g. Hotel lobby view..." />
                   </div>
                   <div class="position-absolute top-0 end-0 m-1">
                     <input type="checkbox" name="delete_gallery_ids[]" value="{{ $img->id }}" id="del_img_{{ $img->id }}" class="form-check-input gallery-delete-cb" onchange="toggleDeleteOverlay(this, {{ $img->id }})" />
@@ -579,7 +562,7 @@
                 </div>
                 <div class="mb-2">
                   <label class="form-label fw-semibold">Answer</label>
-                  <textarea class="form-control tinymce-faq" id="faq_answer_{{ $index }}" name="faqs[{{ $index }}][answer]">{{ $faq->answer }}</textarea>
+                  <textarea class="form-control tinymce" id="faq_answer_{{ $index }}" name="faqs[{{ $index }}][answer]">{{ $faq->answer }}</textarea>
                 </div>
               </div>
             </div>
@@ -629,6 +612,20 @@
               </div>
             </div>
           </div>
+          <input type="hidden" id="new_bf_icon" value="fas fa-check">
+          <div class="form-text">Search and select an icon for the booking feature.</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="saveNewBookingFeature()">
+          <span id="saveBfBtnText">Save Feature</span>
+          <div id="saveBfBtnSpinner" class="spinner-border spinner-border-sm d-none" role="status"></div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="modal fade" id="addHotelPolicyModal" tabindex="-1" aria-labelledby="addHotelPolicyModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -660,6 +657,7 @@
       </div>
     </div>
   </div>
+</div>
 
 <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -686,8 +684,9 @@
             <span id="saveCategoryBtnSpinner" class="d-none"><span class="spinner-border spinner-border-sm me-1"></span>Saving...</span>
           </button>
         </div>
-      </div>
     </div>
+  </div>
+</div>
 
 
 <script>
@@ -734,8 +733,6 @@ document.addEventListener('DOMContentLoaded', function() {
           });
       });
       });
-
-    });
 </script>
 
 
@@ -757,9 +754,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-@endsection
-
-@section('page-script')
 <style>
   /* Cuisines dropdown styles */
   .cuisine-dropdown-wrapper { position: relative; width: 100%; }
@@ -1179,7 +1173,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // Init: render pre-checked tags on page load
   document.addEventListener('DOMContentLoaded', function() { renderAmenityTags(); });
 </script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js" referrerpolicy="origin"></script>
 <script>
   $(document).ready(function() {
@@ -1188,17 +1181,6 @@ document.addEventListener('DOMContentLoaded', function() {
       plugins: 'advlist autolink lists link image charmap preview anchor pagebreak',
       toolbar_mode: 'floating',
       height: 300,
-      setup: function (editor) {
-        editor.on('change', function () {
-          editor.save();
-        });
-      }
-    });
-    tinymce.init({
-      selector: 'textarea.tinymce-faq',
-      plugins: 'advlist autolink lists link image charmap preview anchor pagebreak',
-      toolbar_mode: 'floating',
-      height: 200,
       setup: function (editor) {
         editor.on('change', function () {
           editor.save();
@@ -1224,7 +1206,7 @@ document.addEventListener('DOMContentLoaded', function() {
           </div>
           <div class="mb-2">
             <label class="form-label fw-semibold">Answer</label>
-            <textarea class="form-control tinymce-faq" id="faq_answer_${faqIndex}" name="faqs[${faqIndex}][answer]"></textarea>
+            <textarea class="form-control tinymce" id="faq_answer_${faqIndex}" name="faqs[${faqIndex}][answer]"></textarea>
           </div>
         </div>
       </div>
@@ -1299,20 +1281,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" id="saveAmenityBtn" onclick="saveNewAmenity()">
-          <span id="saveAmenityBtnText"><i class="fas fa-plus me-1"></i>Add Amenity</span>
-          <span id="saveAmenityBtnSpinner" class="d-none"><span class="spinner-border spinner-border-sm me-1"></span>Saving...</span>
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
   {{-- ===== Add Category Modal ===== --}}
-  
-  </div>
 
   <script>
     function saveNewCategory() {
@@ -1408,6 +1377,16 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       existing.textContent = name;
       closeCategoryDropdown();
+
+      // Clear validation styling
+      const categoryTrigger = document.getElementById('categoryTrigger');
+      if (categoryTrigger) {
+        categoryTrigger.style.borderColor = '';
+      }
+      const categoryError = document.getElementById('category-error-msg');
+      if (categoryError) {
+        categoryError.classList.add('d-none');
+      }
     }
 
     document.addEventListener('click', function(e) {
@@ -1424,242 +1403,130 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   </script>
   <script>
-    function toggleCityDropdown() {
-      const panel  = document.getElementById('cityDropdownPanel');
-      const arrow  = document.getElementById('cityArrow');
-      const isOpen = panel.style.display !== 'none';
-      panel.style.display = isOpen ? 'none' : 'block';
-      arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
-      if (!isOpen) document.getElementById('citySearchInput').focus();
-    }
-    function closeCityDropdown() {
-      const panel = document.getElementById('cityDropdownPanel');
-      if(panel) { panel.style.display = 'none'; document.getElementById('cityArrow').style.transform = 'rotate(0deg)'; }
-    }
-    function filterCities(val) {
-      const term  = val.toLowerCase();
-      const items = document.querySelectorAll('#cityItemsList .cuisine-item');
-      let   found = 0;
-      items.forEach(item => {
-        const name = item.querySelector('.cuisine-item-name').textContent.toLowerCase();
-        const show = name.includes(term);
-        item.style.display = show ? '' : 'none';
-        if (show) found++;
-      });
-      document.getElementById('cityNoResults').classList.toggle('d-none', found > 0);
-    }
-    function onCityChange(rb) {
-      const val   = rb.value;
-      const name  = rb.dataset.name;
-      const hidden= document.getElementById('city_hidden');
-      const tags  = document.getElementById('cityTagsArea');
-      const ph    = document.getElementById('cityPlaceholder');
-
-      hidden.value = val;
-      document.querySelectorAll('#cityItemsList .cuisine-item').forEach(l => l.classList.remove('selected'));
-      const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-      const label = document.getElementById('city-label-' + slug);
-      if(label) label.classList.add('selected');
-
-      ph.style.display = 'none';
-      let existing = tags.querySelector('.city-selected-text');
-      if (!existing) {
-        existing = document.createElement('span');
-        existing.className = 'city-selected-text';
-        existing.style.cssText = 'font-size:0.9rem; font-weight:500; color:#333;';
-        tags.insertBefore(existing, ph);
-      }
-      existing.textContent = name;
-      closeCityDropdown();
-    }
-
-    document.addEventListener('click', function(e) {
-      const wrapper = document.getElementById('cityDropdownWrapper');
-      if (wrapper && !wrapper.contains(e.target)) closeCityDropdown();
-    });
-
     document.addEventListener('DOMContentLoaded', function() {
-      const preselectedCity = document.getElementById('city_hidden').value;
-      if (preselectedCity) {
-        const slug = preselectedCity.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-        let rb = document.getElementById('city_rb_' + slug);
-        if (!rb) {
-          const list = document.getElementById('cityItemsList');
-          const lbl = document.createElement('label');
-          lbl.className = 'cuisine-item';
-          lbl.id = 'city-label-' + slug;
-          lbl.innerHTML = `
-            <input type="radio" name="_city_radio" value="${preselectedCity}" id="city_rb_${slug}" class="city-rb d-none" data-name="${preselectedCity}" onchange="onCityChange(this)" />
-            <span class="cuisine-item-name">${preselectedCity}</span>
-            <span class="cuisine-item-check"><i class="fas fa-check"></i></span>
-          `;
-          list.insertBefore(lbl, list.firstChild);
-          rb = lbl.querySelector('input[type="radio"]');
+
+      // Real-time input validation clear
+      const nameInput = document.getElementById('name');
+      const slugInput = document.getElementById('slug');
+      if (nameInput) {
+        nameInput.addEventListener('input', function() {
+          if (this.value.trim()) {
+            this.classList.remove('is-invalid');
+          }
+        });
+      }
+      if (slugInput) {
+        slugInput.addEventListener('input', function() {
+          if (this.value.trim()) {
+            this.classList.remove('is-invalid');
+          }
+        });
+      }
+
+      // Helper function to validate Basic Info fields
+      function validateBasicInfo() {
+        const categoryInput = document.getElementById('hotel_category_id');
+        const nameInput = document.getElementById('name');
+        const slugInput = document.getElementById('slug');
+        
+        let isValid = true;
+        
+        // Check Category
+        if (!categoryInput || !categoryInput.value.trim()) {
+          isValid = false;
+          const categoryTrigger = document.getElementById('categoryTrigger');
+          if (categoryTrigger) {
+            categoryTrigger.style.borderColor = '#ff3e1d';
+          }
+          const categoryError = document.getElementById('category-error-msg');
+          if (categoryError) {
+            categoryError.classList.remove('d-none');
+          }
+        } else {
+          const categoryTrigger = document.getElementById('categoryTrigger');
+          if (categoryTrigger) {
+            categoryTrigger.style.borderColor = '';
+          }
+          const categoryError = document.getElementById('category-error-msg');
+          if (categoryError) {
+            categoryError.classList.add('d-none');
+          }
         }
-        if (rb) { rb.checked = true; onCityChange(rb); }
+        
+        // Check Name
+        if (!nameInput || !nameInput.value.trim()) {
+          isValid = false;
+          if (nameInput) nameInput.classList.add('is-invalid');
+        } else {
+          if (nameInput) nameInput.classList.remove('is-invalid');
+        }
+        
+        // Check Slug
+        if (!slugInput || !slugInput.value.trim()) {
+          isValid = false;
+          if (slugInput) slugInput.classList.add('is-invalid');
+        } else {
+          if (slugInput) slugInput.classList.remove('is-invalid');
+        }
+        
+        return isValid;
+      }
+
+      // Tab navigation validation for Basic Info required fields
+      const triggerTabList = document.querySelectorAll('#hotelFormTabs button');
+      triggerTabList.forEach(triggerEl => {
+        triggerEl.addEventListener('show.bs.tab', function(event) {
+          if (event.target.id !== 'basic-tab') {
+            const isValid = validateBasicInfo();
+            if (!isValid) {
+              event.preventDefault(); // Prevent navigating to the clicked tab
+              
+              // Focus on the first empty required input
+              const nameInput = document.getElementById('name');
+              const slugInput = document.getElementById('slug');
+              if (nameInput && !nameInput.value.trim()) {
+                nameInput.focus();
+              } else if (slugInput && !slugInput.value.trim()) {
+                slugInput.focus();
+              }
+            }
+          }
+        });
+      });
+
+      // Form submission validation
+      const form = document.getElementById('hotelEditForm');
+      if (form) {
+        form.addEventListener('submit', function(event) {
+          if (typeof tinymce !== 'undefined') {
+            tinymce.triggerSave();
+          }
+          const isValid = validateBasicInfo();
+          if (!isValid) {
+            event.preventDefault(); // Prevent form submission
+            
+            // Switch back to Basic Info tab if not active
+            const basicTab = document.getElementById('basic-tab');
+            if (basicTab && !basicTab.classList.contains('active')) {
+              const tab = new bootstrap.Tab(basicTab);
+              tab.show();
+            }
+            
+            // Focus on first invalid field
+            setTimeout(() => {
+              const nameInput = document.getElementById('name');
+              const slugInput = document.getElementById('slug');
+              if (nameInput && !nameInput.value.trim()) {
+                nameInput.focus();
+              } else if (slugInput && !slugInput.value.trim()) {
+                slugInput.focus();
+              }
+            }, 250);
+          }
+        });
       }
     });
   </script>
-
-<div class="modal fade" id="addBookingFeatureModal" tabindex="-1" aria-labelledby="addBookingFeatureModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="addBookingFeatureModalLabel"><i class="fas fa-plus-circle me-2 text-primary"></i>Add New Booking Feature</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div id="bf-modal-alert" class="d-none"></div>
-        <div class="mb-3">
-          <label class="form-label fw-semibold" for="new_bf_name">Feature Name <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" id="new_bf_name" />
-        </div>
-        <div class="mb-3">
-          <label class="form-label fw-semibold" for="new_bf_icon">Icon</label>
-          <div class="dropdown">
-            <button class="btn btn-outline-secondary w-100 text-start d-flex justify-content-between align-items-center" type="button" id="bfIconDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false" style="background: #fff; border: 1px solid #d9dee3; padding: 8px 12px; height: 38px;">
-              <span><i id="bf_selected_icon_display" class="fas fa-check me-2"></i> <span id="bf_selected_icon_text">fas fa-check</span></span>
-              <i class="fas fa-chevron-down text-muted"></i>
-            </button>
-            <div class="dropdown-menu w-100 p-3" aria-labelledby="bfIconDropdownBtn">
-              <input type="text" class="form-control mb-3" id="bfIconSearch" placeholder="Search icons...">
-              <div class="d-flex flex-wrap gap-2 icon-picker-grid" id="bfIconGrid" style="max-height: 200px; overflow-y: auto;">
-                @foreach($popularBfIcons as $ic)
-                  <div class="icon-option bf-icon-option p-2 border rounded cursor-pointer text-center" data-icon="{{ $ic }}" style="width: 45px; height: 45px; display:flex; align-items:center; justify-content:center; cursor: pointer;" title="{{ $ic }}">
-                    <i class="{{ $ic }} fs-5"></i>
-                  </div>
-                @endforeach
-              </div>
-            </div>
-          </div>
-
-<div class="modal fade" id="addHotelPolicyModal" tabindex="-1" aria-labelledby="addHotelPolicyModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="addHotelPolicyModalLabel"><i class="fas fa-plus-circle me-2 text-primary"></i>Add New Hotel Policy</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div id="policy-modal-alert" class="d-none"></div>
-        <div class="mb-3">
-          <label class="form-label fw-semibold" for="new_policy_name">Policy Name <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" id="new_policy_name" placeholder="e.g. Breakfast Schedule" />
-        </div>
-        <div class="mb-3">
-          <label class="form-label fw-semibold" for="new_policy_type">Input Type</label>
-          <select class="form-select" id="new_policy_type">
-            <option value="textarea">Large Text Area (Multiple Lines)</option>
-            <option value="text">Single Line Text</option>
-          </select>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" onclick="saveNewHotelPolicy()">
-          <span id="savePolicyBtnText">Save Policy</span>
-          <div id="savePolicyBtnSpinner" class="spinner-border spinner-border-sm d-none" role="status"></div>
-        </button>
-      </div>
-    </div>
-  </div>
-
-<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addCategoryModalLabel"><i class="fas fa-plus-circle me-2 text-primary"></i>Add New Category</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div id="category-modal-alert" class="d-none"></div>
-          <div class="mb-3">
-            <label class="form-label fw-semibold" for="new_category_name">Category Name <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="new_category_name" onkeyup="document.getElementById('new_category_slug').value = this.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')" />
-          </div>
-          <div class="mb-3">
-            <label class="form-label fw-semibold" for="new_category_slug">Slug <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="new_category_slug" />
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-primary" onclick="saveNewCategory()">
-            <span id="saveCategoryBtnText"><i class="fas fa-plus me-1"></i>Add Category</span>
-            <span id="saveCategoryBtnSpinner" class="d-none"><span class="spinner-border spinner-border-sm me-1"></span>Saving...</span>
-          </button>
-        </div>
-      </div>
-    </div>
-
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-// Icon Picker Search (Amenity)
-      const amenityIconSearch = document.getElementById('amenityIconSearch');
-      if (amenityIconSearch) {
-          amenityIconSearch.addEventListener('input', function() {
-              const term = this.value.toLowerCase();
-              document.querySelectorAll('.amenity-icon-option').forEach(opt => {
-                  const iconName = opt.getAttribute('data-icon').toLowerCase();
-                  opt.style.display = iconName.includes(term) ? 'flex' : 'none';
-              });
-          });
-      }
-      // Icon Selection (Amenity)
-      document.querySelectorAll('.amenity-icon-option').forEach(opt => {
-          opt.addEventListener('click', function() {
-              const iconName = this.getAttribute('data-icon');
-              document.getElementById('new_amenity_icon').value = iconName;
-              document.getElementById('amenity_selected_icon_display').className = iconName + ' me-2';
-              document.getElementById('amenity_selected_icon_text').textContent = iconName;
-          });
-      });
-
-      // Icon Picker Search (Booking Feature)
-      const bfIconSearch = document.getElementById('bfIconSearch');
-      if (bfIconSearch) {
-          bfIconSearch.addEventListener('input', function() {
-              const term = this.value.toLowerCase();
-              document.querySelectorAll('.bf-icon-option').forEach(opt => {
-                  const iconName = opt.getAttribute('data-icon').toLowerCase();
-                  opt.style.display = iconName.includes(term) ? 'flex' : 'none';
-              });
-          });
-      }
-      // Icon Selection (Booking Feature)
-      document.querySelectorAll('.bf-icon-option').forEach(opt => {
-          opt.addEventListener('click', function() {
-              const iconName = this.getAttribute('data-icon');
-              document.getElementById('new_bf_icon').value = iconName;
-              document.getElementById('bf_selected_icon_display').className = iconName + ' me-2';
-              document.getElementById('bf_selected_icon_text').textContent = iconName;
-          });
-      });
-      });
-
-    });
-</script>
-
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    function updateCount(inputId, countId) {
-        const input = document.getElementById(inputId);
-        const count = document.getElementById(countId);
-        if (input && count) {
-            const update = () => {
-                count.textContent = `(${input.value.length} / 160)`;
-            };
-            input.addEventListener('input', update);
-            update(); // Init on load
-        }
-    }
-    updateCount('meta_description', 'meta_desc_count');
-    updateCount('og_description', 'og_desc_count');
-});
-</script>
-
 @endsection
 
 
