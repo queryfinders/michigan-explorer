@@ -59,7 +59,7 @@
                 
                 <a href="{{ route('web.attractions.index', ['scroll' => 1]) }}" class="category-pill {{ !isset($currentCategory) ? 'active' : '' }}">
                     <span class="cat-name">All Places</span>
-                    <span class="cat-count">112</span>
+                    <span class="cat-count">{{ $totalAttractionsCount ?? 0 }}</span>
                 </a>
 
                 @php
@@ -89,7 +89,7 @@
                     @php $catObj = (object)$cat; @endphp
                     <a href="{{ route('web.attractions.category', $catObj->slug) }}" class="category-pill {{ (isset($currentCategory) && $currentCategory->id === $catObj->id) ? 'active' : '' }}">
                         <span class="cat-name">{{ $catObj->name }}</span>
-                        <span class="cat-count">{{ $catObj->attractions_count ?? 30 }}</span>
+                        <span class="cat-count">{{ $catObj->attractions_count ?? 0 }}</span>
                     </a>
                 @endforeach
 

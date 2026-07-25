@@ -12,4 +12,9 @@ class Event extends Model
     {
         return $this->morphOne(\App\Models\Seo::class, 'seoable');
     }
+
+    public function category()
+    {
+        return $this->belongsTo(\App\Models\EventCategory::class, 'event_category_id');
+    }
 }

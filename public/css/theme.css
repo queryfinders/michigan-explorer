@@ -1708,7 +1708,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 .sidebar-card-premium {
     position: sticky;
-    top: 100px;
+    top: 130px;
     background: #fff;
     border-radius: 20px;
     padding: 32px;

@@ -34,7 +34,7 @@
                 
                 <a href="{{ route('web.events.index', ['scroll' => 1]) }}" class="category-pill {{ !isset($currentCategory) ? 'active' : '' }}">
                     <span class="cat-name">All Events</span>
-                    <span class="cat-count">48</span>
+                    <span class="cat-count">{{ $totalEventsCount ?? 0 }}</span>
                 </a>
                 
                 @php
@@ -47,7 +47,7 @@
                     @php $catObj = (object)$cat; @endphp
                     <a href="{{ route('web.events.category', $catObj->slug) }}" class="category-pill {{ (isset($currentCategory) && $currentCategory->id === $catObj->id) ? 'active' : '' }}">
                         <span class="cat-name">{{ $catObj->name }}</span>
-                        <span class="cat-count">{{ $catObj->events_count ?? rand(5, 20) }}</span>
+                        <span class="cat-count">{{ $catObj->events_count ?? 0 }}</span>
                     </a>
                 @endforeach
 

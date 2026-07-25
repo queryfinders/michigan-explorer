@@ -57,8 +57,8 @@
             <h6 class="text-uppercase text-muted fw-bold small mb-0 tracking-wider text-nowrap">Browse by Category</h6>
             <div class="category-filter-wrapper d-flex align-items-center flex-wrap gap-2">
             
-            <a href="{{ route('web.restaurants.index') }}" class="category-pill {{ !isset($currentCategory) ? 'active' : '' }}">
-                <span class="cat-name">All</span>
+            <a href="{{ route('web.restaurants.index', ['scroll' => 1]) }}" class="category-pill {{ !isset($currentCategory) ? 'active' : '' }}">
+                <span class="cat-name">All Restaurants</span>
                 <span class="cat-count">{{ $totalRestaurants ?? 0 }}</span>
             </a>
 
@@ -94,7 +94,7 @@
             @endforeach
 
             <!-- More Categories Button -->
-            <a href="#" class="category-pill bg-light" data-bs-toggle="modal" data-bs-target="#categoriesModal">
+            <a href="#" class="category-pill bg-light more-pill" data-bs-toggle="modal" data-bs-target="#categoriesModal">
                 <span class="cat-name">More...</span>
             </a>
 
@@ -106,18 +106,9 @@
 <section class="py-4 auto-style-8">
     <div class="container pt-3 pb-4">
         
-        <div class="d-flex justify-content-between align-items-end mb-4">
-            <div>
-                <h2 class="fw-bold mb-0 auto-style-9">{{ isset($currentCategory) ? 'Showing ' . $restaurants->total() . ' ' . $currentCategory->name : 'Available Restaurants' }}</h2>
-                <p class="text-muted mt-2 mb-0">Showing {{ $restaurants->count() }} of {{ $restaurants->total() }} restaurants found</p>
-            </div>
-            <div style="width: 380px; max-width: 100%;">
-                <form action="{{ route('web.search') }}" method="GET" class="nav-search-box-premium">
-                    <i class="fas fa-search nav-search-icon-premium"></i>
-                    <input type="text" name="keyword" placeholder="Search restaurants..." class="form-control nav-search-input-premium">
-                    <button type="submit" class="nav-search-btn-premium">Search</button>
-                </form>
-            </div>
+        <div class="mb-4">
+            <h2 class="fw-bold mb-0 auto-style-9">{{ isset($currentCategory) ? 'Showing ' . $restaurants->total() . ' ' . $currentCategory->name : 'Available Restaurants' }}</h2>
+            <p class="text-muted mt-2 mb-0">Showing {{ $restaurants->count() }} of {{ $restaurants->total() }} restaurants found</p>
         </div>
 
         <div class="row g-4" id="all-restaurants">

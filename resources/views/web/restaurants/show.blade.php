@@ -36,7 +36,7 @@
         <div>
             <div class="d-flex align-items-center mb-2 flex-wrap gap-2">
                 <span class="badge bg-warning text-dark rounded-pill fw-bold px-3 py-2"><i class="fas fa-crown me-1"></i> Featured Partner</span>
-                <span class="badge bg-primary text-white rounded-pill fw-bold px-3 py-2">{{ $hotel->category->name ?? 'Luxury Resort' }}</span>
+                <span class="badge bg-primary text-white rounded-pill fw-bold px-3 py-2">{{ $restaurant->category->name ?? 'Dining' }}</span>
             </div>
             <h1 class="hotel-header-title">{{ $restaurant->name }}</h1>
             <div class="hotel-header-location">
@@ -75,7 +75,7 @@
         }
         $extraCount = count($allGalleryImages) - 5;
         
-        $videoUrl = $restaurant->video;
+        $videoUrl = $restaurant->video ?? null;
         $embedUrl = '';
         if ($videoUrl) {
             if (strpos($videoUrl, 'youtube.com/watch?v=') !== false) {
@@ -93,7 +93,8 @@
 
         // Determine if open now
         $isOpen = false;
-        $hoursArray = is_array($restaurant->opening_hours) ? $restaurant->opening_hours : json_decode($restaurant->opening_hours ?? '{}', true);
+        $openingHours = $restaurant->opening_hours ?? null;
+        $hoursArray = is_array($openingHours) ? $openingHours : json_decode($openingHours ?? '{}', true);
         if (is_array($hoursArray)) {
             $today = strtolower(now()->timezone('America/Detroit')->format('l'));
             $currentTime = now()->timezone('America/Detroit')->format('H:i');
@@ -165,7 +166,8 @@
     </div>
 
     @php
-        $hours = is_array($restaurant->opening_hours) ? $restaurant->opening_hours : json_decode($restaurant->opening_hours ?? '{}', true);
+        $openingHours = $restaurant->opening_hours ?? null;
+        $hours = is_array($openingHours) ? $openingHours : json_decode($openingHours ?? '{}', true);
         $groupedHours = [];
         if (is_array($hours) && !empty($hours)) {
             $daysOfWeek = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
@@ -285,7 +287,7 @@
                 </div>
             </div>
 
-            @if($restaurant->faqs && $restaurant->faqs->count() > 0)
+            @if(isset($restaurant->faqs) && count($restaurant->faqs) > 0)
             <!-- FAQ Section -->
             <div class="content-card">
                 <h3>Frequently Asked Questions</h3>

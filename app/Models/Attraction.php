@@ -12,4 +12,9 @@ class Attraction extends Model
     {
         return $this->morphOne(\App\Models\Seo::class, 'seoable');
     }
+
+    public function category()
+    {
+        return $this->belongsTo(\App\Models\AttractionCategory::class, 'attraction_category_id');
+    }
 }

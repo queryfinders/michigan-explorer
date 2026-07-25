@@ -31,11 +31,12 @@ class EventController extends Controller
         $events = $query->orderBy('start_date', 'asc')->paginate(12);
         
         $currentCategory = null;
-        $featuredCategories = \App\Models\EventCategory::where('is_featured', 1)->take(10)->get();
-        $allCategories = \App\Models\EventCategory::where('status', 1)->orderBy('name')->get();
+        $featuredCategories = \App\Models\EventCategory::withCount('events')->where('is_featured', 1)->take(10)->get();
+        $allCategories = \App\Models\EventCategory::withCount('events')->where('status', 1)->orderBy('name')->get();
+        $totalEventsCount = \App\Models\Event::where('status', 1)->count();
         $page = \App\Models\Page::with('seo')->where('slug', 'events')->first();
         
-        return view('web.events.index', compact('events', 'currentCategory', 'featuredCategories', 'allCategories', 'filter', 'page'));
+        return view('web.events.index', compact('events', 'currentCategory', 'featuredCategories', 'allCategories', 'totalEventsCount', 'filter', 'page'));
     }
 
     public function category(Request $request, $slug)
@@ -66,11 +67,12 @@ class EventController extends Controller
         $events = $query->orderBy('start_date', 'asc')->paginate(12);
 
         $currentCategory = $category;
-        $featuredCategories = \App\Models\EventCategory::where('is_featured', 1)->take(10)->get();
-        $allCategories = \App\Models\EventCategory::where('status', 1)->orderBy('name')->get();
+        $featuredCategories = \App\Models\EventCategory::withCount('events')->where('is_featured', 1)->take(10)->get();
+        $allCategories = \App\Models\EventCategory::withCount('events')->where('status', 1)->orderBy('name')->get();
+        $totalEventsCount = \App\Models\Event::where('status', 1)->count();
         $page = \App\Models\Page::with('seo')->where('slug', 'events')->first();
         
-        return view('web.events.index', compact('events', 'currentCategory', 'featuredCategories', 'allCategories', 'filter', 'page'));
+        return view('web.events.index', compact('events', 'currentCategory', 'featuredCategories', 'allCategories', 'totalEventsCount', 'filter', 'page'));
     }
 
     public function show($slug)

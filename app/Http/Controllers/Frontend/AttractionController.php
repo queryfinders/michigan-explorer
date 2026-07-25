@@ -11,10 +11,11 @@ class AttractionController extends Controller
     {
         $attractions = \App\Models\Attraction::with('category')->where('status', 1)->paginate(12);
         $currentCategory = null;
-        $featuredCategories = \App\Models\AttractionCategory::where('is_featured', 1)->take(10)->get();
-        $allCategories = \App\Models\AttractionCategory::where('status', 1)->orderBy('name')->get();
+        $featuredCategories = \App\Models\AttractionCategory::withCount('attractions')->where('is_featured', 1)->take(10)->get();
+        $allCategories = \App\Models\AttractionCategory::withCount('attractions')->where('status', 1)->orderBy('name')->get();
+        $totalAttractionsCount = \App\Models\Attraction::where('status', 1)->count();
         $page = \App\Models\Page::with('seo')->where('slug', 'attractions')->first();
-        return view('web.attractions.index', compact('attractions', 'currentCategory', 'featuredCategories', 'allCategories', 'page'));
+        return view('web.attractions.index', compact('attractions', 'currentCategory', 'featuredCategories', 'allCategories', 'totalAttractionsCount', 'page'));
     }
 
     public function category($slug)
@@ -23,12 +24,13 @@ class AttractionController extends Controller
         if (!$category) {
             abort(404);
         }
-        $attractions = \App\Models\Attraction::with('category')->where('category_id', $category->id)->where('status', 1)->paginate(12);
+        $attractions = \App\Models\Attraction::with('category')->where('attraction_category_id', $category->id)->where('status', 1)->paginate(12);
         $currentCategory = $category;
-        $featuredCategories = \App\Models\AttractionCategory::where('is_featured', 1)->take(10)->get();
-        $allCategories = \App\Models\AttractionCategory::where('status', 1)->orderBy('name')->get();
+        $featuredCategories = \App\Models\AttractionCategory::withCount('attractions')->where('is_featured', 1)->take(10)->get();
+        $allCategories = \App\Models\AttractionCategory::withCount('attractions')->where('status', 1)->orderBy('name')->get();
+        $totalAttractionsCount = \App\Models\Attraction::where('status', 1)->count();
         $page = \App\Models\Page::with('seo')->where('slug', 'attractions')->first();
-        return view('web.attractions.index', compact('attractions', 'currentCategory', 'featuredCategories', 'allCategories', 'page'));
+        return view('web.attractions.index', compact('attractions', 'currentCategory', 'featuredCategories', 'allCategories', 'totalAttractionsCount', 'page'));
     }
 
     public function show($slug)
