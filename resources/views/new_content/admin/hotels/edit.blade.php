@@ -22,6 +22,7 @@
         'fas fa-wallet', 'fas fa-receipt', 'fas fa-file-invoice-dollar', 'fas fa-user-check'
     ];
 @endphp
+@section('content')
 <style>
     .icon-option:hover {
         background-color: #f8f9fa;
@@ -31,8 +32,6 @@
         scrollbar-width: thin;
     }
 </style>
-
-@section('content')
 <nav aria-label="breadcrumb" class="mb-4">
   <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Dashboard</a></li>
@@ -688,7 +687,9 @@
   </div>
 </div>
 
+@endsection
 
+@section('page-script')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 // Icon Picker Search (Amenity)
