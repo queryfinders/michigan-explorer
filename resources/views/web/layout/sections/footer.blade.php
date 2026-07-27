@@ -50,7 +50,7 @@
             <div class="d-flex gap-3 small">
                 <a href="#" class="text-white-50 text-decoration-none transition-base">Privacy</a>
                 <a href="#" class="text-white-50 text-decoration-none transition-base">Terms</a>
-                <a href="#" class="text-white-50 text-decoration-none transition-base">Sitemap</a>
+                <!-- <a href="#" class="text-white-50 text-decoration-none transition-base">Sitemap</a> -->
             </div>
         </div>
     </div>
