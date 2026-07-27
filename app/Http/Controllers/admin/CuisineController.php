@@ -25,7 +25,7 @@ class CuisineController extends Controller
             'name'       => 'required|string|max:255|unique:restaurant_cuisines,name',
             'slug'       => 'required|string|max:255|unique:restaurant_cuisines,slug',
             'status'     => 'boolean',
-            'sort_order' => 'integer'
+            'sort_order' => 'required|integer|unique:restaurant_cuisines,sort_order'
         ]);
 
         RestaurantCuisine::create($request->all());
@@ -67,7 +67,7 @@ class CuisineController extends Controller
             'name'       => 'required|string|max:255|unique:restaurant_cuisines,name,' . $cuisine->id,
             'slug'       => 'required|string|max:255|unique:restaurant_cuisines,slug,' . $cuisine->id,
             'status'     => 'boolean',
-            'sort_order' => 'integer'
+            'sort_order' => 'required|integer|unique:restaurant_cuisines,sort_order,' . $cuisine->id
         ]);
 
         $cuisine->update($request->all());
@@ -85,6 +85,6 @@ class CuisineController extends Controller
         $cuisine = RestaurantCuisine::findOrFail($id);
         $cuisine->status = $status == 1 ? 0 : 1;
         $cuisine->save();
-        return redirect()->route('cuisines.index')->with('success', 'Status updated successfully.');
+        return response()->json(['success' => true, 'status' => $cuisine->status]);
     }
 }

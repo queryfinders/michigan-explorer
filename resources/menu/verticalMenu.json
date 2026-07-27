@@ -53,7 +53,7 @@
     {
       "name": "Restaurants",
       "icon": "menu-icon tf-icons ti ti-tools-kitchen-2",
-      "slug": ["restaurants", "restaurant-categories"],
+      "slug": ["restaurants", "restaurant-categories", "cuisines"],
       "submenu": [
         {
           "name": "All Restaurants",
@@ -66,6 +66,12 @@
           "url": "/admin/restaurant-categories",
           "icon": "menu-icon tf-icons ti ti-category",
           "slug": "restaurant-categories.index"
+        },
+        {
+          "name": "Cuisines",
+          "url": "/admin/cuisines",
+          "icon": "menu-icon tf-icons ti ti-soup",
+          "slug": "cuisines.index"
         }
       ]
     },

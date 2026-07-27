@@ -212,13 +212,13 @@
             <input type="text" class="form-control" id="featured_image_alt" name="featured_image_alt" value="{{ old('featured_image_alt', $attraction->featured_image_alt ?? '') }}" />
             <div class="form-text">Describe the image clearly for search engines and accessibility.</div>
           </div>
-          <div class="mb-3 border-top pt-3">
+          <!-- <div class="mb-3 border-top pt-3">
             <label class="form-label fw-semibold" for="video_file">Promo Video</label>
             <input type="file" class="form-control" id="video_file" name="video_file" accept="video/mp4,video/x-m4v,video/*" />
             <div class="form-text">Supported: MP4, MOV, WebM. Max 30MB. This video will play on the attraction's detail page.</div>
-          </div>
+          </div> -->
           <div class="mb-3">
-            <label class="form-label fw-semibold" for="video_url">OR YouTube Video URL</label>
+            <label class="form-label fw-semibold" for="video_url">Video URL</label>
             <input type="url" class="form-control" id="video_url" name="video_url" value="{{ old('video_url', isset($attraction) ? (str_starts_with($attraction->video ?? '', 'http') ? $attraction->video : '') : '') }}" />
             <div class="form-text">Paste a YouTube link directly instead of uploading a video file.</div>
           </div>

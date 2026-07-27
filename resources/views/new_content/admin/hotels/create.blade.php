@@ -103,15 +103,16 @@
                   </div>
                 </div>
               </div>
+              <div class="text-danger small mt-1 d-none" id="category-error-msg">The category field is required.</div>
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="name">Name <span class="text-danger">*</span></label>
-              <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required placeholder="e.g. The Grand Hotel" />
+              <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}"  placeholder="e.g. The Grand Hotel" />
               @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="slug">Slug <span class="text-danger">*</span></label>
-              <input type="text" class="form-control @error('slug') is-invalid @enderror" id="slug" name="slug" value="{{ old('slug') }}" required placeholder="e.g. the-grand-hotel" />
+              <input type="text" class="form-control @error('slug') is-invalid @enderror" id="slug" name="slug" value="{{ old('slug') }}"  placeholder="e.g. the-grand-hotel" />
               @error('slug') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
           </div>
@@ -136,12 +137,44 @@
           <div class="row">
             <div class="col-md-4 mb-3">
               <label class="form-label" for="city">City</label>
-              <select class="form-select select2" id="city" name="city">
-                <option value="">Select a city</option>
-                @foreach(config('michigan_cities') as $m_city)
-                  <option value="{{ $m_city }}" {{ old('city') == $m_city ? 'selected' : '' }}>{{ $m_city }}</option>
-                @endforeach
-              </select>
+              {{-- Hidden input that holds the selected city --}}
+              <input type="hidden" name="city" id="city" value="{{ old('city') }}" />
+
+              <div class="cuisine-dropdown-wrapper" id="cityDropdownWrapper">
+                <div class="cuisine-dropdown-trigger" id="cityTrigger" onclick="toggleCityDropdown()">
+                  <div class="cuisine-tags-area" id="cityTagsArea">
+                    <span class="cuisine-placeholder" id="cityPlaceholder">
+                      <i class="fas fa-map-marker-alt me-2 text-muted"></i>Select a city...
+                    </span>
+                  </div>
+                  <i class="fas fa-chevron-down cuisine-dropdown-arrow" id="cityArrow"></i>
+                </div>
+                <div class="cuisine-dropdown-panel" id="cityDropdownPanel" style="display:none;">
+                  <div class="cuisine-search-wrap">
+                    <i class="fas fa-search cuisine-search-icon"></i>
+                    <input type="text" class="cuisine-search-input" id="citySearchInput"
+                           placeholder="Search cities..." oninput="filterCitiesList(this.value)" autocomplete="off" />
+                  </div>
+                  <div class="cuisine-divider"></div>
+                  <div class="cuisine-items-list" id="cityItemsList">
+                    @foreach(config('michigan_cities') as $m_city)
+                    <label class="cuisine-item" id="city-label-{{ $loop->index }}">
+                      <input type="radio" name="_city_radio" value="{{ $m_city }}"
+                             id="city_rb_{{ $loop->index }}"
+                             class="city-rb d-none"
+                             data-name="{{ $m_city }}"
+                             {{ old('city') == $m_city ? 'checked' : '' }}
+                             onchange="onCityChange(this)" />
+                      <span class="cuisine-item-name">{{ $m_city }}</span>
+                      <span class="cuisine-item-check"><i class="fas fa-check"></i></span>
+                    </label>
+                    @endforeach
+                    <div class="cuisine-no-results d-none" id="cityNoResults">
+                      <i class="fas fa-search-minus me-2"></i>No cities found
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="zip">Zip Code</label>
@@ -149,7 +182,7 @@
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="address">Street Address</label>
-              <input type="text" class="form-control" id="address" name="address" placeholder="e.g. 286 Grand Avenue" />
+              <textarea class="form-control" id="address" name="address" rows="1" placeholder="e.g. 286 Grand Avenue">{{ old('address') }}</textarea>
             </div>
           </div>
           <div class="row">
@@ -346,13 +379,13 @@
             <input type="text" class="form-control" id="featured_image_alt" name="featured_image_alt" />
             <div class="form-text">Describe the image clearly for search engines and accessibility.</div>
           </div>
-          <div class="mb-3 border-top pt-3">
+          <!-- <div class="mb-3 border-top pt-3">
             <label class="form-label fw-semibold" for="video_file">Promo Video</label>
             <input type="file" class="form-control" id="video_file" name="video_file" accept="video/mp4,video/x-m4v,video/*" />
             <div class="form-text">Supported: MP4, MOV, WebM. Max 30MB. This video will play on the hotel's detail page.</div>
-          </div>
+          </div> -->
           <div class="mb-3">
-            <label class="form-label fw-semibold" for="video_url">OR YouTube Video URL</label>
+            <label class="form-label fw-semibold" for="video_url">Video URL</label>
             <input type="url" class="form-control" id="video_url" name="video_url" />
             <div class="form-text">Paste a YouTube link directly instead of uploading a video file.</div>
           </div>
@@ -962,13 +995,72 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('click', function(e) {
       const wrapper = document.getElementById('categoryDropdownWrapper');
       if (wrapper && !wrapper.contains(e.target)) closeCategoryDropdown();
+      const cityWrapper = document.getElementById('cityDropdownWrapper');
+      if (cityWrapper && !cityWrapper.contains(e.target)) closeCityDropdown();
     });
+
+    function toggleCityDropdown() {
+      const panel  = document.getElementById('cityDropdownPanel');
+      const arrow  = document.getElementById('cityArrow');
+      const isOpen = panel.style.display !== 'none';
+      panel.style.display = isOpen ? 'none' : 'block';
+      arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+      if (!isOpen) document.getElementById('citySearchInput').focus();
+    }
+    function closeCityDropdown() {
+      const panel = document.getElementById('cityDropdownPanel');
+      if(panel) { panel.style.display = 'none'; document.getElementById('cityArrow').style.transform = 'rotate(0deg)'; }
+    }
+    function filterCitiesList(val) {
+      const term  = val.toLowerCase();
+      const items = document.querySelectorAll('#cityItemsList .cuisine-item');
+      let   found = 0;
+      items.forEach(item => {
+        const name = item.querySelector('.cuisine-item-name').textContent.toLowerCase();
+        const show = name.includes(term);
+        item.style.display = show ? '' : 'none';
+        if (show) found++;
+      });
+      document.getElementById('cityNoResults').classList.toggle('d-none', found > 0);
+    }
+    function onCityChange(rb) {
+      const name  = rb.dataset.name;
+      const hidden= document.getElementById('city');
+      const tags  = document.getElementById('cityTagsArea');
+      const ph    = document.getElementById('cityPlaceholder');
+
+      hidden.value = name;
+      document.querySelectorAll('#cityItemsList .cuisine-item').forEach(l => l.classList.remove('selected'));
+      const label = rb.closest('.cuisine-item');
+      if(label) label.classList.add('selected');
+
+      ph.style.display = 'none';
+      let existing = tags.querySelector('.city-selected-text');
+      if (!existing) {
+        existing = document.createElement('span');
+        existing.className = 'city-selected-text';
+        existing.style.cssText = 'font-size:0.9rem; font-weight:500; color:#333;';
+        tags.insertBefore(existing, ph);
+      }
+      existing.textContent = name;
+      closeCityDropdown();
+    }
+
+    window.toggleCityDropdown = toggleCityDropdown;
+    window.closeCityDropdown = closeCityDropdown;
+    window.filterCitiesList = filterCitiesList;
+    window.onCityChange = onCityChange;
 
     document.addEventListener('DOMContentLoaded', function() {
       const preselectedCat = document.getElementById('hotel_category_id').value;
       if (preselectedCat) {
         const rb = document.getElementById('cat_rb_' + preselectedCat);
         if (rb) { rb.checked = true; onCategoryChange(rb); }
+      }
+      const preselectedCity = document.getElementById('city').value;
+      if (preselectedCity) {
+        const rb = Array.from(document.querySelectorAll('#cityItemsList .city-rb')).find(r => r.dataset.name === preselectedCity);
+        if (rb) { rb.checked = true; onCityChange(rb); }
       }
     });
   </script>
@@ -1272,12 +1364,111 @@ document.addEventListener('DOMContentLoaded', function() {
     updateCount('meta_description', 'meta_desc_count');
     updateCount('og_description', 'og_desc_count');
 
-    // Trigger TinyMCE save on submit
+    // Real-time input validation clear
+    const nameInput = document.getElementById('name');
+    const slugInput = document.getElementById('slug');
+    if (nameInput) {
+      nameInput.addEventListener('input', function() {
+        if (this.value.trim()) {
+          this.classList.remove('is-invalid');
+        }
+      });
+    }
+    if (slugInput) {
+      slugInput.addEventListener('input', function() {
+        if (this.value.trim()) {
+          this.classList.remove('is-invalid');
+        }
+      });
+    }
+
+    // Helper function to validate Basic Info fields
+    function validateBasicInfo() {
+      const categoryInput = document.getElementById('hotel_category_id');
+      const nameInput = document.getElementById('name');
+      const slugInput = document.getElementById('slug');
+      
+      let isValid = true;
+      
+      // Check Category
+      if (!categoryInput || !categoryInput.value.trim()) {
+        isValid = false;
+        const categoryTrigger = document.getElementById('categoryTrigger');
+        if (categoryTrigger) {
+          categoryTrigger.style.borderColor = '#ff3e1d';
+        }
+        const categoryError = document.getElementById('category-error-msg');
+        if (categoryError) {
+          categoryError.classList.remove('d-none');
+        }
+      } else {
+        const categoryTrigger = document.getElementById('categoryTrigger');
+        if (categoryTrigger) {
+          categoryTrigger.style.borderColor = '';
+        }
+        const categoryError = document.getElementById('category-error-msg');
+        if (categoryError) {
+          categoryError.classList.add('d-none');
+        }
+      }
+      
+      // Check Name
+      if (!nameInput || !nameInput.value.trim()) {
+        isValid = false;
+        if (nameInput) nameInput.classList.add('is-invalid');
+      } else {
+        if (nameInput) nameInput.classList.remove('is-invalid');
+      }
+      
+      // Check Slug
+      if (!slugInput || !slugInput.value.trim()) {
+        isValid = false;
+        if (slugInput) slugInput.classList.add('is-invalid');
+      } else {
+        if (slugInput) slugInput.classList.remove('is-invalid');
+      }
+      
+      return isValid;
+    }
+
+    // Tab navigation validation for Basic Info required fields
+    const triggerTabList = document.querySelectorAll('#hotelFormTabs button');
+    triggerTabList.forEach(triggerEl => {
+      triggerEl.addEventListener('show.bs.tab', function(event) {
+        if (event.target.id !== 'basic-tab') {
+          validateBasicInfo(); // Validate to show errors on Basic Info tab, but allow navigation
+        }
+      });
+    });
+
+    // Trigger TinyMCE save and form validation on submit
     const form = document.getElementById('hotelCreateForm');
     if (form) {
-        form.addEventListener('submit', function() {
+        form.addEventListener('submit', function(event) {
             if (typeof tinymce !== 'undefined') {
                 tinymce.triggerSave();
+            }
+            const isValid = validateBasicInfo();
+            if (!isValid) {
+              event.preventDefault(); // Prevent form submission
+              
+              // Switch back to Basic Info tab if not active
+              const basicTab = document.getElementById('basic-tab');
+              if (basicTab && !basicTab.classList.contains('active')) {
+                const tab = new bootstrap.Tab(basicTab);
+                tab.show();
+              }
+              
+              // Focus on first invalid field
+              setTimeout(() => {
+                const nameInput = document.getElementById('name');
+                const slugInput = document.getElementById('slug');
+                if (nameInput && !nameInput.value.trim()) {
+                  nameInput.focus();
+                } else if (slugInput && !slugInput.value.trim()) {
+                  slugInput.focus();
+                }
+              }, 250);
             }
         });
     }
