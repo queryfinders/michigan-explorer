@@ -75,6 +75,7 @@ class RestaurantController extends Controller
         }
 
         $data = $request->except('_token', '_method', 'featured_image_file', 'meta_title', 'meta_description', 'og_title', 'og_description', 'schema_markup', 'gallery_images', 'gallery_alts', 'faqs', 'cuisines', 'features', 'featured_image_alt');
+        $data['featured_image_alt'] = $request->input('featured_image_alt');
         $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
 
         // Comma-separated list for backward compatibility on frontend string rendering
@@ -234,6 +235,7 @@ class RestaurantController extends Controller
         }
 
         $data = $request->except('_token', '_method', 'featured_image_file', 'meta_title', 'meta_description', 'og_title', 'og_description', 'schema_markup', 'gallery_images', 'gallery_alts', 'delete_gallery_ids', 'faqs', 'cuisines', 'features', 'featured_image_alt');
+        $data['featured_image_alt'] = $request->input('featured_image_alt');
         $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
 
         // Comma-separated list for backward compatibility on frontend string rendering

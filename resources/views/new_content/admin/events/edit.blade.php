@@ -90,7 +90,7 @@
         <label class="form-label" for="schema_markup">Schema Markup (JSON-LD)</label>
         <textarea class="form-control" id="schema_markup" name="schema_markup" rows="8" placeholder="Enter JSON-LD Schema markup here">{{ $event->seo->schema_markup ?? '' }}</textarea>
       </div>
-      <div class="mb-3 border-top pt-3">
+      <!-- <div class="mb-3 border-top pt-3">
         <label class="form-label fw-semibold" for="video_file">Promo Video</label>
         <input type="file" class="form-control" id="video_file" name="video_file" accept="video/mp4,video/x-m4v,video/*" />
         <div class="form-text">Supported: MP4, MOV, WebM. Max 30MB. This video will play on the event's detail page.</div>
@@ -100,9 +100,9 @@
             <a href="{{ asset($event->video) }}" target="_blank" class="small fw-bold">{{ basename($event->video) }}</a>
           </div>
         @endif
-      </div>
+      </div> -->
       <div class="mb-3">
-        <label class="form-label fw-semibold" for="video_url">OR YouTube Video URL</label>
+        <label class="form-label fw-semibold" for="video_url">Video URL</label>
         <input type="url" class="form-control" id="video_url" name="video_url" value="{{ str_starts_with($event->video ?? '', 'http') ? $event->video : '' }}" placeholder="e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ" />
         <div class="form-text">Paste a YouTube link directly instead of uploading a video file.</div>
       </div>

@@ -170,44 +170,76 @@
           <div class="row">
             <div class="col-md-4 mb-3">
               <label class="form-label" for="city">City</label>
-              <select class="form-select select2" id="city" name="city">
-                <option value="">Select a city</option>
-                @foreach(config('michigan_cities') as $m_city)
-                  <option value="{{ $m_city }}" {{ old('city', $hotel->city) == $m_city ? 'selected' : '' }}>{{ $m_city }}</option>
-                @endforeach
-              </select>
+              {{-- Hidden input that holds the selected city --}}
+              <input type="hidden" name="city" id="city" value="{{ old('city', $hotel->city) }}" />
+
+              <div class="cuisine-dropdown-wrapper" id="cityDropdownWrapper">
+                <div class="cuisine-dropdown-trigger" id="cityTrigger" onclick="toggleCityDropdown()">
+                  <div class="cuisine-tags-area" id="cityTagsArea">
+                    <span class="cuisine-placeholder" id="cityPlaceholder">
+                      <i class="fas fa-map-marker-alt me-2 text-muted"></i>Select a city...
+                    </span>
+                  </div>
+                  <i class="fas fa-chevron-down cuisine-dropdown-arrow" id="cityArrow"></i>
+                </div>
+                <div class="cuisine-dropdown-panel" id="cityDropdownPanel" style="display:none;">
+                  <div class="cuisine-search-wrap">
+                    <i class="fas fa-search cuisine-search-icon"></i>
+                    <input type="text" class="cuisine-search-input" id="citySearchInput"
+                           placeholder="Search cities..." oninput="filterCitiesList(this.value)" autocomplete="off" />
+                  </div>
+                  <div class="cuisine-divider"></div>
+                  <div class="cuisine-items-list" id="cityItemsList">
+                    @foreach(config('michigan_cities') as $m_city)
+                    <label class="cuisine-item" id="city-label-{{ $loop->index }}">
+                      <input type="radio" name="_city_radio" value="{{ $m_city }}"
+                             id="city_rb_{{ $loop->index }}"
+                             class="city-rb d-none"
+                             data-name="{{ $m_city }}"
+                             {{ old('city', $hotel->city) == $m_city ? 'checked' : '' }}
+                             onchange="onCityChange(this)" />
+                      <span class="cuisine-item-name">{{ $m_city }}</span>
+                      <span class="cuisine-item-check"><i class="fas fa-check"></i></span>
+                    </label>
+                    @endforeach
+                    <div class="cuisine-no-results d-none" id="cityNoResults">
+                      <i class="fas fa-search-minus me-2"></i>No cities found
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="zip">Zip Code</label>
-              <input type="text" class="form-control" id="zip" name="zip" value="{{ $hotel->zip }}" placeholder="e.g. 49757" />
+              <input type="text" class="form-control" id="zip" name="zip" value="{{ old('zip', $hotel->zip) }}" placeholder="e.g. 49757" />
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="address">Street Address</label>
-              <input type="text" class="form-control" id="address" name="address" value="{{ $hotel->address }}" placeholder="e.g. 286 Grand Avenue" />
+              <textarea class="form-control" id="address" name="address" rows="1" placeholder="e.g. 286 Grand Avenue">{{ old('address', $hotel->address) }}</textarea>
             </div>
           </div>
           <div class="row">
             <div class="col-md-4 mb-3">
               <label class="form-label" for="phone">Phone Number</label>
-              <input type="text" class="form-control" id="phone" name="phone" value="{{ $hotel->phone }}" placeholder="e.g. +1 555-123-4567" />
+              <input type="text" class="form-control" id="phone" name="phone" value="{{ old('phone', $hotel->phone) }}" placeholder="e.g. +1 555-123-4567" />
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label" for="email">Email</label>
-              <input type="email" class="form-control" id="email" name="email" value="{{ $hotel->email }}" placeholder="e.g. info@example.com" />
+              <input type="email" class="form-control" id="email" name="email" value="{{ old('email', $hotel->email) }}" placeholder="e.g. info@example.com" />
             </div>
-            <!-- <div class="col-md-4 mb-3">
+            <div class="col-md-4 mb-3">
               <label class="form-label" for="website">Website URL</label>
-              <input type="url" class="form-control" id="website" name="website" value="{{ $hotel->website }}" placeholder="e.g. https://www.example.com" />
-            </div> -->
+              <input type="url" class="form-control" id="website" name="website" value="{{ old('website', $hotel->website) }}" placeholder="e.g. https://www.example.com" />
+            </div>
           </div>
           <div class="row">
             <div class="col-md-6 mb-3">
               <label class="form-label" for="starting_price">Starting Price ($)</label>
-              <input type="number" class="form-control" id="starting_price" name="starting_price" value="{{ $hotel->starting_price }}" placeholder="e.g. 199" />
+              <input type="number" class="form-control" id="starting_price" name="starting_price" value="{{ old('starting_price', $hotel->starting_price) }}" placeholder="e.g. 199" />
             </div>
             <div class="col-md-6 mb-3">
               <label class="form-label" for="affiliate_url">Booking Affiliate URL</label>
-              <input type="url" class="form-control" id="affiliate_url" name="affiliate_url" value="{{ $hotel->affiliate_url }}" placeholder="e.g. https://booking.com/..." />
+              <input type="url" class="form-control" id="affiliate_url" name="affiliate_url" value="{{ old('affiliate_url', $hotel->affiliate_url) }}" placeholder="e.g. https://booking.com/..." />
             </div>
           </div>
           <div class="row">
@@ -216,73 +248,71 @@
               <textarea class="form-control" id="map_iframe" name="map_iframe" rows="1" placeholder="Paste the <iframe src='...'></iframe> embed code here">{{ old('map_iframe', $hotel->map_iframe) }}</textarea>
             </div>
           </div>
-          <div class="mb-3 mt-3">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <label class="form-label fw-semibold mb-0">Amenities</label>
-              <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addAmenityModal">
-                <i class="fas fa-plus me-1"></i> Add Amenity
-              </button>
-            </div>
 
-            {{-- Custom Amenity Dropdown --}}
-            <div class="amenity-dropdown-wrapper" id="amenityDropdownWrapper">
-
-              {{-- Trigger Button --}}
-              <div class="amenity-dropdown-trigger" id="amenityTrigger" onclick="toggleAmenityDropdown()">
-                <div class="amenity-tags-area" id="amenityTagsArea">
-                  <span class="amenity-placeholder" id="amenityPlaceholder">
-                    <i class="fas fa-concierge-bell me-2 text-muted"></i>Click to select amenities...
-                  </span>
-                </div>
-                <i class="fas fa-chevron-down amenity-dropdown-arrow" id="amenityArrow"></i>
+          <div class="row mt-3">
+            <div class="col-md-6 mb-3">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <label class="form-label fw-semibold mb-0">Amenities</label>
+                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addAmenityModal">
+                  <i class="fas fa-plus me-1"></i> Add Amenity
+                </button>
               </div>
 
-              {{-- Dropdown Panel --}}
-              <div class="amenity-dropdown-panel" id="amenityDropdownPanel" style="display:none;">
-                {{-- Search --}}
-                <div class="amenity-search-wrap">
-                  <i class="fas fa-search amenity-search-icon"></i>
-                  <input type="text" class="amenity-search-input" id="amenitySearchInput"
-                         placeholder="Search amenities..." oninput="filterAmenities(this.value)" autocomplete="off" />
+              {{-- Custom Amenity Dropdown --}}
+              <div class="amenity-dropdown-wrapper" id="amenityDropdownWrapper">
+
+                {{-- Trigger Button --}}
+                <div class="amenity-dropdown-trigger" id="amenityTrigger" onclick="toggleAmenityDropdown()">
+                  <div class="amenity-tags-area" id="amenityTagsArea">
+                    <span class="amenity-placeholder" id="amenityPlaceholder">
+                      <i class="fas fa-concierge-bell me-2 text-muted"></i>Click to select amenities...
+                    </span>
+                  </div>
+                  <i class="fas fa-chevron-down amenity-dropdown-arrow" id="amenityArrow"></i>
                 </div>
-                <div class="amenity-divider"></div>
-                {{-- Items List --}}
-                <div class="amenity-items-list" id="amenityItemsList">
-                  @foreach($amenities as $amenity)
-                  @php $checked = $hotel->amenities->contains($amenity->id); @endphp
-                  <label class="amenity-item {{ $checked ? 'amenity-item--checked' : '' }}" id="amenity-label-{{ $amenity->id }}">
-                    <input type="checkbox" name="amenities[]" value="{{ $amenity->id }}"
-                           id="amenity_cb_{{ $amenity->id }}"
-                           class="amenity-cb"
-                           data-name="{{ $amenity->name }}"
-                           data-id="{{ $amenity->id }}"
-                           {{ $checked ? 'checked' : '' }}
-                           onchange="onAmenityChange(this)" />
-                    <span class="amenity-item-icon"><i class="fas {{ $amenity->icon ?? 'fa-star' }}"></i></span>
-                    <span class="amenity-item-name">{{ $amenity->name }}</span>
-                    <span class="amenity-item-check"><i class="fas fa-check"></i></span>
-                  </label>
-                  @endforeach
-                  <div class="amenity-no-results d-none" id="amenityNoResults">
-                    <i class="fas fa-search-minus me-2"></i>No amenities found
+
+                {{-- Dropdown Panel --}}
+                <div class="amenity-dropdown-panel" id="amenityDropdownPanel" style="display:none;">
+                  <div class="amenity-search-wrap">
+                    <i class="fas fa-search amenity-search-icon"></i>
+                    <input type="text" class="amenity-search-input" id="amenitySearchInput"
+                           placeholder="Search amenities..." oninput="filterAmenities(this.value)" autocomplete="off" />
+                  </div>
+                  <div class="amenity-divider"></div>
+                  <div class="amenity-items-list" id="amenityItemsList">
+                    @foreach($amenities as $amenity)
+                    @php $checked = $hotel->amenities->contains($amenity->id); @endphp
+                    <label class="amenity-item {{ $checked ? 'amenity-item--checked' : '' }}" id="amenity-label-{{ $amenity->id }}">
+                      <input type="checkbox" name="amenities[]" value="{{ $amenity->id }}"
+                             id="amenity_cb_{{ $amenity->id }}"
+                             class="amenity-cb"
+                             data-name="{{ $amenity->name }}"
+                             data-id="{{ $amenity->id }}"
+                             {{ $checked ? 'checked' : '' }}
+                             onchange="onAmenityChange(this)" />
+                      <span class="amenity-item-icon"><i class="fas {{ $amenity->icon ?? 'fa-star' }}"></i></span>
+                      <span class="amenity-item-name">{{ $amenity->name }}</span>
+                      <span class="amenity-item-check"><i class="fas fa-check"></i></span>
+                    </label>
+                    @endforeach
+                    <div class="amenity-no-results d-none" id="amenityNoResults">
+                      <i class="fas fa-search-minus me-2"></i>No amenities found
+                    </div>
+                  </div>
+                  <div class="amenity-divider"></div>
+                  <div class="amenity-panel-footer">
+                    <button type="button" class="btn btn-sm btn-link p-0 text-primary fw-semibold"
+                            data-bs-toggle="modal" data-bs-target="#addAmenityModal" onclick="closeAmenityDropdown()">
+                      <i class="fas fa-plus-circle me-1"></i>Add New Amenity
+                    </button>
+                    <span class="amenity-selected-count" id="amenitySelectedCount">0 selected</span>
                   </div>
                 </div>
-                <div class="amenity-divider"></div>
-                {{-- Footer --}}
-                <div class="amenity-panel-footer">
-                  <button type="button" class="btn btn-sm btn-link p-0 text-primary fw-semibold"
-                          data-bs-toggle="modal" data-bs-target="#addAmenityModal" onclick="closeAmenityDropdown()">
-                    <i class="fas fa-plus-circle me-1"></i>Add New Amenity
-                  </button>
-                  <span class="amenity-selected-count" id="amenitySelectedCount">0 selected</span>
-                </div>
               </div>
             </div>
-          </div>
 
-          <!-- Booking Features -->
-          <div class="row">
-            <div class="col-12 mt-4">
+            <!-- Booking Features -->
+            <div class="col-md-6 mb-3">
               <div class="d-flex justify-content-between align-items-center mb-2">
                 <label class="form-label fw-semibold mb-0">Booking Features</label>
                 <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addBookingFeatureModal">
@@ -298,19 +328,9 @@
                 {{-- Trigger Button --}}
                 <div class="amenity-dropdown-trigger" id="bookingFeatureTrigger" onclick="toggleBookingFeatureDropdown()">
                   <div class="amenity-tags-area" id="bookingFeatureTagsArea">
-                    <span class="amenity-placeholder" id="bookingFeaturePlaceholder" {!! count($hotelBookingFeatureIds) > 0 ? 'style="display:none;"' : '' !!}>
+                    <span class="amenity-placeholder" id="bookingFeaturePlaceholder">
                       <i class="fas fa-check-circle me-2 text-muted"></i>Click to select booking features...
                     </span>
-                    @foreach($bookingFeatures as $feature)
-                      @if(in_array($feature->id, $hotelBookingFeatureIds))
-                        <span class="amenity-selected-tag" data-id="{{ $feature->id }}">
-                          @if($feature->icon)
-                            <i class="fas {{ $feature->icon }}"></i>
-                          @endif
-                          {{ $feature->name }}
-                        </span>
-                      @endif
-                    @endforeach
                   </div>
                   <i class="fas fa-chevron-down amenity-dropdown-arrow" id="bookingFeatureArrow"></i>
                 </div>
@@ -328,7 +348,7 @@
                     @php
                       $bfChecked = in_array($feature->id, $hotelBookingFeatureIds);
                     @endphp
-                    <label class="amenity-item {{ $bfChecked ? 'selected' : '' }}" id="booking-feature-label-{{ $feature->id }}">
+                    <label class="amenity-item {{ $bfChecked ? 'amenity-item--checked' : '' }}" id="booking-feature-label-{{ $feature->id }}">
                       <input type="checkbox" name="booking_features[]" value="{{ $feature->id }}"
                              id="booking_feature_cb_{{ $feature->id }}"
                              class="booking-feature-cb"
@@ -353,7 +373,7 @@
                             data-bs-toggle="modal" data-bs-target="#addBookingFeatureModal" onclick="closeBookingFeatureDropdown()">
                       <i class="fas fa-plus-circle me-1"></i>Add New Booking Feature
                     </button>
-                    <span class="amenity-selected-count" id="bookingFeatureSelectedCount">{{ count($hotelBookingFeatureIds) }} selected</span>
+                    <span class="amenity-selected-count" id="bookingFeatureSelectedCount">0 selected</span>
                   </div>
                 </div>
               </div>
@@ -389,7 +409,6 @@
               </div>
             </div>
           </div>
-
         </div>
 
         <!-- Tab 3: Featured Image & Video -->
@@ -1123,6 +1142,153 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+  // --- Booking Feature Dropdown Logic ---
+  let bookingFeatureDropdownOpen = false;
+  function toggleBookingFeatureDropdown() { bookingFeatureDropdownOpen ? closeBookingFeatureDropdown() : openBookingFeatureDropdown(); }
+  function openBookingFeatureDropdown() {
+    document.getElementById('bookingFeatureDropdownPanel').style.display = 'block';
+    document.getElementById('bookingFeatureTrigger').classList.add('open');
+    document.getElementById('bookingFeatureArrow').classList.add('rotated');
+    document.getElementById('bookingFeatureSearchInput').focus();
+    bookingFeatureDropdownOpen = true;
+  }
+  function closeBookingFeatureDropdown() {
+    document.getElementById('bookingFeatureDropdownPanel').style.display = 'none';
+    document.getElementById('bookingFeatureTrigger').classList.remove('open');
+    document.getElementById('bookingFeatureArrow').classList.remove('rotated');
+    document.getElementById('bookingFeatureSearchInput').value = '';
+    filterBookingFeatures('');
+    bookingFeatureDropdownOpen = false;
+  }
+  document.addEventListener('click', function(e) {
+    const w = document.getElementById('bookingFeatureDropdownWrapper');
+    if (w && !w.contains(e.target)) closeBookingFeatureDropdown();
+  });
+  function onBookingFeatureChange(cb) {
+    const label = document.getElementById('booking-feature-label-' + cb.dataset.id);
+    if(label) { cb.checked ? label.classList.add('amenity-item--checked') : label.classList.remove('amenity-item--checked'); }
+    renderBookingFeatureTags();
+  }
+  function renderBookingFeatureTags() {
+    const cbs = document.querySelectorAll('.booking-feature-cb:checked');
+    const tagsArea = document.getElementById('bookingFeatureTagsArea');
+    const placeholder = document.getElementById('bookingFeaturePlaceholder');
+    const countEl = document.getElementById('bookingFeatureSelectedCount');
+    
+    // Clear old tags
+    const oldTags = tagsArea.querySelectorAll('.amenity-tag');
+    oldTags.forEach(t => t.remove());
+
+    if (cbs.length === 0) {
+      placeholder.style.display = 'flex';
+      countEl.textContent = '0 selected';
+      return;
+    }
+    placeholder.style.display = 'none';
+    cbs.forEach(cb => {
+      const tag = document.createElement('span');
+      tag.className = 'amenity-tag';
+      tag.innerHTML = cb.dataset.name + ' <span class="tag-remove" onclick="removeBookingFeatureTag(event,\'' + cb.dataset.id + '\')"><i class="fas fa-times"></i></span>';
+      tagsArea.appendChild(tag);
+    });
+    countEl.textContent = cbs.length + ' selected';
+  }
+  function filterBookingFeatures(val) {
+    const term = val.toLowerCase();
+    const items = document.querySelectorAll('#bookingFeatureItemsList .amenity-item');
+    let found = 0;
+    items.forEach(item => {
+      const txt = item.querySelector('.amenity-item-name').textContent.toLowerCase();
+      if (txt.includes(term)) { item.style.display = 'flex'; found++; }
+      else { item.style.display = 'none'; }
+    });
+    document.getElementById('bookingFeatureNoResults').classList.toggle('d-none', found > 0);
+  }
+
+  function removeBookingFeatureTag(e, id) {
+    e.stopPropagation();
+    const cb = document.getElementById('booking_feature_cb_' + id);
+    if (cb) { cb.checked = false; cb.dispatchEvent(new Event('change')); }
+  }
+
+  function updateBookingFeatureIconPreview(val) { document.getElementById('booking-feature-icon-preview').className = 'fas ' + val.trim(); }
+
+  function saveNewBookingFeature() {
+    const name = document.getElementById('new_bf_name').value.trim();
+    const icon = document.getElementById('new_bf_icon').value.trim();
+    const alertBox = document.getElementById('bf-modal-alert');
+    if (!name) { alertBox.className = 'alert alert-danger'; alertBox.textContent = 'Please enter a name.'; return; }
+    alertBox.className = 'd-none';
+    document.getElementById('saveBfBtnText').classList.add('d-none');
+    document.getElementById('saveBfBtnSpinner').classList.remove('d-none');
+    $.ajax({
+      url: '{{ route("booking-features.store") }}', type: 'POST',
+      data: { _token: '{{ csrf_token() }}', name, icon: icon || 'fa-check', status: 1 },
+      success: function(response) {
+        if (response.success) {
+          const a = response.booking_feature;
+          const list = document.getElementById('bookingFeatureItemsList');
+          const noResults = document.getElementById('bookingFeatureNoResults');
+          const newLabel = document.createElement('label');
+          newLabel.className = 'amenity-item amenity-item--checked';
+          newLabel.id = 'booking-feature-label-' + a.id;
+          newLabel.innerHTML = '<input type="checkbox" name="booking_features[]" value="'+a.id+'" id="booking_feature_cb_'+a.id+'" class="booking-feature-cb" data-name="'+a.name+'" data-id="'+a.id+'" checked onchange="onBookingFeatureChange(this)" /><span class="amenity-item-icon"><i class="fas '+(a.icon || 'fa-check')+'"></i></span><span class="amenity-item-name">'+a.name+'</span><span class="amenity-item-check"><i class="fas fa-check"></i></span>';
+          list.insertBefore(newLabel, noResults);
+          renderBookingFeatureTags();
+          document.getElementById('new_bf_name').value = '';
+          document.getElementById('new_bf_icon').value = 'fa-check';
+          updateBookingFeatureIconPreview('fa-check');
+          bootstrap.Modal.getInstance(document.getElementById('addBookingFeatureModal')).hide();
+        } else { alertBox.className = 'alert alert-danger'; alertBox.textContent = response.message || 'Failed.'; }
+      },
+      error: function(xhr) {
+        alertBox.className = 'alert alert-danger';
+        const errors = xhr.responseJSON?.errors;
+        alertBox.textContent = errors ? Object.values(errors).flat().join(' ') : 'An error occurred.';
+      },
+      complete: function() {
+        document.getElementById('saveBfBtnText').classList.remove('d-none');
+        document.getElementById('saveBfBtnSpinner').classList.add('d-none');
+      }
+    });
+  }
+
+  function saveNewHotelPolicy() {
+    const name = document.getElementById('new_policy_name').value.trim();
+    const type = document.getElementById('new_policy_type').value;
+    const alertBox = document.getElementById('policy-modal-alert');
+    if (!name) { alertBox.className = 'alert alert-danger'; alertBox.textContent = 'Please enter a policy name.'; return; }
+    alertBox.className = 'd-none';
+    document.getElementById('savePolicyBtnText').classList.add('d-none');
+    document.getElementById('savePolicyBtnSpinner').classList.remove('d-none');
+    $.ajax({
+      url: '{{ route("hotel-policies.store") }}', type: 'POST',
+      data: { _token: '{{ csrf_token() }}', name, input_type: type, status: 1 },
+      success: function(response) {
+        if (response.success) {
+          const p = response.hotel_policy;
+          const container = document.querySelector('label:contains("Hotel Policies")').closest('.row.g-3') || document.querySelector('.row.g-3').lastElementChild.parentElement;
+          const div = document.createElement('div');
+          div.className = 'col-md-6';
+          let inputHtml = type === 'textarea' ? '<textarea class="form-control" name="hotel_policies['+p.id+']" id="policy_'+p.id+'" rows="2"></textarea>' : '<input type="text" class="form-control" name="hotel_policies['+p.id+']" id="policy_'+p.id+'" />';
+          div.innerHTML = '<label class="form-label" for="policy_'+p.id+'">'+p.name+'</label>' + inputHtml;
+          container.appendChild(div);
+          
+          document.getElementById('new_policy_name').value = '';
+          bootstrap.Modal.getInstance(document.getElementById('addHotelPolicyModal')).hide();
+        } else { alertBox.className = 'alert alert-danger'; alertBox.textContent = response.message || 'Failed.'; }
+      },
+      error: function(xhr) {
+        alertBox.className = 'alert alert-danger';
+        const errors = xhr.responseJSON?.errors;
+        alertBox.textContent = errors ? Object.values(errors).flat().join(' ') : 'An error occurred.';
+      },
+      complete: function() {
+        document.getElementById('savePolicyBtnText').classList.remove('d-none');
+        document.getElementById('savePolicyBtnSpinner').classList.add('d-none');
+      }
+    });
+  }
 
   // ===== Gallery delete overlay =====
   function toggleDeleteOverlay(cb, id) {
@@ -1172,7 +1338,10 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // Init: render pre-checked tags on page load
-  document.addEventListener('DOMContentLoaded', function() { renderAmenityTags(); });
+  document.addEventListener('DOMContentLoaded', function() {
+    renderAmenityTags();
+    renderBookingFeatureTags();
+  });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js" referrerpolicy="origin"></script>
 <script>
@@ -1393,13 +1562,72 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('click', function(e) {
       const wrapper = document.getElementById('categoryDropdownWrapper');
       if (wrapper && !wrapper.contains(e.target)) closeCategoryDropdown();
+      const cityWrapper = document.getElementById('cityDropdownWrapper');
+      if (cityWrapper && !cityWrapper.contains(e.target)) closeCityDropdown();
     });
+
+    function toggleCityDropdown() {
+      const panel  = document.getElementById('cityDropdownPanel');
+      const arrow  = document.getElementById('cityArrow');
+      const isOpen = panel.style.display !== 'none';
+      panel.style.display = isOpen ? 'none' : 'block';
+      arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+      if (!isOpen) document.getElementById('citySearchInput').focus();
+    }
+    function closeCityDropdown() {
+      const panel = document.getElementById('cityDropdownPanel');
+      if(panel) { panel.style.display = 'none'; document.getElementById('cityArrow').style.transform = 'rotate(0deg)'; }
+    }
+    function filterCitiesList(val) {
+      const term  = val.toLowerCase();
+      const items = document.querySelectorAll('#cityItemsList .cuisine-item');
+      let   found = 0;
+      items.forEach(item => {
+        const name = item.querySelector('.cuisine-item-name').textContent.toLowerCase();
+        const show = name.includes(term);
+        item.style.display = show ? '' : 'none';
+        if (show) found++;
+      });
+      document.getElementById('cityNoResults').classList.toggle('d-none', found > 0);
+    }
+    function onCityChange(rb) {
+      const name  = rb.dataset.name;
+      const hidden= document.getElementById('city');
+      const tags  = document.getElementById('cityTagsArea');
+      const ph    = document.getElementById('cityPlaceholder');
+
+      hidden.value = name;
+      document.querySelectorAll('#cityItemsList .cuisine-item').forEach(l => l.classList.remove('selected'));
+      const label = rb.closest('.cuisine-item');
+      if(label) label.classList.add('selected');
+
+      ph.style.display = 'none';
+      let existing = tags.querySelector('.city-selected-text');
+      if (!existing) {
+        existing = document.createElement('span');
+        existing.className = 'city-selected-text';
+        existing.style.cssText = 'font-size:0.9rem; font-weight:500; color:#333;';
+        tags.insertBefore(existing, ph);
+      }
+      existing.textContent = name;
+      closeCityDropdown();
+    }
+
+    window.toggleCityDropdown = toggleCityDropdown;
+    window.closeCityDropdown = closeCityDropdown;
+    window.filterCitiesList = filterCitiesList;
+    window.onCityChange = onCityChange;
 
     document.addEventListener('DOMContentLoaded', function() {
       const preselectedCat = document.getElementById('hotel_category_id').value;
       if (preselectedCat) {
         const rb = document.getElementById('cat_rb_' + preselectedCat);
         if (rb) { rb.checked = true; onCategoryChange(rb); }
+      }
+      const preselectedCity = document.getElementById('city').value;
+      if (preselectedCity) {
+        const rb = Array.from(document.querySelectorAll('#cityItemsList .city-rb')).find(r => r.dataset.name === preselectedCity);
+        if (rb) { rb.checked = true; onCityChange(rb); }
       }
     });
   </script>
@@ -1478,19 +1706,7 @@ document.addEventListener('DOMContentLoaded', function() {
       triggerTabList.forEach(triggerEl => {
         triggerEl.addEventListener('show.bs.tab', function(event) {
           if (event.target.id !== 'basic-tab') {
-            const isValid = validateBasicInfo();
-            if (!isValid) {
-              event.preventDefault(); // Prevent navigating to the clicked tab
-              
-              // Focus on the first empty required input
-              const nameInput = document.getElementById('name');
-              const slugInput = document.getElementById('slug');
-              if (nameInput && !nameInput.value.trim()) {
-                nameInput.focus();
-              } else if (slugInput && !slugInput.value.trim()) {
-                slugInput.focus();
-              }
-            }
+            validateBasicInfo(); // Validate to show errors on Basic Info tab, but allow navigation
           }
         });
       });

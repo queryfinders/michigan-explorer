@@ -123,22 +123,48 @@
         elseif ($priceValue >= 50) $priceSymbols = '$$$';
         elseif ($priceValue >= 20) $priceSymbols = '$$';
     @endphp
-    <div class="gallery-grid mb-4" onclick="openCustomGallery()">
-        {{-- Main featured image --}}
+    <div class="gallery-grid mb-4">
+        {{-- Main featured image or video --}}
         <div class="gallery-item main-img position-relative">
-            <img src="{{ $allGalleryImages[0]['src'] }}" alt="{{ $allGalleryImages[0]['alt'] }}">
             @if($embedUrl)
-            <div class="position-absolute top-50 start-50 translate-middle" style="pointer-events: none; z-index: 10;">
-                <div class="bg-white rounded-circle d-flex align-items-center justify-content-center shadow" style="width: 60px; height: 60px; opacity: 0.9;">
-                    <i class="fas fa-play text-primary fs-4 ms-1"></i>
+                <div class="video-wrapper-premium w-100 h-100 position-relative">
+                    <div class="video-loading-spinner" id="videoSpinnerRestaurants">
+                        <div class="spinner-border text-white" role="status" style="width: 1.5rem; height: 1.5rem;">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    @php
+                        $isYoutube = preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $restaurant->video, $matches);
+                        $youtubeId = $isYoutube ? $matches[1] : null;
+                    @endphp
+                    @if($isYoutube)
+                        <iframe class="w-100 h-100 rounded-3 shadow-sm" style="min-height:350px;" src="https://www.youtube.com/embed/{{ $youtubeId }}?autoplay=1&mute=1&loop=1&playlist={{ $youtubeId }}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen onload="document.getElementById('videoSpinnerRestaurants').style.display='none'"></iframe>
+                    @else
+                        <video class="w-100 h-100 object-fit-cover rounded-3 shadow-sm" controls autoplay muted loop playsinline style="object-fit: cover;"
+                               onplay="document.getElementById('videoSpinnerRestaurants').style.display='none'"
+                               onplaying="document.getElementById('videoSpinnerRestaurants').style.display='none'"
+                               onwaiting="document.getElementById('videoSpinnerRestaurants').style.display='flex'"
+                               oncanplay="document.getElementById('videoSpinnerRestaurants').style.display='none'">
+                            <source src="{{ asset($restaurant->video) }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    @endif
+                    
+                    {{-- Fullscreen button overlay --}}
+                    <div class="position-absolute bottom-0 end-0 m-3" style="z-index: 11;">
+                        <button class="btn btn-sm btn-dark bg-opacity-75 rounded-pill px-3 text-white border-0" onclick="openCustomGallery(0)">
+                            <i class="fas fa-expand-arrows-alt me-1"></i> View Video Gallery
+                        </button>
+                    </div>
                 </div>
-            </div>
+            @else
+                <img src="{{ $allGalleryImages[0]['src'] }}" alt="{{ $allGalleryImages[0]['alt'] }}" onclick="openCustomGallery(0)" class="cursor-pointer">
             @endif
         </div>
         {{-- Thumbnails: show up to 4 --}}
         @for($gi = 1; $gi <= min(4, count($allGalleryImages) - 1); $gi++)
-        <div class="gallery-item">
-            <img src="{{ $allGalleryImages[$gi]['src'] }}" alt="{{ $allGalleryImages[$gi]['alt'] }}">
+        <div class="gallery-item" onclick="openCustomGallery({{ $gi }})">
+            <img src="{{ $allGalleryImages[$gi]['src'] }}" alt="{{ $allGalleryImages[$gi]['alt'] }}" class="cursor-pointer">
             @if($gi === 4 && $extraCount > 0)
                 <div class="gallery-overlay-count">+{{ $extraCount }}</div>
             @endif
@@ -489,15 +515,6 @@
             if (e.key === 'Escape') closeCustomGallery();
             if (e.key === 'ArrowRight') changeLightboxImage(1);
             if (e.key === 'ArrowLeft') changeLightboxImage(-1);
-        }
-    });
-
-    // Auto-open video on page load if present
-    document.addEventListener('DOMContentLoaded', function() {
-        if (restaurantVideoUrl) {
-            setTimeout(() => {
-                openCustomGallery(0);
-            }, 500); // slight delay for smooth UX
         }
     });
 </script>
