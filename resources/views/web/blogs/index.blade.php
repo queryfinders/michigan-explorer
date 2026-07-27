@@ -17,33 +17,28 @@
 {{-- 1. HERO --}}
 <section class="blog-hero position-relative overflow-hidden" style="height:520px;padding-top:80px;background-image:linear-gradient(to bottom,rgba(0,0,0,0.25),rgba(0,0,0,0.82)),url('{{ asset('images/attraction_nature_1783508280642.png') }}');background-size:cover;background-position:center;background-attachment:fixed;">
     <div class="container h-100 d-flex flex-column justify-content-center align-items-center text-center">
-        <nav aria-label="breadcrumb" class="mb-3 slide-up-anim">
-            <ol class="breadcrumb justify-content-center text-white opacity-75 small text-uppercase">
-                <li class="breadcrumb-item"><a href="{{ route('web.home') }}" class="text-white text-decoration-none">Home</a></li>
-                <li class="breadcrumb-item active text-white fw-bold" aria-current="page">Travel Guides</li>
-            </ol>
-        </nav>
-        <h1 class="display-3 fw-bold text-white mb-3 slide-up-anim" style="font-family:'Merriweather',Georgia,serif;letter-spacing:-1px;">
+       
+        <h1 class="display-3 fw-bold text-white mb-3 slide-up-anim">
             Travel Guides &amp; Stories
         </h1>
         <p class="lead text-white mb-4 slide-up-anim" style="max-width:540px;opacity:0.9;">
             Expert guides, hidden gems &amp; seasonal adventures across Michigan.
         </p>
-        <div class="hero-search-bar w-100 slide-up-anim" style="max-width:580px;">
+        <!-- <div class="hero-search-bar w-100 slide-up-anim" style="max-width:580px;">
             <form action="{{ route('web.blogs.index') }}" method="GET" role="search" class="d-flex w-100 align-items-center m-0">
                 <i class="fas fa-search text-muted ms-3 fs-5"></i>
                 <input type="text" name="q" class="border-0 bg-transparent flex-grow-1 px-3" style="outline: none; font-size:1rem; color: #333;"
                        placeholder="Search guides, destinations, tips…" value="{{ request('q') }}" aria-label="Search">
                 <button class="btn btn-primary rounded-pill px-4 py-2 fw-bold border-0" type="submit">Search</button>
             </form>
-        </div>
-        <div class="d-flex align-items-center justify-content-center gap-5 mt-4 text-white">
+        </div> -->
+        <!-- <div class="d-flex align-items-center justify-content-center gap-5 mt-4 text-white">
             <div class="text-center"><div class="fs-3 fw-bold lh-1 stat-num" data-target="{{ $totalBlogs }}">0</div><div class="small opacity-75 mt-1">Articles</div></div>
             <div class="vr opacity-25" style="height:36px;"></div>
             <div class="text-center"><div class="fs-3 fw-bold lh-1 stat-num" data-target="{{ $categories->count() }}">0</div><div class="small opacity-75 mt-1">Categories</div></div>
             <div class="vr opacity-25" style="height:36px;"></div>
             <div class="text-center"><div class="fs-3 fw-bold lh-1 stat-num" data-target="{{ $totalViews }}">0</div><div class="small opacity-75 mt-1">Total Reads</div></div>
-        </div>
+        </div> -->
     </div>
 </section>
 
@@ -362,22 +357,22 @@
 .blog-featured-card { border-radius:20px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.10);background:#fff;transition:transform .3s,box-shadow .3s; }
 .blog-featured-card:hover { transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.14); }
 .featured-img-overlay { position:absolute;inset:0;background:linear-gradient(135deg,rgba(115,103,240,.18) 0%,transparent 60%);pointer-events:none; }
-.blog-cat-badge { display:inline-flex;align-items:center;background:#7367f0;color:#fff;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:4px 12px;border-radius:50px;text-decoration:none;transition:background .2s; }
-.blog-cat-badge:hover { background:#5e50ee;color:#fff; }
+.blog-cat-badge { display:inline-flex;align-items:center;background:#0d6efd;color:#fff;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:4px 12px;border-radius:50px;text-decoration:none;transition:background .2s; }
+.blog-cat-badge:hover { background:#0b5ed7;color:#fff; }
 .featured-star-badge { width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#ff9f43,#ffd89b);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(255,159,67,.4);font-size:.85rem; }
-.btn-read-more { width:40px;height:40px;border-radius:50%;border:2px solid #7367f0;color:#7367f0;display:flex;align-items:center;justify-content:center;text-decoration:none;transition:all .2s; }
-.btn-read-more:hover { background:#7367f0;color:#fff;transform:scale(1.1); }
+.btn-read-more { width:40px;height:40px;border-radius:50%;border:2px solid #0d6efd;color:#0d6efd;display:flex;align-items:center;justify-content:center;text-decoration:none;transition:all .2s; }
+.btn-read-more:hover { background:#0d6efd;color:#fff;transform:scale(1.1); }
 .btn-read-more-sm { width:34px;height:34px;border-width:1.5px; }
 .blog-card { border-radius:16px;overflow:hidden;background:#fff;border:1px solid #f0f0f5;box-shadow:0 2px 12px rgba(0,0,0,.06);transition:transform .3s,box-shadow .3s;display:flex;flex-direction:column; }
 .blog-card:hover { transform:translateY(-6px);box-shadow:0 12px 36px rgba(0,0,0,.12); }
 .blog-card-img-wrap { height:210px;overflow:hidden;position:relative; }
 .blog-card-img { width:100%;height:100%;object-fit:cover;display:block; }
-.blog-card-cat-badge { position:absolute;top:12px;left:12px;background:rgba(255,255,255,.92);color:#7367f0;font-size:.72rem;font-weight:700;padding:4px 12px;border-radius:50px;text-decoration:none;transition:all .2s;backdrop-filter:blur(4px); }
-.blog-card-cat-badge:hover { background:#7367f0;color:#fff; }
+.blog-card-cat-badge { position:absolute;top:12px;left:12px;background:rgba(255,255,255,.92);color:#0d6efd;font-size:.72rem;font-weight:700;padding:4px 12px;border-radius:50px;text-decoration:none;transition:all .2s;backdrop-filter:blur(4px); }
+.blog-card-cat-badge:hover { background:#0d6efd;color:#fff; }
 .blog-card-actions { position:absolute;top:12px;right:12px;display:flex;flex-direction:column;gap:6px;opacity:0;transition:opacity .25s; }
 .blog-card:hover .blog-card-actions { opacity:1; }
 .blog-action-btn { width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.9);border:none;color:#555;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.8rem;transition:all .2s;box-shadow:0 2px 6px rgba(0,0,0,.12); }
-.blog-action-btn:hover { background:#7367f0;color:#fff; }
+.blog-action-btn:hover { background:#0d6efd;color:#fff; }
 .blog-card-body { padding:20px;flex:1;display:flex;flex-direction:column; }
 .blog-card-title { font-size:.95rem;font-weight:700;margin-bottom:8px;line-height:1.4; }
 .blog-card-excerpt { color:#6c757d;font-size:.85rem;line-height:1.6;flex:1;margin-bottom:16px; }
@@ -385,24 +380,24 @@
 .sidebar-widget { background:#fff;border-radius:16px;box-shadow:0 2px 16px rgba(0,0,0,.07);overflow:hidden; }
 .sidebar-widget-header { font-size:.95rem;font-weight:700;padding:18px 20px;border-bottom:1px solid #f5f5f8;display:flex;align-items:center; }
 .sidebar-widget-body { padding:16px 20px; }
-.sidebar-cat-item { display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;border-left:3px solid #7367f0;margin-bottom:8px;text-decoration:none;color:#333;background:#fafafa;transition:all .2s; }
+.sidebar-cat-item { display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;border-left:3px solid #0d6efd;margin-bottom:8px;text-decoration:none;color:#333;background:#fafafa;transition:all .2s; }
 .sidebar-cat-item:last-child { margin-bottom:0; }
-.sidebar-cat-item:hover,.sidebar-cat-item.active { background:#f0edff;color:#7367f0; }
+.sidebar-cat-item:hover,.sidebar-cat-item.active { background:#e7f1ff;color:#0d6efd; }
 .sidebar-cat-icon { width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0; }
 .sidebar-cat-name { flex:1;font-size:.87rem;font-weight:600; }
 .sidebar-cat-count { font-size:.78rem;font-weight:700;padding:2px 10px;border-radius:50px; }
 .sidebar-article-item { display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f5f5f8;text-decoration:none;color:#333;transition:all .2s; }
 .sidebar-article-item:last-child { border-bottom:none;padding-bottom:0; }
-.sidebar-article-item:hover { color:#7367f0; }
+.sidebar-article-item:hover { color:#0d6efd; }
 .sidebar-article-item:hover .sidebar-article-img { transform:scale(1.06); }
-.sidebar-rank { width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#7367f0,#a296ff);color:#fff;font-size:.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+.sidebar-rank { width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#0d6efd,#3b82f6);color:#fff;font-size:.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
 .sidebar-article-img { width:64px;height:54px;border-radius:10px;object-fit:cover;flex-shrink:0;transition:transform .3s; }
 .sidebar-article-info { flex:1;min-width:0; }
 .sidebar-article-title { font-size:.82rem;font-weight:600;line-height:1.4;margin-bottom:4px; }
 .sidebar-article-meta { font-size:.72rem;color:#999;font-weight:600; }
 .tag-cloud { display:flex;flex-wrap:wrap;gap:8px; }
-.tag-chip { display:inline-flex;align-items:center;padding:5px 14px;border-radius:50px;font-size:.78rem;font-weight:600;background:#f4f3ff;color:#7367f0;border:1px solid #e0dbff;text-decoration:none;transition:all .2s; }
-.tag-chip:hover { background:#7367f0;color:#fff;border-color:#7367f0;transform:translateY(-2px) scale(1.05); }
+.tag-chip { display:inline-flex;align-items:center;padding:5px 14px;border-radius:50px;font-size:.78rem;font-weight:600;background:#e7f1ff;color:#0d6efd;border:1px solid #b6d4fe;text-decoration:none;transition:all .2s; }
+.tag-chip:hover { background:#0d6efd;color:#fff;border-color:#0d6efd;transform:translateY(-2px) scale(1.05); }
 .blog-empty-state { background:#fff;border-radius:20px;border:1px solid #f0f0f5; }
 </style>
 @endsection
