@@ -17,7 +17,12 @@
 {{-- 1. HERO --}}
 <section class="blog-hero position-relative overflow-hidden" style="height:520px;padding-top:80px;background-image:linear-gradient(to bottom,rgba(0,0,0,0.25),rgba(0,0,0,0.82)),url('{{ asset('images/attraction_nature_1783508280642.png') }}');background-size:cover;background-position:center;background-attachment:fixed;">
     <div class="container h-100 d-flex flex-column justify-content-center align-items-center text-center">
-       
+        <nav aria-label="breadcrumb" class="mb-3 slide-up-anim">
+            <ol class="breadcrumb justify-content-center text-white opacity-75 small text-uppercase">
+                <li class="breadcrumb-item"><a href="{{ route('web.home') }}" class="text-white text-decoration-none">Home</a></li>
+                <li class="breadcrumb-item active text-white fw-bold" aria-current="page">Travel Guides</li>
+            </ol>
+        </nav>
         <h1 class="display-3 fw-bold text-white mb-3 slide-up-anim">
             Travel Guides &amp; Stories
         </h1>
