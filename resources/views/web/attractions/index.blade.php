@@ -123,32 +123,14 @@
         </div>
 
         <div class="row g-4" id="all-attractions">
-            @forelse($attractions as $index => $attraction)
-            <!-- Attraction Card -->
-            <div class="col-lg-4 col-md-6">
-                <x-attraction-card :attraction="$attraction" :featured="($attraction->is_featured ?? 0) == 1" />
-            </div>
-            @empty
-            <!-- Static Fallback Data for Empty State -->
-            @for($i=1; $i<=6; $i++)
-            <div class="col-lg-4 col-md-6">
-                <x-attraction-card :attraction="(object)[
-                    'name' => 'Sleeping Bear Dunes',
-                    'slug' => 'demo',
-                    'city' => 'Empire',
-                    'description' => 'Experience towering sand dunes and spectacular views of Lake Michigan at this national lakeshore.',
-                    'distance' => '2.5 miles away',
-                    'travel_time_car' => '10 min drive',
-                    'travel_time_walk' => '45 min walk',
-                ]" :featured="$i === 1" />
-            </div>
-            @endfor
-            @endforelse
+            @include('web.attractions._attractions_grid')
         </div>
 
-        <!-- 4. Pagination -->
-        <div class="d-flex justify-content-center mt-5 pt-4 border-top">
-            {{ $attractions->links('pagination::bootstrap-5') }}
+        <!-- Infinite Scroll Loading Spinner -->
+        <div class="d-none justify-content-center mt-5" id="infinite-scroll-spinner">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
         </div>
         
     </div>
@@ -231,5 +213,53 @@
             }
         });
     });
+
+    let isLoading = false;
+
+    // Detect scroll to bottom
+    $(window).scroll(function() {
+        if ($(window).scrollTop() + $(window).height() >= $(document).height() - 400) {
+            const nextLink = $('#next-page-link');
+            if (nextLink.length > 0 && !isLoading) {
+                loadMoreAttractions(nextLink.attr('href'));
+            }
+        }
+    });
+
+    function loadMoreAttractions(url) {
+        isLoading = true;
+        $('#infinite-scroll-spinner').removeClass('d-none').addClass('d-flex');
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'html',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function(response) {
+                const tempDiv = $('<div>').html(response);
+                
+                // Remove the old pagination wrapper
+                $('#infinite-scroll-pagination-wrapper').remove();
+
+                // Append new attraction cards
+                const newItems = tempDiv.find('.attraction-card-item');
+                $('#all-attractions').append(newItems);
+
+                // Add the new pagination wrapper at the bottom
+                const newPagination = tempDiv.find('#infinite-scroll-pagination-wrapper');
+                $('#all-attractions').append(newPagination);
+
+                isLoading = false;
+                $('#infinite-scroll-spinner').removeClass('d-flex').addClass('d-none');
+            },
+            error: function(xhr) {
+                console.error("AJAX failed to load more attractions.", xhr);
+                isLoading = false;
+                $('#infinite-scroll-spinner').removeClass('d-flex').addClass('d-none');
+            }
+        });
+    }
 </script>
 @endsection

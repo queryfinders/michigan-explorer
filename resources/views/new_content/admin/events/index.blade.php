@@ -42,11 +42,16 @@
         @foreach($events as $event)
         <tr>
           <td>{{ $loop->iteration }}</td>
-          <td>{{ $event->name }}</td>
+          <td><strong>{{ $event->name }}</strong></td>
           <td>{{ $event->category ? $event->category->name : 'N/A' }}</td>
           <td>{{ $event->start_date ? \Carbon\Carbon::parse($event->start_date)->format('M d, Y g:i A') : 'N/A' }}</td>
           <td>{{ $event->city }}</td>
-          <td>{{ $event->status ? 'Active' : 'Inactive' }}</td>
+          <td>
+            <label class="switch">
+              <input type="checkbox" class="switch-input event-status-switch" data-id="{{ $event->id }}" data-status="{{ $event->status }}" {{ $event->status == 1 ? 'checked' : '' }}>
+              <span class="switch-toggle-slider"></span>
+            </label>
+          </td>
           <td>
             <a href="{{ route('events.edit', $event->id) }}" class="btn btn-sm btn-primary"><i class="fa fa-edit"></i></a>
             <form action="{{ route('events.destroy', $event->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure?');">
@@ -71,4 +76,28 @@
 </div>
 @endsection
 
-
+@section('page-script')
+<script>
+  $(document).ready(function() {
+      $(document).on('change', '.event-status-switch', function (e) {
+          e.preventDefault();
+          var id = $(this).data('id');
+          var status = $(this).data('status');
+          var $switch = $(this);
+          
+          var newStatus = status == 1 ? 0 : 1;
+          
+          $.ajax({
+              url: '{{ url("admin/events/status") }}/' + id + '/' + newStatus,
+              type: 'GET',
+              success: function (response) {
+                  $switch.data('status', newStatus);
+               },
+              error: function (xhr, status, error) {
+                  console.error(error);
+              }
+          });
+      });
+  });
+</script>
+@endsection

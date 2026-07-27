@@ -226,6 +226,8 @@ function shareCurrentPage(title) {
         return 300;
     }
 
+    const isEventsPage = categoryBar.getAttribute('data-page') === 'events';
+
     function updatePillVisibility() {
         const rect = categoryBar.getBoundingClientRect();
         const isStuck = rect.top <= 76 && window.scrollY > 50;
@@ -242,7 +244,7 @@ function shareCurrentPage(title) {
         } else if (w < 1200) {
             maxPills = 5;
         } else if (isStuck) {
-            maxPills = 6;
+            maxPills = isEventsPage ? 5 : 6;
         }
 
         regularPills.forEach(function(pill, i) {

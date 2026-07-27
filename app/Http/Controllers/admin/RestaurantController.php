@@ -160,7 +160,7 @@ class RestaurantController extends Controller
                     'name' => $faq->question,
                     'acceptedAnswer' => [
                         '@type' => 'Answer',
-                        'text' => $faq->answer
+                        'text' => html_entity_decode(strip_tags($faq->answer))
                     ]
                 ];
             }
@@ -337,7 +337,7 @@ class RestaurantController extends Controller
                     'name' => $faq->question,
                     'acceptedAnswer' => [
                         '@type' => 'Answer',
-                        'text' => $faq->answer
+                        'text' => html_entity_decode(strip_tags($faq->answer))
                     ]
                 ];
             }

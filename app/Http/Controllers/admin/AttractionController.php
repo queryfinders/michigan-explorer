@@ -77,7 +77,50 @@ class AttractionController extends Controller
             }
         }
         
-        $seoData = $request->only(['meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup']);
+        $seoData = $request->only(['meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description']);
+        
+        $schemas = [];
+        $attractionSchema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'TouristAttraction',
+            'name' => $attraction->name,
+            'description' => $request->meta_description ?? $attraction->short_description ?? '',
+            'url' => route('web.attractions.show', $attraction->slug),
+            'address' => [
+                '@type' => 'PostalAddress',
+                'addressLocality' => $attraction->city,
+                'addressRegion' => 'MI',
+                'addressCountry' => 'US',
+            ],
+        ];
+        if ($attraction->featured_image) {
+            $attractionSchema['image'] = url($attraction->featured_image);
+        }
+        $attractionSchema['address'] = array_filter($attractionSchema['address']);
+        if (count($attractionSchema['address']) === 1) unset($attractionSchema['address']);
+        $attractionSchema = array_filter($attractionSchema);
+        $schemas[] = $attractionSchema;
+
+        if ($attraction->faqs()->count() > 0) {
+            $mainEntity = [];
+            foreach ($attraction->faqs as $faq) {
+                $mainEntity[] = [
+                    '@type' => 'Question',
+                    'name' => $faq->question,
+                    'acceptedAnswer' => [
+                        '@type' => 'Answer',
+                        'text' => html_entity_decode(strip_tags($faq->answer))
+                    ]
+                ];
+            }
+            $schemas[] = [
+                '@context' => 'https://schema.org',
+                '@type' => 'FAQPage',
+                'mainEntity' => $mainEntity
+            ];
+        }
+
+        $seoData['schema_markup'] = json_encode($schemas, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         $attraction->seo()->create($seoData);
 
         return redirect()->route('attractions.index')->with('success', 'Attraction created successfully.');
@@ -190,7 +233,50 @@ class AttractionController extends Controller
             }
         }
         
-        $seoData = $request->only(['meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup']);
+        $seoData = $request->only(['meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description']);
+        
+        $schemas = [];
+        $attractionSchema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'TouristAttraction',
+            'name' => $attraction->name,
+            'description' => $request->meta_description ?? $attraction->short_description ?? '',
+            'url' => route('web.attractions.show', $attraction->slug),
+            'address' => [
+                '@type' => 'PostalAddress',
+                'addressLocality' => $attraction->city,
+                'addressRegion' => 'MI',
+                'addressCountry' => 'US',
+            ],
+        ];
+        if ($attraction->featured_image) {
+            $attractionSchema['image'] = url($attraction->featured_image);
+        }
+        $attractionSchema['address'] = array_filter($attractionSchema['address']);
+        if (count($attractionSchema['address']) === 1) unset($attractionSchema['address']);
+        $attractionSchema = array_filter($attractionSchema);
+        $schemas[] = $attractionSchema;
+
+        if ($attraction->faqs()->count() > 0) {
+            $mainEntity = [];
+            foreach ($attraction->faqs as $faq) {
+                $mainEntity[] = [
+                    '@type' => 'Question',
+                    'name' => $faq->question,
+                    'acceptedAnswer' => [
+                        '@type' => 'Answer',
+                        'text' => html_entity_decode(strip_tags($faq->answer))
+                    ]
+                ];
+            }
+            $schemas[] = [
+                '@context' => 'https://schema.org',
+                '@type' => 'FAQPage',
+                'mainEntity' => $mainEntity
+            ];
+        }
+
+        $seoData['schema_markup'] = json_encode($schemas, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         if ($attraction->seo) {
             $attraction->seo->update($seoData);
         } else {

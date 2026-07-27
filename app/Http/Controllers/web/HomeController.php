@@ -37,11 +37,31 @@ class HomeController extends Controller
         });
         
         $events = \Illuminate\Support\Facades\Cache::remember('home_events', 3600, function() {
-            return \App\Models\Event::where('status', 1)->orderBy('start_date', 'asc')->take(3)->get();
+            return \App\Models\Event::where('status', 1)
+                ->where('is_featured', 1)
+                ->where(function($q) {
+                    $q->whereNull('end_date')
+                      ->orWhere('end_date', '>=', \Carbon\Carbon::now());
+                })
+                ->orderBy('start_date', 'asc')
+                ->take(3)
+                ->get();
         });
         
         $blogs = \Illuminate\Support\Facades\Cache::remember('home_blogs', 3600, function() {
             return \App\Models\Blog::where('status', 'published')->orderBy('published_at', 'desc')->take(3)->get();
+        });
+
+        $upcomingEventsWidget = \Illuminate\Support\Facades\Cache::remember('home_upcoming_events_widget', 1800, function() {
+            return \App\Models\Event::with('category')
+                ->where('status', 1)
+                ->where(function($q) {
+                    $q->whereNull('end_date')
+                      ->orWhere('end_date', '>=', \Carbon\Carbon::now());
+                })
+                ->orderBy('start_date', 'asc')
+                ->take(4)
+                ->get();
         });
 
         $page = \App\Models\Page::with('seo')->where('slug', 'home')->first();
@@ -50,6 +70,6 @@ class HomeController extends Controller
             return \App\Models\SearchShortcut::where('status', 1)->orderBy('sort_order', 'asc')->get();
         });
 
-        return view('web.pages.index', compact('hotels', 'restaurants', 'attractions', 'events', 'blogs', 'page', 'searchShortcuts'));
+        return view('web.pages.index', compact('hotels', 'restaurants', 'attractions', 'events', 'blogs', 'page', 'searchShortcuts', 'upcomingEventsWidget'));
     }
 }

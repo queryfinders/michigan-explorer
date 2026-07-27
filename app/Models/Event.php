@@ -17,4 +17,9 @@ class Event extends Model
     {
         return $this->belongsTo(\App\Models\EventCategory::class, 'event_category_id');
     }
+
+    public function faqs()
+    {
+        return $this->hasMany(\App\Models\EventFaq::class, 'event_id')->orderBy('sort_order', 'asc');
+    }
 }

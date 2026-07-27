@@ -32,7 +32,7 @@
 
 @section('webLayoutContent')
 <!-- Hero Banner -->
-<section class="hotel-listing-hero position-relative" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8)), url('{{ $bannerImage }}'); padding: 120px 0; background-size: cover; background-position: center; background-attachment: fixed;">
+<section class="hotel-listing-hero position-relative" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8)), url('{{ $bannerImage }}'); background-size: cover; background-position: center; background-attachment: fixed;">
     <div class="content d-flex flex-column justify-content-center align-items-center h-100 text-center w-100 position-relative" style="z-index: 2;">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb" class="mb-4">

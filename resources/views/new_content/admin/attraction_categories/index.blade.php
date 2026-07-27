@@ -41,7 +41,7 @@
         @foreach($categories as $category)
         <tr>
           <td>{{ $loop->iteration }}</td>
-          <td>{{ $category->name }}</td>
+          <td><strong>{{ $category->name }}</strong></td>
           <td>{{ $category->slug }}</td>
           <td>
             <label class="switch">
