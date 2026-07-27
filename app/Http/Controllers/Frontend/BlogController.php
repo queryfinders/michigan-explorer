@@ -80,12 +80,22 @@ class BlogController extends Controller
 
         $page = \App\Models\Page::with('seo')->where('slug', 'blogs')->first();
 
-        return view('web.blogs.index', compact('blogs', 'featuredBlog', 'categories', 'tags', 'recentBlogs', 'mostViewedBlogs', 'page'));
+        $totalBlogs = Blog::where('status', 'published')
+            ->where(function($q) {
+                $q->whereNull('published_at')->orWhere('published_at', '<=', now());
+            })->count();
+
+        $totalViews = Blog::where('status', 'published')
+            ->where(function($q) {
+                $q->whereNull('published_at')->orWhere('published_at', '<=', now());
+            })->sum('views');
+
+        return view('web.blogs.index', compact('blogs', 'featuredBlog', 'categories', 'tags', 'recentBlogs', 'mostViewedBlogs', 'page', 'totalBlogs', 'totalViews'));
     }
 
     public function show($slug)
     {
-        $blog = Blog::with(['category', 'author', 'tags', 'seo'])
+        $blog = Blog::with(['category', 'author', 'tags', 'seo', 'faqs'])
             ->where('slug', $slug)
             ->where('status', 'published')
             ->firstOrFail();

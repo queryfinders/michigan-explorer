@@ -34,4 +34,9 @@ class Blog extends Model
     {
         return $this->morphOne(\App\Models\Seo::class, 'seoable');
     }
+
+    public function faqs()
+    {
+        return $this->hasMany(\App\Models\BlogFaq::class)->orderBy('sort_order');
+    }
 }

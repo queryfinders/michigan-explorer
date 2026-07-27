@@ -1,408 +1,443 @@
 @extends('web.layout.app_layout')
-
 @php
     $pageTitle = 'Travel Guides & Stories';
     $metaTitle = 'Travel Guides & Stories - Michigan Explorer';
     $metaDescription = 'Discover expert travel guides, hidden gems, seasonal adventures, local food, road trips, and insider tips across Michigan.';
     $canonicalUrl = route('web.blogs.index');
 @endphp
-
 @section('title', $metaTitle)
-
 @section('meta_description')
 <meta name="description" content="{{ $metaDescription }}">
 @endsection
-
 @section('canonical')
 <link rel="canonical" href="{{ $canonicalUrl }}">
 @endsection
 
 @section('webLayoutContent')
-<!-- 1. Premium Magazine Hero Section -->
-<section class="position-relative hero-magazine overflow-hidden" style="height: 500px; padding-top: 80px; background-image: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.85)), url('{{ asset('images/attraction_nature_1783508280642.png') }}'); background-size: cover; background-position: center; background-attachment: fixed;">
+{{-- 1. HERO --}}
+<section class="blog-hero position-relative overflow-hidden" style="height:520px;padding-top:80px;background-image:linear-gradient(to bottom,rgba(0,0,0,0.25),rgba(0,0,0,0.82)),url('{{ asset('images/attraction_nature_1783508280642.png') }}');background-size:cover;background-position:center;background-attachment:fixed;">
     <div class="container h-100 d-flex flex-column justify-content-center align-items-center text-center">
-        
-        <nav aria-label="breadcrumb" class="mb-3 slide-up-anim auto-style-19">
-            <ol class="breadcrumb justify-content-center text-white opacity-75 small text-uppercase letter-spacing-1">
-                <li class="breadcrumb-item"><a href="{{ route('web.home') }}" class="text-white text-decoration-none hover-text-accent">Home</a></li>
+        <nav aria-label="breadcrumb" class="mb-3 slide-up-anim">
+            <ol class="breadcrumb justify-content-center text-white opacity-75 small text-uppercase">
+                <li class="breadcrumb-item"><a href="{{ route('web.home') }}" class="text-white text-decoration-none">Home</a></li>
                 <li class="breadcrumb-item active text-white fw-bold" aria-current="page">Travel Guides</li>
             </ol>
         </nav>
-        
-        <h1 class="display-3 fw-bold text-white mb-3 slide-up-anim auto-style-20">
-            Travel Guides & Stories
+        <h1 class="display-3 fw-bold text-white mb-3 slide-up-anim" style="font-family:'Merriweather',Georgia,serif;letter-spacing:-1px;">
+            Travel Guides &amp; Stories
         </h1>
-        
-        <p class="lead text-white opacity-90 slide-up-anim mb-0 auto-style-21">
-            Discover expert travel guides, hidden gems, seasonal adventures, local food, road trips, and insider tips across Michigan.
+        <p class="lead text-white mb-4 slide-up-anim" style="max-width:540px;opacity:0.9;">
+            Expert guides, hidden gems &amp; seasonal adventures across Michigan.
         </p>
-
-
-
+        <div class="hero-search-bar w-100 slide-up-anim" style="max-width:580px;">
+            <form action="{{ route('web.blogs.index') }}" method="GET" role="search" class="d-flex w-100 align-items-center m-0">
+                <i class="fas fa-search text-muted ms-3 fs-5"></i>
+                <input type="text" name="q" class="border-0 bg-transparent flex-grow-1 px-3" style="outline: none; font-size:1rem; color: #333;"
+                       placeholder="Search guides, destinations, tips…" value="{{ request('q') }}" aria-label="Search">
+                <button class="btn btn-primary rounded-pill px-4 py-2 fw-bold border-0" type="submit">Search</button>
+            </form>
+        </div>
+        <div class="d-flex align-items-center justify-content-center gap-5 mt-4 text-white">
+            <div class="text-center"><div class="fs-3 fw-bold lh-1 stat-num" data-target="{{ $totalBlogs }}">0</div><div class="small opacity-75 mt-1">Articles</div></div>
+            <div class="vr opacity-25" style="height:36px;"></div>
+            <div class="text-center"><div class="fs-3 fw-bold lh-1 stat-num" data-target="{{ $categories->count() }}">0</div><div class="small opacity-75 mt-1">Categories</div></div>
+            <div class="vr opacity-25" style="height:36px;"></div>
+            <div class="text-center"><div class="fs-3 fw-bold lh-1 stat-num" data-target="{{ $totalViews }}">0</div><div class="small opacity-75 mt-1">Total Reads</div></div>
+        </div>
     </div>
 </section>
 
-<!-- 2. Sticky Filter & Sort Section -->
-<section class="filter-bar bg-white border-bottom sticky-top shadow-sm z-index-1000 py-3 transition-all" id="stickyFilterBar">
+{{-- 2. FILTER BAR --}}
+<section class="filter-bar bg-white border-bottom sticky-top shadow-sm py-3 transition-all" id="stickyFilterBar" style="z-index:1000; top: 78px;">
     <div class="container">
-        <div class="row align-items-center">
-            <div class="col-12 col-lg-8 mb-3 mb-lg-0 overflow-auto hide-scrollbar">
-                <div class="d-flex align-items-center gap-3 filter-scroll-wrapper auto-style-22">
-                    <span class="text-muted fw-bold small text-uppercase letter-spacing-1 me-2 d-none d-md-block">Filters:</span>
+        <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3">
+            <div class="category-bar-inner d-flex flex-column align-items-start gap-2 flex-grow-1 overflow-hidden" style="max-width: 100%;">
+                <h6 class="text-uppercase text-muted fw-bold small mb-0 tracking-wider text-nowrap">Browse by Category</h6>
+                <div class="category-filter-wrapper d-flex align-items-center flex-nowrap gap-2 w-100" style="max-width: 100%;">
                     
-                    @if(request()->has('q') || request()->has('category') || request()->has('sort'))
-                        <a href="{{ route('web.blogs.index') }}" class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill text-decoration-none transition-all hover-bg-danger hover-text-white d-flex align-items-center">
-                            <i class="fas fa-times me-2"></i> Clear Filters
-                        </a>
+                    <a href="{{ route('web.blogs.index', array_merge(request()->query(), ['category' => null])) }}" class="category-pill {{ !request('category') ? 'active' : '' }}">
+                        <span class="cat-name">All Articles</span>
+                        <span class="cat-count">{{ $totalBlogs }}</span>
+                    </a>
+
+                    @php
+                        $selectedCategory = null;
+                        if (request('category')) {
+                            $selectedCategory = $categories->firstWhere('slug', request('category'));
+                        }
+                        
+                        $displayCategories = $categories->take(4);
+                        
+                        if ($selectedCategory && !$displayCategories->contains('id', $selectedCategory->id)) {
+                            $displayCategories = $categories->take(3)->concat([$selectedCategory]);
+                        }
+                    @endphp
+
+                    @foreach($displayCategories as $cat)
+                    <a href="{{ route('web.blogs.index', array_merge(request()->query(), ['category' => $cat->slug])) }}" class="category-pill {{ request('category') == $cat->slug ? 'active' : '' }}">
+                        <span class="cat-name">{{ $cat->name }}</span>
+                        <span class="cat-count">{{ $cat->blogs_count }}</span>
+                    </a>
+                    @endforeach
+
+                    @if($categories->count() > 4)
+                    <a href="#" class="category-pill bg-light more-pill" data-bs-toggle="modal" data-bs-target="#categoriesModal">
+                        <span class="cat-name">More...</span>
+                    </a>
                     @endif
 
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary rounded-pill dropdown-toggle px-4 {{ request('category') ? 'active bg-primary text-white border-primary' : '' }}" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="far fa-compass me-2"></i> {{ request('category') ? ucfirst(str_replace('-', ' ', request('category'))) : 'Category' }}
-                        </button>
-                        <ul class="dropdown-menu shadow-lg border-0 rounded-4 mt-2">
-                            <li><a class="dropdown-item py-2" href="{{ route('web.blogs.index', array_merge(request()->query(), ['category' => null])) }}">All Categories</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            @foreach($categories as $cat)
-                                <li>
-                                    <a class="dropdown-item py-2 d-flex justify-content-between align-items-center {{ request('category') == $cat->slug ? 'active bg-primary text-white' : '' }}" href="{{ route('web.blogs.index', array_merge(request()->query(), ['category' => $cat->slug])) }}">
-                                        <span>@if($cat->icon) <i class="{{ $cat->icon }} me-2 opacity-75"></i> @endif {{ $cat->name }}</span>
-                                        <span class="badge {{ request('category') == $cat->slug ? 'bg-white text-primary' : 'bg-light text-muted' }} rounded-pill ms-3">{{ $cat->blogs_count }}</span>
-                                    </a>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
+                    @if(request('q'))
+                    <a href="{{ route('web.blogs.index', array_merge(request()->except('q'))) }}" class="category-pill active bg-danger border-danger text-white">
+                        <span class="cat-name"><i class="fas fa-search me-1"></i> "{{ Str::limit(request('q'), 15) }}"</span>
+                        <span class="cat-count bg-white text-danger px-2"><i class="fas fa-times"></i></span>
+                    </a>
+                    @endif
 
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary rounded-pill dropdown-toggle px-4" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-leaf me-2"></i> Season
-                        </button>
-                        <ul class="dropdown-menu shadow-lg border-0 rounded-4 mt-2">
-                            <li><a class="dropdown-item py-2" href="#">All Seasons</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item py-2" href="#"><i class="fas fa-sun text-warning me-2"></i> Summer</a></li>
-                            <li><a class="dropdown-item py-2" href="#"><i class="fas fa-snowflake text-info me-2"></i> Winter</a></li>
-                            <li><a class="dropdown-item py-2" href="#"><i class="fas fa-leaf text-success me-2"></i> Spring</a></li>
-                            <li><a class="dropdown-item py-2" href="#"><i class="fab fa-canadian-maple-leaf text-danger me-2"></i> Fall</a></li>
-                        </ul>
-                    </div>
                 </div>
             </div>
-            <div class="col-12 col-lg-4 d-flex justify-content-lg-end">
-                <div class="d-flex align-items-center bg-light rounded-pill p-1 border">
-                    <span class="text-muted small fw-bold px-3 d-none d-sm-block">Sort by:</span>
-                    <a href="{{ route('web.blogs.index', array_merge(request()->query(), ['sort' => 'latest'])) }}" class="btn btn-sm rounded-pill px-4 {{ request('sort', 'latest') == 'latest' ? 'btn-white shadow-sm fw-bold text-primary' : 'btn-light text-muted border-0' }}">Latest</a>
-                    <a href="{{ route('web.blogs.index', array_merge(request()->query(), ['sort' => 'popular'])) }}" class="btn btn-sm rounded-pill px-4 {{ request('sort') == 'popular' ? 'btn-white shadow-sm fw-bold text-primary' : 'btn-light text-muted border-0' }}">Popular</a>
-                    <a href="{{ route('web.blogs.index', array_merge(request()->query(), ['sort' => 'oldest'])) }}" class="btn btn-sm rounded-pill px-4 {{ request('sort') == 'oldest' ? 'btn-white shadow-sm fw-bold text-primary' : 'btn-light text-muted border-0' }}">Oldest</a>
+            <div class="d-flex justify-content-lg-end align-items-center flex-shrink-0 mt-3">
+                <div class="sort-tabs">
+                    <span class="text-muted small fw-bold me-2 ms-2 d-none d-sm-inline">Sort:</span>
+                    <a href="{{ route('web.blogs.index', array_merge(request()->query(), ['sort' => 'latest'])) }}" class="sort-tab {{ request('sort', 'latest') == 'latest' ? 'active' : '' }}">Latest</a>
+                    <a href="{{ route('web.blogs.index', array_merge(request()->query(), ['sort' => 'popular'])) }}" class="sort-tab {{ request('sort') == 'popular' ? 'active' : '' }}">Popular</a>
+                    <a href="{{ route('web.blogs.index', array_merge(request()->query(), ['sort' => 'oldest'])) }}" class="sort-tab {{ request('sort') == 'oldest' ? 'active' : '' }}">Oldest</a>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- 3. Main Content Layout -->
-<section class="py-5 bg-body-tertiary auto-style-23">
+{{-- 3. MAIN CONTENT --}}
+<section class="py-5 bg-body-tertiary">
     <div class="container py-3">
         <div class="row g-5">
-            
-            <!-- Left Content: Blogs -->
             <div class="col-lg-8">
-                
-                @if($featuredBlog && !request()->has('category') && request('page', 1) == 1 && request('sort', 'latest') == 'latest')
-                <!-- Premium Featured Article -->
-                <div class="card border-0 rounded-4 shadow-sm overflow-hidden mb-5 featured-card-anim">
+
+                @if($featuredBlog && !request()->has('category') && !request()->has('q') && request('page', 1) == 1 && request('sort', 'latest') == 'latest')
+                <div class="blog-featured-card mb-5">
                     <div class="row g-0">
-                        <div class="col-md-6 overflow-hidden">
+                        <div class="col-md-6 overflow-hidden position-relative">
                             <a href="{{ route('web.blogs.show', $featuredBlog->slug) }}" class="d-block h-100">
-                                <img src="{{ $featuredBlog->featured_image ? asset($featuredBlog->featured_image) : 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800' }}" loading="lazy" class="img-fluid h-100 w-100 object-fit-cover hover-zoom-img" alt="{{ $featuredBlog->title }}">
+                                <img src="{{ $featuredBlog->featured_image ? asset($featuredBlog->featured_image) : 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800' }}" loading="lazy" class="img-fluid h-100 w-100 object-fit-cover blog-img-zoom" alt="{{ $featuredBlog->title }}">
+                                <div class="featured-img-overlay"></div>
                             </a>
+                            <div class="reading-time-badge"><i class="far fa-clock me-1"></i>{{ $featuredBlog->reading_time ?? ceil(str_word_count(strip_tags($featuredBlog->content)) / 200) }} min read</div>
                         </div>
                         <div class="col-md-6 p-4 p-lg-5 d-flex flex-column justify-content-center bg-white position-relative">
-                            
-                            <!-- Star Badge -->
-                            <div class="position-absolute top-0 end-0 p-4">
-                                <div class="bg-accent text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm auto-style-10" data-bs-toggle="tooltip" title="Featured Story">
-                                    <i class="fas fa-star"></i>
-                                </div>
-                            </div>
-
+                            <div class="position-absolute top-0 end-0 p-3"><div class="featured-star-badge" data-bs-toggle="tooltip" title="Featured Story"><i class="fas fa-star"></i></div></div>
                             @if($featuredBlog->category)
-                                <a href="?category={{ $featuredBlog->category->slug }}" class="badge bg-primary bg-opacity-10 text-white text-uppercase px-3 py-2 rounded-pill fw-bold text-decoration-none align-self-start mb-3 transition-all hover-bg-primary hover-text-white d-flex align-items-center">
-                                    @if($featuredBlog->category->icon) <i class="{{ $featuredBlog->category->icon }} me-2"></i> @endif
-                                    {{ $featuredBlog->category->name }}
-                                </a>
+                            <a href="?category={{ $featuredBlog->category->slug }}" class="blog-cat-badge mb-3 align-self-start">
+                                @if($featuredBlog->category->icon)<i class="{{ $featuredBlog->category->icon }} me-1"></i>@endif{{ $featuredBlog->category->name }}
+                            </a>
                             @endif
-                            <h2 class="h3 fw-bold mb-3 auto-style-7">
-                                <a href="{{ route('web.blogs.show', $featuredBlog->slug) }}" class="text-dark text-decoration-none hover-text-primary transition-all">{{ $featuredBlog->title }}</a>
-                            </h2>
-                            <p class="text-muted mb-4 fs-6 lh-lg">{{ $featuredBlog->excerpt ?? Str::limit(strip_tags($featuredBlog->content), 120) }}</p>
-                            
-                            <div class="d-flex align-items-center text-muted small mb-4 fw-bold">
-                                <span class="me-4"><i class="far fa-clock me-1 text-primary"></i> {{ $featuredBlog->reading_time ?? ceil(str_word_count(strip_tags($featuredBlog->content)) / 200) }} min read</span>
-                                <span><i class="far fa-eye me-1 text-primary"></i> {{ number_format($featuredBlog->views ?? 0) }} views</span>
+                            <h2 class="h3 fw-bold mb-3"><a href="{{ route('web.blogs.show', $featuredBlog->slug) }}" class="text-dark text-decoration-none hover-text-primary transition-all">{{ $featuredBlog->title }}</a></h2>
+                            <p class="text-muted mb-4 lh-lg">{{ $featuredBlog->excerpt ?? Str::limit(strip_tags($featuredBlog->content), 120) }}</p>
+                            <div class="d-flex align-items-center gap-3 text-muted small fw-bold mb-4">
+                                <span><i class="far fa-eye me-1 text-primary"></i>{{ number_format($featuredBlog->views ?? 0) }} views</span>
                             </div>
-
                             <div class="mt-auto d-flex align-items-center justify-content-between border-top pt-4">
-                                <div class="d-flex align-items-center">
-                                    <img src="{{ $featuredBlog->author && $featuredBlog->author->avatar ? asset($featuredBlog->author->avatar) : 'https://placehold.co/100' }}" class="rounded-circle me-3 shadow-sm border border-2 border-white object-fit-cover w-45px h-45px" alt="Author">
+                                <div class="d-flex align-items-center gap-3">
+                                    <img src="{{ $featuredBlog->author && $featuredBlog->author->avatar ? asset($featuredBlog->author->avatar) : 'https://placehold.co/100' }}" class="rounded-circle shadow-sm border border-2 border-white object-fit-cover" style="width:42px;height:42px;" alt="Author">
                                     <div>
-                                        <div class="fw-bold text-dark">{{ $featuredBlog->author ? $featuredBlog->author->name : 'Admin' }}</div>
-                                        <div class="text-muted small">{{ $featuredBlog->published_at ? \Carbon\Carbon::parse($featuredBlog->published_at)->format('M d, Y') : $featuredBlog->created_at->format('M d, Y') }}</div>
+                                        <div class="fw-bold text-dark small">{{ $featuredBlog->author ? $featuredBlog->author->name : 'Admin' }}</div>
+                                        <div class="text-muted" style="font-size:.75rem;">{{ $featuredBlog->published_at ? \Carbon\Carbon::parse($featuredBlog->published_at)->format('M d, Y') : $featuredBlog->created_at->format('M d, Y') }}</div>
                                     </div>
                                 </div>
-                                <a href="{{ route('web.blogs.show', $featuredBlog->slug) }}" class="btn btn-outline-primary rounded-circle shadow-sm hover-bg-primary transition-all d-flex align-items-center justify-content-center auto-style-24">
-                                    <i class="fas fa-arrow-right"></i>
-                                </a>
+                                <a href="{{ route('web.blogs.show', $featuredBlog->slug) }}" class="btn-read-more" aria-label="Read article"><i class="fas fa-arrow-right"></i></a>
                             </div>
                         </div>
                     </div>
                 </div>
                 @endif
 
-                <!-- Standard Blogs Grid -->
                 <div class="row g-4">
                     @forelse($blogs as $blog)
-                        @if($featuredBlog && $blog->id == $featuredBlog->id && !request()->has('category') && request('page', 1) == 1 && request('sort', 'latest') == 'latest')
+                        @if($featuredBlog && $blog->id == $featuredBlog->id && !request()->has('category') && !request()->has('q') && request('page', 1) == 1 && request('sort', 'latest') == 'latest')
                             @continue
                         @endif
                         <div class="col-md-6 fade-up-card">
-                            <div class="card h-100 border-0 rounded-4 shadow-sm hover-lift transition-all bg-white overflow-hidden">
-                                <div class="position-relative overflow-hidden">
-                                    <a href="{{ route('web.blogs.show', $blog->slug) }}" class="d-block h-100">
-                                        <img src="{{ $blog->featured_image ? asset($blog->featured_image) : 'https://placehold.co/600x400/e9ecef/495057?text=No+Image' }}" loading="lazy" class="card-img-top blog-img object-fit-cover hover-zoom-img auto-style-25" alt="{{ $blog->title }}">
+                            <div class="blog-card h-100">
+                                <div class="blog-card-img-wrap position-relative overflow-hidden">
+                                    <a href="{{ route('web.blogs.show', $blog->slug) }}">
+                                        <img src="{{ $blog->featured_image ? asset($blog->featured_image) : 'https://placehold.co/600x400/e9ecef/495057?text=No+Image' }}" loading="lazy" class="blog-card-img blog-img-zoom" alt="{{ $blog->title }}">
                                     </a>
-                                    
-                                    <!-- Badges -->
-                                    <div class="position-absolute top-0 start-0 m-3 d-flex flex-column gap-2">
-                                        @if($blog->category)
-                                            <a href="?category={{ $blog->category->slug }}" class="badge bg-white text-primary px-3 py-2 rounded-pill shadow-sm text-decoration-none fw-bold hover-bg-primary hover-text-white transition-all d-flex align-items-center glass-badge">
-                                                @if($blog->category->icon) <i class="{{ $blog->category->icon }} me-2"></i> @endif
-                                                {{ $blog->category->name }}
-                                            </a>
-                                        @endif
-                                    </div>
-
-                                    <!-- Action Buttons overlay -->
-                                    <div class="position-absolute top-0 end-0 m-3 d-flex flex-column gap-2 opacity-0 card-actions transition-all">
-                                        <button class="btn btn-light rounded-circle shadow-sm text-muted hover-text-primary p-0 d-flex align-items-center justify-content-center auto-style-26" data-bs-toggle="tooltip" title="Bookmark">
-                                            <i class="far fa-bookmark"></i>
-                                        </button>
-                                        <button class="btn btn-light rounded-circle shadow-sm text-muted hover-text-primary p-0 d-flex align-items-center justify-content-center auto-style-26" data-bs-toggle="tooltip" title="Share">
-                                            <i class="fas fa-share-alt"></i>
-                                        </button>
+                                    @if($blog->category)
+                                    <a href="?category={{ $blog->category->slug }}" class="blog-card-cat-badge">
+                                        @if($blog->category->icon)<i class="{{ $blog->category->icon }} me-1"></i>@endif{{ $blog->category->name }}
+                                    </a>
+                                    @endif
+                                    <div class="reading-time-badge"><i class="far fa-clock me-1"></i>{{ $blog->reading_time ?? ceil(str_word_count(strip_tags($blog->content)) / 200) }} min</div>
+                                    <div class="blog-card-actions">
+                                        <button class="blog-action-btn" data-bs-toggle="tooltip" title="Bookmark"><i class="far fa-bookmark"></i></button>
+                                        <button class="blog-action-btn" data-bs-toggle="tooltip" title="Share"><i class="fas fa-share-alt"></i></button>
                                     </div>
                                 </div>
-                                <div class="card-body p-4 d-flex flex-column">
-                                    <div class="d-flex align-items-center text-muted small mb-3 fw-bold">
-                                        <span class="me-3"><i class="far fa-clock me-1 text-primary"></i> {{ $blog->reading_time ?? ceil(str_word_count(strip_tags($blog->content)) / 200) }} min read</span>
-                                        <span><i class="far fa-eye me-1 text-primary"></i> {{ number_format($blog->views ?? 0) }}</span>
+                                <div class="blog-card-body">
+                                    <div class="d-flex align-items-center gap-3 text-muted mb-2" style="font-size:.78rem;font-weight:600;">
+                                        <span><i class="far fa-eye me-1 text-primary"></i>{{ number_format($blog->views ?? 0) }}</span>
+                                        <span class="ms-auto">{{ $blog->published_at ? \Carbon\Carbon::parse($blog->published_at)->format('M d, Y') : $blog->created_at->format('M d, Y') }}</span>
                                     </div>
-
-                                    <h5 class="card-title fw-bold mb-3 auto-style-7">
-                                        <a href="{{ route('web.blogs.show', $blog->slug) }}" class="text-dark text-decoration-none hover-text-primary transition-all">{{ $blog->title }}</a>
-                                    </h5>
-                                    <p class="card-text text-muted mb-4 flex-grow-1">{{ $blog->excerpt ? $blog->excerpt : Str::limit(strip_tags($blog->content), 90) }}</p>
-                                    
-                                    <div class="mt-auto d-flex align-items-center justify-content-between border-top pt-3">
-                                        <div class="d-flex align-items-center">
-                                            @if($blog->author)
-                                            <img src="{{ $blog->author && $blog->author->avatar ? asset($blog->author->avatar) : 'https://placehold.co/100' }}" class="rounded-circle me-2 shadow-sm border border-2 border-white object-fit-cover w-35px h-35px" alt="Author">
-                                            @endif
-                                            <div>
-                                                <div class="fw-bold text-dark small lh-1 mb-1">{{ $blog->author ? $blog->author->name : 'Admin' }}</div>
-                                                <div class="text-muted auto-style-11">{{ $blog->published_at ? \Carbon\Carbon::parse($blog->published_at)->format('M d, Y') : $blog->created_at->format('M d, Y') }}</div>
-                                            </div>
+                                    <h5 class="blog-card-title"><a href="{{ route('web.blogs.show', $blog->slug) }}" class="text-dark text-decoration-none hover-text-primary transition-all">{{ $blog->title }}</a></h5>
+                                    <p class="blog-card-excerpt">{{ $blog->excerpt ? $blog->excerpt : Str::limit(strip_tags($blog->content), 90) }}</p>
+                                    <div class="blog-card-footer">
+                                        @if($blog->author)
+                                        <div class="d-flex align-items-center gap-2">
+                                            <img src="{{ $blog->author && $blog->author->avatar ? asset($blog->author->avatar) : 'https://placehold.co/100' }}" class="rounded-circle object-fit-cover border border-2 border-white shadow-sm" style="width:32px;height:32px;" alt="{{ $blog->author->name }}">
+                                            <span class="fw-bold text-dark" style="font-size:.8rem;">{{ $blog->author->name }}</span>
                                         </div>
+                                        @else<div></div>@endif
+                                        <a href="{{ route('web.blogs.show', $blog->slug) }}" class="btn-read-more btn-read-more-sm" aria-label="Read more"><i class="fas fa-arrow-right"></i></a>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     @empty
-                        <!-- Premium Empty State -->
-                        <div class="col-12 text-center py-5 bg-white rounded-4 shadow-sm border border-light">
-                            <div class="mb-4 text-primary opacity-50">
-                                <i class="far fa-compass display-1"></i>
+                        <div class="col-12">
+                            <div class="blog-empty-state text-center py-5">
+                                <div class="mb-4" style="color:#7367f0;opacity:.4;"><i class="far fa-compass" style="font-size:4rem;"></i></div>
+                                <h3 class="fw-bold mb-3">No travel guides found</h3>
+                                <p class="text-muted lead mb-4 mx-auto" style="max-width:420px;">We could not find articles matching your filters. Try a different category or clear your search.</p>
+                                <a href="{{ route('web.blogs.index') }}" class="btn btn-primary rounded-pill px-5 py-3 fw-bold shadow-sm">Browse All Guides</a>
                             </div>
-                            <h3 class="fw-bold mb-3">No travel guides found.</h3>
-                            <p class="text-muted lead mb-4 mx-auto auto-style-27">We couldn't find any articles matching your current filters or search criteria. Try adjusting your search or explore our popular categories.</p>
-                            <a href="{{ route('web.blogs.index') }}" class="btn btn-primary rounded-pill px-5 py-3 fw-bold shadow-sm hover-lift">Browse All Categories</a>
                         </div>
                     @endforelse
                 </div>
 
-                <!-- Premium Pagination -->
                 @if($blogs->hasPages())
                 <div class="d-flex justify-content-center mt-5 pt-4">
                     <nav aria-label="Blog pagination">
                         <ul class="pagination pagination-lg premium-pagination mb-0 gap-2">
-                            <!-- Previous Page Link -->
                             @if ($blogs->onFirstPage())
-                                <li class="page-item disabled">
-                                    <span class="page-link rounded-circle border-0 d-flex align-items-center justify-content-center bg-light text-muted"><i class="fas fa-chevron-left"></i></span>
-                                </li>
+                                <li class="page-item disabled"><span class="page-link rounded-circle border-0 d-flex align-items-center justify-content-center bg-light text-muted" style="width:44px;height:44px;"><i class="fas fa-chevron-left"></i></span></li>
                             @else
-                                <li class="page-item">
-                                    <a class="page-link rounded-circle border-0 shadow-sm d-flex align-items-center justify-content-center hover-bg-primary hover-text-white transition-all" href="{{ $blogs->previousPageUrl() }}" rel="prev"><i class="fas fa-chevron-left"></i></a>
-                                </li>
+                                <li class="page-item"><a class="page-link rounded-circle border-0 shadow-sm d-flex align-items-center justify-content-center hover-bg-primary hover-text-white transition-all" style="width:44px;height:44px;" href="{{ $blogs->previousPageUrl() }}" rel="prev"><i class="fas fa-chevron-left"></i></a></li>
                             @endif
-
-                            <!-- Pagination Elements -->
                             @foreach ($blogs->links()->elements as $element)
-                                <!-- "Three Dots" Separator -->
-                                @if (is_string($element))
-                                    <li class="page-item disabled"><span class="page-link border-0 bg-transparent">{{ $element }}</span></li>
-                                @endif
-
-                                <!-- Array Of Links -->
+                                @if (is_string($element))<li class="page-item disabled"><span class="page-link border-0 bg-transparent">{{ $element }}</span></li>@endif
                                 @if (is_array($element))
                                     @foreach ($element as $page => $url)
                                         @if ($page == $blogs->currentPage())
-                                            <li class="page-item active" aria-current="page">
-                                                <span class="page-link rounded-circle border-0 shadow-sm bg-primary d-flex align-items-center justify-content-center">{{ $page }}</span>
-                                            </li>
+                                            <li class="page-item active" aria-current="page"><span class="page-link rounded-circle border-0 shadow-sm bg-primary d-flex align-items-center justify-content-center" style="width:44px;height:44px;">{{ $page }}</span></li>
                                         @else
-                                            <li class="page-item">
-                                                <a class="page-link rounded-circle border-0 shadow-sm d-flex align-items-center justify-content-center hover-bg-primary hover-text-white transition-all text-dark bg-white" href="{{ $url }}">{{ $page }}</a>
-                                            </li>
+                                            <li class="page-item"><a class="page-link rounded-circle border-0 shadow-sm d-flex align-items-center justify-content-center hover-bg-primary hover-text-white transition-all text-dark bg-white" style="width:44px;height:44px;" href="{{ $url }}">{{ $page }}</a></li>
                                         @endif
                                     @endforeach
                                 @endif
                             @endforeach
-
-                            <!-- Next Page Link -->
                             @if ($blogs->hasMorePages())
-                                <li class="page-item">
-                                    <a class="page-link rounded-circle border-0 shadow-sm d-flex align-items-center justify-content-center hover-bg-primary hover-text-white transition-all" href="{{ $blogs->nextPageUrl() }}" rel="next"><i class="fas fa-chevron-right"></i></a>
-                                </li>
+                                <li class="page-item"><a class="page-link rounded-circle border-0 shadow-sm d-flex align-items-center justify-content-center hover-bg-primary hover-text-white transition-all" style="width:44px;height:44px;" href="{{ $blogs->nextPageUrl() }}" rel="next"><i class="fas fa-chevron-right"></i></a></li>
                             @else
-                                <li class="page-item disabled">
-                                    <span class="page-link rounded-circle border-0 d-flex align-items-center justify-content-center bg-light text-muted"><i class="fas fa-chevron-right"></i></span>
-                                </li>
+                                <li class="page-item disabled"><span class="page-link rounded-circle border-0 d-flex align-items-center justify-content-center bg-light text-muted" style="width:44px;height:44px;"><i class="fas fa-chevron-right"></i></span></li>
                             @endif
                         </ul>
                     </nav>
                 </div>
                 @endif
 
-            </div>
+            </div>{{-- /col-lg-8 --}}
 
-            <!-- Right Content: Premium Sidebar -->
+            {{-- SIDEBAR --}}
             <div class="col-lg-4">
-                <div class="position-sticky auto-style-16">
-                    
-                  
+                <div class="sticky-top" style="top: 160px; z-index: 10;">
 
-                    <!-- Premium Categories -->
-                    <div class="card border-0 rounded-4 shadow-sm mb-4 bg-white sidebar-widget">
-                        <div class="card-body p-4">
-                            <h5 class="fw-bold mb-4 d-flex align-items-center"><i class="fas fa-layer-group text-primary me-2"></i> Categories</h5>
-                            <div class="d-flex flex-column gap-3">
-                                @foreach($categories as $cat)
-                                <a href="?category={{ $cat->slug }}" class="text-decoration-none transition-all hover-lift">
-                                    <div class="p-3 rounded-4 border border-light bg-light hover-bg-primary-light d-flex align-items-center justify-content-between group">
-                                        <div class="d-flex align-items-center text-dark group-hover-primary">
-                                            <div class="bg-white rounded-circle d-flex align-items-center justify-content-center shadow-sm text-primary me-3 transition-all group-hover-bg-primary group-hover-text-white auto-style-10">
-                                                <i class="{{ $cat->icon ?? 'fas fa-hashtag' }}"></i>
-                                            </div>
-                                            <span class="fw-bold">{{ $cat->name }}</span>
-                                        </div>
-                                        <span class="badge bg-white text-muted shadow-sm rounded-pill px-3 py-2 transition-all group-hover-bg-primary group-hover-text-white border border-light">{{ $cat->blogs_count }}</span>
-                                    </div>
-                                </a>
-                                @endforeach
-                            </div>
+                    <!-- <div class="sidebar-widget mb-4">
+                        <div class="sidebar-widget-header"><i class="fas fa-layer-group text-primary me-2"></i> Categories</div>
+                        <div class="sidebar-widget-body">
+                            @foreach($categories as $cat)
+                            @php $catColors=['#7367f0','#28c76f','#ff9f43','#00cfe8','#ea5455','#6c757d']; $catColor=$catColors[$loop->index % count($catColors)]; $isActive=request('category')==$cat->slug; @endphp
+                            <a href="?category={{ $cat->slug }}" class="sidebar-cat-item {{ $isActive ? 'active' : '' }}" style="border-left-color:{{ $catColor }};">
+                                <div class="sidebar-cat-icon" style="background:{{ $catColor }}22;color:{{ $catColor }};"><i class="{{ $cat->icon ?? 'fas fa-hashtag' }}"></i></div>
+                                <span class="sidebar-cat-name">{{ $cat->name }}</span>
+                                <span class="sidebar-cat-count" style="background:{{ $catColor }}18;color:{{ $catColor }};">{{ $cat->blogs_count }}</span>
+                            </a>
+                            @endforeach
                         </div>
-                    </div>
+                    </div> -->
 
-                    <!-- Most Viewed -->
                     @if(isset($mostViewedBlogs) && $mostViewedBlogs->count() > 0)
-                    <div class="card border-0 rounded-4 shadow-sm mb-4 bg-white sidebar-widget">
-                        <div class="card-body p-4">
-                            <h5 class="fw-bold mb-4 d-flex align-items-center"><i class="fas fa-fire text-danger me-2"></i> Most Viewed</h5>
-                            <div class="d-flex flex-column gap-3">
-                                @foreach($mostViewedBlogs as $mvb)
-                                <a href="{{ route('web.blogs.show', $mvb->slug) }}" class="text-decoration-none text-dark d-flex align-items-center hover-text-primary transition-all group">
-                                    <img src="{{ $mvb->featured_image ? asset($mvb->featured_image) : 'https://placehold.co/100' }}" loading="lazy" class="rounded-3 object-fit-cover shadow-sm transition-all group-hover-lift auto-style-28" alt="{{ $mvb->title }}">
-                                    <div class="ms-3">
-                                        <h6 class="fw-bold mb-1 lh-base group-hover-primary auto-style-7">{{ Str::limit($mvb->title, 45) }}</h6>
-                                        <div class="d-flex align-items-center text-muted small fw-bold">
-                                            <i class="far fa-eye text-primary me-1"></i> {{ number_format($mvb->views ?? 0) }} Views
-                                        </div>
-                                    </div>
-                                </a>
-                                @endforeach
-                            </div>
+                    <div class="sidebar-widget mb-4">
+                        <div class="sidebar-widget-header"><i class="fas fa-fire text-danger me-2"></i> Most Viewed</div>
+                        <div class="sidebar-widget-body">
+                            @foreach($mostViewedBlogs as $mvb)
+                            <a href="{{ route('web.blogs.show', $mvb->slug) }}" class="sidebar-article-item">
+                                <div class="sidebar-rank">{{ $loop->index + 1 }}</div>
+                                <img src="{{ $mvb->featured_image ? asset($mvb->featured_image) : 'https://placehold.co/100' }}" loading="lazy" class="sidebar-article-img" alt="{{ $mvb->title }}">
+                                <div class="sidebar-article-info">
+                                    <div class="sidebar-article-title">{{ Str::limit($mvb->title, 45) }}</div>
+                                    <div class="sidebar-article-meta"><i class="far fa-eye me-1 text-primary"></i>{{ number_format($mvb->views ?? 0) }} Views</div>
+                                </div>
+                            </a>
+                            @endforeach
                         </div>
                     </div>
                     @endif
 
-                    <!-- Recent Posts -->
                     @if(isset($recentBlogs) && $recentBlogs->count() > 0)
-                    <div class="card border-0 rounded-4 shadow-sm mb-4 bg-white sidebar-widget">
-                        <div class="card-body p-4">
-                            <h5 class="fw-bold mb-4 d-flex align-items-center"><i class="far fa-clock text-primary me-2"></i> Recent Articles</h5>
-                            <div class="d-flex flex-column gap-3">
-                                @foreach($recentBlogs as $rb)
-                                <a href="{{ route('web.blogs.show', $rb->slug) }}" class="text-decoration-none text-dark d-flex align-items-center hover-text-primary transition-all group">
-                                    <img src="{{ $rb->featured_image ? asset($rb->featured_image) : 'https://placehold.co/100' }}" loading="lazy" class="rounded-3 object-fit-cover shadow-sm transition-all group-hover-lift auto-style-28" alt="{{ $rb->title }}">
-                                    <div class="ms-3">
-                                        <h6 class="fw-bold mb-1 lh-base group-hover-primary auto-style-7">{{ Str::limit($rb->title, 45) }}</h6>
-                                        <div class="d-flex align-items-center text-muted small fw-bold">
-                                            <i class="far fa-calendar-alt text-primary me-1"></i> {{ $rb->published_at ? \Carbon\Carbon::parse($rb->published_at)->format('M d, Y') : $rb->created_at->format('M d, Y') }}
-                                        </div>
-                                    </div>
-                                </a>
-                                @endforeach
-                            </div>
+                    <div class="sidebar-widget mb-4">
+                        <div class="sidebar-widget-header"><i class="far fa-clock text-primary me-2"></i> Recent Articles</div>
+                        <div class="sidebar-widget-body">
+                            @foreach($recentBlogs as $rb)
+                            <a href="{{ route('web.blogs.show', $rb->slug) }}" class="sidebar-article-item">
+                                <img src="{{ $rb->featured_image ? asset($rb->featured_image) : 'https://placehold.co/100' }}" loading="lazy" class="sidebar-article-img" alt="{{ $rb->title }}">
+                                <div class="sidebar-article-info">
+                                    <div class="sidebar-article-title">{{ Str::limit($rb->title, 45) }}</div>
+                                    <div class="sidebar-article-meta"><i class="far fa-calendar-alt me-1 text-primary"></i>{{ $rb->published_at ? \Carbon\Carbon::parse($rb->published_at)->format('M d, Y') : $rb->created_at->format('M d, Y') }}</div>
+                                </div>
+                            </a>
+                            @endforeach
                         </div>
                     </div>
                     @endif
 
-                    <!-- Popular Tags (Rounded Chips) -->
-                    <div class="card border-0 rounded-4 shadow-sm mb-4 bg-white sidebar-widget">
-                        <div class="card-body p-4">
-                            <h5 class="fw-bold mb-4 d-flex align-items-center"><i class="fas fa-tags text-primary me-2"></i> Popular Tags</h5>
-                            <div class="d-flex flex-wrap gap-2">
+                    <div class="sidebar-widget mb-4">
+                        <div class="sidebar-widget-header"><i class="fas fa-tags text-primary me-2"></i> Popular Tags</div>
+                        <div class="sidebar-widget-body">
+                            <div class="tag-cloud">
                                 @foreach($tags as $tag)
-                                <a href="#" class="badge bg-light text-dark border border-light text-decoration-none px-4 py-2 rounded-pill fw-bold hover-bg-primary hover-text-white transition-all shadow-sm hover-lift">{{ $tag->name }}</a>
+                                <a href="{{ route('web.blogs.index', ['tag' => $tag->id]) }}" class="tag-chip">{{ $tag->name }}</a>
                                 @endforeach
                             </div>
                         </div>
                     </div>
-
-                 
 
                 </div>
-            </div>
+            </div>{{-- /col-lg-4 --}}
+
         </div>
     </div>
 </section>
 
-<!-- Custom Premium Styles for Blog Index -->
+<!-- Categories Modal -->
+<div class="modal fade" id="categoriesModal" tabindex="-1" aria-labelledby="categoriesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold fs-4" id="categoriesModalLabel">All Blog Categories</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                
+                <!-- Flat Grid Categories -->
+                <div id="categoryListContainer">
+                    <div class="row g-3">
+                        @foreach($categories->sortBy('name') as $cat)
+                        <div class="col-12 category-item" data-name="{{ strtolower($cat->name) }}">
+                            <a href="{{ route('web.blogs.index', array_merge(request()->query(), ['category' => $cat->slug])) }}" class="modal-category-card">
+                                <div>
+                                    <div class="fw-bold text-heading" style="font-size: 0.95rem;">
+                                        @if($cat->icon)<i class="{{ $cat->icon }} me-2 opacity-75 text-primary"></i>@endif{{ $cat->name }}
+                                    </div>
+                                    <div class="text-muted fs-xs mt-1">{{ $cat->blogs_count }} {{ Str::plural('Article', $cat->blogs_count) }}</div>
+                                </div>
+                                <i class="fas fa-chevron-right text-muted opacity-50 fs-xs"></i>
+                            </a>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
 
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@700;900&display=swap');
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.filter-pill { display:inline-flex;align-items:center;gap:4px;padding:6px 16px;border-radius:50px;font-size:.82rem;font-weight:600;border:1.5px solid #dee2e6;background:#fff;color:#555;text-decoration:none;cursor:pointer;transition:all .2s;white-space:nowrap; }
+.filter-pill:hover { border-color:#7367f0;color:#7367f0;background:#f5f3ff; }
+.filter-pill-active { background:#7367f0;color:#fff !important;border-color:#7367f0; }
+.filter-pill-active:hover { background:#5e50ee;border-color:#5e50ee; }
+.filter-pill-clear { background:#fff3f3;color:#ea5455;border-color:#f5c6c6; }
+.filter-pill-clear:hover { background:#ea5455;color:#fff;border-color:#ea5455; }
+.filter-count { display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.35);width:18px;height:18px;border-radius:50%;font-size:.7rem;font-weight:700;margin-left:4px; }
+.sort-tabs { display:inline-flex;align-items:center;background:#f0f0f5;border-radius:50px;padding:4px;border:1px solid #e5e5ef; }
+.sort-tab { padding:5px 16px;border-radius:50px;font-size:.82rem;font-weight:600;color:#888;text-decoration:none;transition:all .2s; }
+.sort-tab:hover { color:#0d6efd; }
+.sort-tab.active { background:#fff;color:#0d6efd;box-shadow:0 2px 8px rgba(13,110,253,.18); }
+.blog-img-zoom { transition:transform .55s cubic-bezier(.4,0,.2,1); }
+.blog-featured-card:hover .blog-img-zoom,.blog-card:hover .blog-img-zoom { transform:scale(1.06); }
+.reading-time-badge { position:absolute;bottom:12px;left:12px;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);color:#fff;font-size:.75rem;font-weight:600;padding:4px 12px;border-radius:50px;display:flex;align-items:center; }
+.blog-featured-card { border-radius:20px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.10);background:#fff;transition:transform .3s,box-shadow .3s; }
+.blog-featured-card:hover { transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.14); }
+.featured-img-overlay { position:absolute;inset:0;background:linear-gradient(135deg,rgba(115,103,240,.18) 0%,transparent 60%);pointer-events:none; }
+.blog-cat-badge { display:inline-flex;align-items:center;background:#7367f0;color:#fff;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:4px 12px;border-radius:50px;text-decoration:none;transition:background .2s; }
+.blog-cat-badge:hover { background:#5e50ee;color:#fff; }
+.featured-star-badge { width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#ff9f43,#ffd89b);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(255,159,67,.4);font-size:.85rem; }
+.btn-read-more { width:40px;height:40px;border-radius:50%;border:2px solid #7367f0;color:#7367f0;display:flex;align-items:center;justify-content:center;text-decoration:none;transition:all .2s; }
+.btn-read-more:hover { background:#7367f0;color:#fff;transform:scale(1.1); }
+.btn-read-more-sm { width:34px;height:34px;border-width:1.5px; }
+.blog-card { border-radius:16px;overflow:hidden;background:#fff;border:1px solid #f0f0f5;box-shadow:0 2px 12px rgba(0,0,0,.06);transition:transform .3s,box-shadow .3s;display:flex;flex-direction:column; }
+.blog-card:hover { transform:translateY(-6px);box-shadow:0 12px 36px rgba(0,0,0,.12); }
+.blog-card-img-wrap { height:210px;overflow:hidden;position:relative; }
+.blog-card-img { width:100%;height:100%;object-fit:cover;display:block; }
+.blog-card-cat-badge { position:absolute;top:12px;left:12px;background:rgba(255,255,255,.92);color:#7367f0;font-size:.72rem;font-weight:700;padding:4px 12px;border-radius:50px;text-decoration:none;transition:all .2s;backdrop-filter:blur(4px); }
+.blog-card-cat-badge:hover { background:#7367f0;color:#fff; }
+.blog-card-actions { position:absolute;top:12px;right:12px;display:flex;flex-direction:column;gap:6px;opacity:0;transition:opacity .25s; }
+.blog-card:hover .blog-card-actions { opacity:1; }
+.blog-action-btn { width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.9);border:none;color:#555;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.8rem;transition:all .2s;box-shadow:0 2px 6px rgba(0,0,0,.12); }
+.blog-action-btn:hover { background:#7367f0;color:#fff; }
+.blog-card-body { padding:20px;flex:1;display:flex;flex-direction:column; }
+.blog-card-title { font-size:.95rem;font-weight:700;margin-bottom:8px;line-height:1.4; }
+.blog-card-excerpt { color:#6c757d;font-size:.85rem;line-height:1.6;flex:1;margin-bottom:16px; }
+.blog-card-footer { display:flex;align-items:center;justify-content:space-between;border-top:1px solid #f0f0f5;padding-top:14px;margin-top:auto; }
+.sidebar-widget { background:#fff;border-radius:16px;box-shadow:0 2px 16px rgba(0,0,0,.07);overflow:hidden; }
+.sidebar-widget-header { font-size:.95rem;font-weight:700;padding:18px 20px;border-bottom:1px solid #f5f5f8;display:flex;align-items:center; }
+.sidebar-widget-body { padding:16px 20px; }
+.sidebar-cat-item { display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;border-left:3px solid #7367f0;margin-bottom:8px;text-decoration:none;color:#333;background:#fafafa;transition:all .2s; }
+.sidebar-cat-item:last-child { margin-bottom:0; }
+.sidebar-cat-item:hover,.sidebar-cat-item.active { background:#f0edff;color:#7367f0; }
+.sidebar-cat-icon { width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0; }
+.sidebar-cat-name { flex:1;font-size:.87rem;font-weight:600; }
+.sidebar-cat-count { font-size:.78rem;font-weight:700;padding:2px 10px;border-radius:50px; }
+.sidebar-article-item { display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f5f5f8;text-decoration:none;color:#333;transition:all .2s; }
+.sidebar-article-item:last-child { border-bottom:none;padding-bottom:0; }
+.sidebar-article-item:hover { color:#7367f0; }
+.sidebar-article-item:hover .sidebar-article-img { transform:scale(1.06); }
+.sidebar-rank { width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#7367f0,#a296ff);color:#fff;font-size:.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+.sidebar-article-img { width:64px;height:54px;border-radius:10px;object-fit:cover;flex-shrink:0;transition:transform .3s; }
+.sidebar-article-info { flex:1;min-width:0; }
+.sidebar-article-title { font-size:.82rem;font-weight:600;line-height:1.4;margin-bottom:4px; }
+.sidebar-article-meta { font-size:.72rem;color:#999;font-weight:600; }
+.tag-cloud { display:flex;flex-wrap:wrap;gap:8px; }
+.tag-chip { display:inline-flex;align-items:center;padding:5px 14px;border-radius:50px;font-size:.78rem;font-weight:600;background:#f4f3ff;color:#7367f0;border:1px solid #e0dbff;text-decoration:none;transition:all .2s; }
+.tag-chip:hover { background:#7367f0;color:#fff;border-color:#7367f0;transform:translateY(-2px) scale(1.05); }
+.blog-empty-state { background:#fff;border-radius:20px;border:1px solid #f0f0f5; }
+</style>
+@endsection
 
 @section('page-script')
 <script>
-    // Initialize tooltips
-    document.addEventListener("DOMContentLoaded", function(){
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        });
-        
-        // Add subtle shrink effect on sticky filter bar on scroll
-        window.addEventListener('scroll', function() {
-            var filterBar = document.getElementById('stickyFilterBar');
-            if (window.scrollY > 500) {
-                filterBar.classList.add('py-2');
-                filterBar.classList.remove('py-3');
-            } else {
-                filterBar.classList.add('py-3');
-                filterBar.classList.remove('py-2');
-            }
-        });
-    });
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el){ new bootstrap.Tooltip(el); });
+    var filterBar = document.getElementById('stickyFilterBar');
+    window.addEventListener('scroll', function() {
+        if(window.scrollY > 400){ filterBar.classList.replace('py-3','py-2'); }
+        else { filterBar.classList.replace('py-2','py-3'); }
+    }, {passive:true});
+    function animateCounter(el) {
+        var target = parseInt(el.dataset.target.toString().replace(/,/g,''), 10);
+        if(isNaN(target)) return;
+        var duration = 1400, step = Math.ceil(target/(duration/16)), current = 0;
+        var timer = setInterval(function() {
+            current = Math.min(current + step, target);
+            el.textContent = current.toLocaleString();
+            if(current >= target) clearInterval(timer);
+        }, 16);
+    }
+    var statEls = document.querySelectorAll('.stat-num');
+    if('IntersectionObserver' in window) {
+        var obs = new IntersectionObserver(function(entries) {
+            entries.forEach(function(e){ if(e.isIntersecting){ animateCounter(e.target); obs.unobserve(e.target); } });
+        }, {threshold:0.5});
+        statEls.forEach(function(el){ obs.observe(el); });
+    } else { statEls.forEach(animateCounter); }
+    if(sessionStorage.getItem('scrollToGrid')==='1') {
+        sessionStorage.removeItem('scrollToGrid');
+        var grid = document.querySelector('.blog-card, .blog-featured-card');
+        if(grid) setTimeout(function(){ grid.scrollIntoView({behavior:'smooth',block:'start'}); }, 200);
+    }
+});
 </script>
-@endsection
 @endsection

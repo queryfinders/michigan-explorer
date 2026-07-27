@@ -5,19 +5,43 @@
     $metaTitle = $blog->meta_title ?? ($blog->title . ' - Michigan Explorer');
     $metaDescription = $blog->meta_description ?? Str::limit(strip_tags($blog->content), 160);
     $canonicalUrl = $blog->canonical_url ?? route('web.blogs.show', $blog->slug);
-    $heroImage = $blog->featured_image ? asset($blog->featured_image) : 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1600';
+    
+    if ($blog->featured_image) {
+        $heroImage = Str::startsWith($blog->featured_image, ['http://', 'https://']) 
+            ? $blog->featured_image 
+            : asset($blog->featured_image);
+    } else {
+        $heroImage = 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1600';
+    }
+    
     $readTime = ceil(str_word_count(strip_tags($blog->content)) / 200);
 
     // Fetch Next and Previous Articles locally
     $prevBlog = App\Models\Blog::where('id', '<', $blog->id)
         ->where('status', 'published')
+        ->where(function($q) {
+            $q->whereNull('published_at')->orWhere('published_at', '<=', now());
+        })
         ->orderBy('id', 'desc')
         ->first();
 
     $nextBlog = App\Models\Blog::where('id', '>', $blog->id)
         ->where('status', 'published')
+        ->where(function($q) {
+            $q->whereNull('published_at')->orWhere('published_at', '<=', now());
+        })
         ->orderBy('id', 'asc')
         ->first();
+
+    // Determine Author Avatar
+    $authorAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($blog->author ? $blog->author->name : 'Admin') . '&background=0d6efd&color=fff';
+    if ($blog->author && $blog->author->avatar) {
+        if (Str::startsWith($blog->author->avatar, ['http://', 'https://'])) {
+            $authorAvatar = $blog->author->avatar;
+        } elseif (file_exists(public_path($blog->author->avatar))) {
+            $authorAvatar = asset($blog->author->avatar);
+        }
+    }
 @endphp
 
 @section('title', $metaTitle)
@@ -125,7 +149,7 @@
                 
                 <div class="d-flex flex-wrap align-items-center justify-content-center text-white opacity-90 gap-4 fade-up-anim auto-style-34">
                     <div class="d-flex align-items-center">
-                        <img src="{{ $blog->author && $blog->author->avatar && file_exists(public_path($blog->author->avatar)) ? asset($blog->author->avatar) : 'https://ui-avatars.com/api/?name='.urlencode($blog->author ? $blog->author->name : 'Admin').'&background=0d6efd&color=fff' }}" alt="Author" class="rounded-circle me-2 border border-2 border-white shadow-sm auto-style-35">
+                        <img src="{{ $authorAvatar }}" alt="Author" class="rounded-circle me-2 border border-2 border-white shadow-sm auto-style-35">
                         <span class="fw-bold">{{ $blog->author ? $blog->author->name : 'Admin' }}</span>
                     </div>
                     <div class="d-flex align-items-center small text-uppercase letter-spacing-1 fw-bold">
@@ -163,7 +187,7 @@
                         <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ urlencode($canonicalUrl) }}&title={{ urlencode($blog->title) }}" target="_blank" class="share-btn linkedin"><i class="fab fa-linkedin-in"></i></a>
                         <a href="https://pinterest.com/pin/create/button/?url={{ urlencode($canonicalUrl) }}&media={{ urlencode($heroImage) }}&description={{ urlencode($blog->title) }}" target="_blank" class="share-btn pinterest"><i class="fab fa-pinterest-p"></i></a>
                         <a href="https://api.whatsapp.com/send?text={{ urlencode($blog->title . ' ' . $canonicalUrl) }}" target="_blank" class="share-btn whatsapp"><i class="fab fa-whatsapp"></i></a>
-                        <button onclick="navigator.clipboard.writeText('{{ $canonicalUrl }}'); alert('Link Copied!');" class="share-btn copy-link"><i class="fas fa-link"></i></button>
+                        <button onclick="if(navigator.clipboard){ navigator.clipboard.writeText('{{ $canonicalUrl }}').then(() => alert('Link Copied!')); } else { var temp = document.createElement('input'); document.body.appendChild(temp); temp.value = '{{ $canonicalUrl }}'; temp.select(); document.execCommand('copy'); document.body.removeChild(temp); alert('Link Copied!'); }" class="share-btn copy-link"><i class="fas fa-link"></i></button>
                     </div>
                 </div>
             </div>
@@ -179,53 +203,31 @@
                     @endif
 
                     <div class="content-body" id="article-body">
-                        {!! $blog->content !!}
+                        {!! html_entity_decode($blog->content) !!}
                     </div>
                     
                 </article>
 
                 <!-- FAQ Section -->
+                @if($blog->faqs && $blog->faqs->count() > 0)
                 <div class="bg-white rounded-4 shadow-sm p-4 p-md-5 mb-5">
                     <h3 class="fw-bold mb-4 font-heading text-heading">Frequently Asked Questions</h3>
                     <div class="accordion accordion-flush" id="blogFaq">
+                        @foreach($blog->faqs as $index => $faq)
                         <div class="accordion-item border rounded-3 mb-2 overflow-hidden">
                             <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-                                    When is the best time to visit Michigan for this trip?
+                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq{{ $faq->id }}">
+                                    {{ $faq->question }}
                                 </button>
                             </h2>
-                            <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#blogFaq">
-                                <div class="accordion-body text-muted lh-18">
-                                    Late spring through early autumn (May to October) is ideal. Summer offers beach activities and warm weather, while autumn brings breathtaking fall colors and harvest season at local vineyards.
-                                </div>
+                            <div id="faq{{ $faq->id }}" class="accordion-collapse collapse" data-bs-parent="#blogFaq">
+                                <div class="accordion-body text-muted lh-lg">{!! $faq->answer !!}</div>
                             </div>
                         </div>
-                        <div class="accordion-item border rounded-3 mb-2 overflow-hidden">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
-                                    Are these recommendations family-friendly?
-                                </button>
-                            </h2>
-                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#blogFaq">
-                                <div class="accordion-body text-muted lh-18">
-                                    Yes! Most locations, parks, and dining options mentioned in our guides offer options suitable for travelers of all ages.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="accordion-item border rounded-3 overflow-hidden">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
-                                    Do I need to book reservations in advance?
-                                </button>
-                            </h2>
-                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#blogFaq">
-                                <div class="accordion-body text-muted lh-18">
-                                    For popular attractions, restaurants, and hotels, we highly recommend booking 2-4 weeks in advance, especially during the peak summer and fall color seasons.
-                                </div>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
+                @endif
 
                 <!-- Tags -->
                 <div class="d-flex flex-wrap align-items-center gap-2 mb-5 pb-4 border-bottom">
@@ -246,25 +248,37 @@
                     <a href="https://api.whatsapp.com/send?text={{ urlencode($blog->title . ' ' . $canonicalUrl) }}" target="_blank" class="share-btn-mobile whatsapp"><i class="fab fa-whatsapp"></i></a>
                 </div>
 
+
+
                 <!-- Premium Author Card -->
                 @if($blog->author)
                 <div class="author-premium-card p-4 p-md-5 mb-5 rounded-4 border-0">
                     <div class="d-flex flex-column flex-md-row align-items-center text-center text-md-start">
                         <div class="position-relative mb-4 mb-md-0 me-md-4">
-                            <img src="{{ $blog->author && $blog->author->avatar && file_exists(public_path($blog->author->avatar)) ? asset($blog->author->avatar) : 'https://ui-avatars.com/api/?name='.urlencode($blog->author->name).'&background=0d6efd&color=fff&size=150' }}" alt="{{ $blog->author->name }}" class="rounded-circle object-fit-cover shadow-sm border border-3 border-white auto-style-37">
+                            <img src="{{ $authorAvatar }}" alt="{{ $blog->author->avatar_alt ?? $blog->author->name }}" class="rounded-circle object-fit-cover shadow-sm border border-3 border-white auto-style-37">
                             <div class="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center border border-2 border-white auto-style-38">
                                 <i class="fas fa-check-circle"></i>
                             </div>
                         </div>
                         <div class="flex-grow-1">
-                            <span class="text-primary fw-bold text-uppercase small letter-spacing-1 mb-1 d-block">Author & Explorer</span>
+                            <span class="text-primary fw-bold text-uppercase small letter-spacing-1 mb-1 d-block">{{ $blog->author->designation ?? 'Author & Explorer' }}</span>
                             <h3 class="fw-bold mb-2">{{ $blog->author->name }}</h3>
                             <p class="text-muted mb-3">{{ $blog->author->bio ?? 'Passionate traveler and local expert sharing the best of Michigan\'s hidden gems and iconic destinations.' }}</p>
                             <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-3">
                                 <a href="#" class="btn btn-outline-primary btn-sm rounded-pill px-4 fw-bold">View Profile</a>
-                                <div class="d-flex gap-2">
-                                    <a href="#" class="text-muted hover-text-primary"><i class="fab fa-instagram fs-5"></i></a>
-                                    <a href="#" class="text-muted hover-text-primary"><i class="fab fa-x-twitter fs-5"></i></a>
+                                <div class="d-flex gap-3 align-items-center">
+                                    @if($blog->author->facebook)
+                                    <a href="{{ Str::startsWith($blog->author->facebook, ['http://', 'https://']) ? $blog->author->facebook : 'https://' . $blog->author->facebook }}" target="_blank" class="text-muted hover-text-primary"><i class="fab fa-facebook-f fs-5"></i></a>
+                                    @endif
+                                    @if($blog->author->twitter)
+                                    <a href="{{ Str::startsWith($blog->author->twitter, ['http://', 'https://']) ? $blog->author->twitter : 'https://' . $blog->author->twitter }}" target="_blank" class="text-muted hover-text-primary"><i class="fab fa-x-twitter fs-5"></i></a>
+                                    @endif
+                                    @if($blog->author->linkedin)
+                                    <a href="{{ Str::startsWith($blog->author->linkedin, ['http://', 'https://']) ? $blog->author->linkedin : 'https://' . $blog->author->linkedin }}" target="_blank" class="text-muted hover-text-primary"><i class="fab fa-linkedin-in fs-5"></i></a>
+                                    @endif
+                                    @if($blog->author->instagram)
+                                    <a href="{{ Str::startsWith($blog->author->instagram, ['http://', 'https://']) ? $blog->author->instagram : 'https://' . $blog->author->instagram }}" target="_blank" class="text-muted hover-text-primary"><i class="fab fa-instagram fs-5"></i></a>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -293,7 +307,7 @@
                 </div>
 
                 <!-- Newsletter Callout -->
-                <div class="newsletter-premium-card p-4 p-md-5 mb-5 rounded-4 position-relative overflow-hidden">
+                <!-- <div class="newsletter-premium-card p-4 p-md-5 mb-5 rounded-4 position-relative overflow-hidden">
                     <div class="position-absolute top-0 end-0 opacity-10 auto-style-39">
                         <i class="fas fa-paper-plane auto-style-40"></i>
                     </div>
@@ -306,7 +320,7 @@
                             <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Subscribe</button>
                         </form>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Comments Placeholder -->
                 <!-- <div class="comments-section mb-5">
@@ -348,7 +362,7 @@
 
             <!-- Right: Table of Contents -->
             <div class="col-lg-3 col-xl-4 d-none d-lg-block">
-                <div class="sticky-top pt-4 auto-style-44">
+                <div class="sticky-top pt-4 auto-style-44" style="top: 60px; z-index: 10;">
                     <div class="toc-premium-card p-4 rounded-4 shadow-sm bg-white border border-light">
                         <h6 class="text-uppercase fw-bold letter-spacing-1 mb-3 text-primary d-flex align-items-center">
                             <i class="fas fa-list-ul me-2"></i> In this article
@@ -368,7 +382,7 @@
                             @foreach($relatedBlogs->take(3) as $related)
                             <div class="d-flex align-items-center gap-3 pb-2 border-bottom border-light">
                                 <a href="{{ route('web.blogs.show', $related->slug) }}" class="flex-shrink-0" style="width: 70px; height: 70px;">
-                                    <img src="{{ $related->featured_image ? asset($related->featured_image) : 'https://placehold.co/100' }}" class="rounded-3 w-100 h-100 object-fit-cover shadow-sm" alt="{{ $related->title }}">
+                                    <img src="{{ $related->featured_image ? (Str::startsWith($related->featured_image, ['http://', 'https://']) ? $related->featured_image : asset($related->featured_image)) : 'https://placehold.co/100' }}" class="rounded-3 w-100 h-100 object-fit-cover shadow-sm" alt="{{ $related->title }}">
                                 </a>
                                 <div>
                                     <h6 class="mb-1 fw-bold" style="font-size: 0.9rem; line-height: 1.3;">
@@ -383,14 +397,10 @@
                     @endif
 
                     <!-- Sidebar Ad / Promo Placeholder -->
-                    <div class="mt-4 rounded-4 overflow-hidden position-relative shadow-sm group">
-                        <img src="{{ asset('images/michigan_explorer_ad.png') }}" class="w-100 object-fit-cover auto-style-45" alt="Promo">
-                        <div class="position-absolute top-0 start-0 w-100 h-100 auto-style-46"></div>
-                        <div class="position-absolute bottom-0 start-0 w-100 p-4 text-white">
-                            <span class="badge bg-accent text-dark mb-2 rounded-pill fw-bold">Discover</span>
-                            <h5 class="fw-bold mb-2">Michigan Explorer Premium</h5>
-                            <a href="#" class="text-white text-decoration-none fw-bold small text-uppercase letter-spacing-1">Learn More <i class="fas fa-arrow-right ms-1"></i></a>
-                        </div>
+                    <div class="mt-4 rounded-4 overflow-hidden position-relative shadow-sm group hover-shadow-lg transition-all" style="border: 1px solid #f1f5f9;">
+                        <a href="#" class="d-block">
+                            <img src="{{ asset('images/michigan_explorer_ad.png') }}" class="w-100 object-fit-cover hover-zoom auto-style-45" alt="Explore Michigan Explorer Premium" style="transition: transform 0.3s ease;">
+                        </a>
                     </div>
 
                 </div>
@@ -412,7 +422,7 @@
                     <div class="card h-100 border-0 rounded-4 shadow-sm hover-shadow-lg transition-all blog-card-premium overflow-hidden">
                         <div class="position-relative overflow-hidden auto-style-47">
                             <a href="{{ route('web.blogs.show', $related->slug) }}" class="d-block w-100 h-100">
-                                <img src="{{ $related->featured_image ? asset($related->featured_image) : 'https://placehold.co/600x400' }}" class="w-100 h-100 object-fit-cover hover-zoom" alt="{{ $related->title }}">
+                                <img src="{{ $related->featured_image ? (Str::startsWith($related->featured_image, ['http://', 'https://']) ? $related->featured_image : asset($related->featured_image)) : 'https://placehold.co/600x400' }}" class="w-100 h-100 object-fit-cover hover-zoom" alt="{{ $related->title }}">
                             </a>
                             @if($related->category)
                             <div class="position-absolute top-0 start-0 m-3">
@@ -450,6 +460,199 @@
 </section>
 
 <!-- CSS specifically for Blog Editorial Layout -->
+<style>
+/* ── Premium Editorial Custom Styles ── */
+.blog-editorial-content {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+    font-size: 1.15rem !important;
+    line-height: 1.95 !important;
+    color: #334155 !important;
+}
+
+/* Excerpt Card */
+.lead-excerpt {
+    font-size: 1.25rem !important;
+    line-height: 1.8 !important;
+    font-weight: 500 !important;
+    color: #475569 !important;
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9) !important;
+    border-left: 4px solid #7367f0 !important;
+    padding: 1.75rem 2rem !important;
+    border-radius: 12px !important;
+    border-bottom: none !important;
+    margin-bottom: 3rem !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.02) !important;
+}
+
+/* Magazine Headings */
+.blog-editorial-content h2 {
+    font-size: 2rem !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.5px !important;
+    margin-top: 1.85rem !important;
+    margin-bottom: 0.75rem !important;
+    position: relative;
+    padding-left: 15px;
+}
+.blog-editorial-content h2::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 15%;
+    height: 70%;
+    width: 4px;
+    background: #7367f0;
+    border-radius: 4px;
+}
+
+.blog-editorial-content h3 {
+    font-size: 1.6rem !important;
+    font-weight: 700 !important;
+    margin-top: 1.6rem !important;
+    margin-bottom: 0.6rem !important;
+}
+
+/* Floating Share Bar */
+.share-sidebar {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    border-radius: 40px;
+    padding: 20px 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.share-btn {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: #64748b;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+}
+.share-btn:hover {
+    color: #fff !important;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+.share-btn.facebook:hover { background: #3b5998; border-color: #3b5998; }
+.share-btn.twitter:hover { background: #1da1f2; border-color: #1da1f2; }
+.share-btn.linkedin:hover { background: #0077b5; border-color: #0077b5; }
+.share-btn.pinterest:hover { background: #bd081c; border-color: #bd081c; }
+.share-btn.whatsapp:hover { background: #25d366; border-color: #25d366; }
+.share-btn.copy-link:hover { background: #475569; border-color: #475569; }
+
+/* Premium Tags chips */
+.tag-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 16px;
+    border-radius: 50px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+.tag-chip:hover {
+    background: #7367f0;
+    color: #fff !important;
+    border-color: #7367f0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(115, 103, 240, 0.2);
+}
+
+.hover-zoom {
+    transition: transform 0.3s ease;
+}
+.group:hover .hover-zoom {
+    transform: scale(1.05);
+}
+
+/* Meet the Author Card */
+.author-premium-card {
+    background: linear-gradient(135deg, #ffffff, #f8fafc) !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 20px !important;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.04) !important;
+    transition: all 0.3s ease;
+}
+.author-premium-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 45px rgba(0,0,0,0.06) !important;
+}
+.author-premium-card .hover-text-primary {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #f1f5f9;
+    color: #64748b !important;
+    transition: all 0.2s ease;
+}
+.author-premium-card .hover-text-primary:hover {
+    background: #7367f0;
+    color: #fff !important;
+}
+
+/* TOC & Sidebar Cards */
+.toc-premium-card, .sidebar-widget {
+    border-radius: 20px !important;
+    border: 1px solid #f1f5f9 !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03) !important;
+    background: #fff !important;
+}
+
+.toc-nav a {
+    font-size: 0.88rem;
+    color: #64748b;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border-left: 2px solid #e2e8f0;
+    padding-left: 12px;
+}
+.toc-nav a:hover, .toc-nav a.active {
+    color: #7367f0 !important;
+    border-left-color: #7367f0;
+    font-weight: 600;
+    padding-left: 16px;
+}
+
+/* FAQ Accordion Premium styling */
+.accordion-item {
+    border-radius: 12px !important;
+    margin-bottom: 12px !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.01) !important;
+    transition: all 0.2s ease;
+}
+.accordion-item:hover {
+    box-shadow: 0 6px 18px rgba(0,0,0,0.03) !important;
+    border-color: #cbd5e1 !important;
+}
+.accordion-button {
+    font-weight: 600 !important;
+    color: #1e293b !important;
+    padding: 1.25rem 1.5rem !important;
+    background-color: #fff !important;
+    border-radius: 12px !important;
+}
+.accordion-button:not(.collapsed) {
+    background-color: #f8fafc !important;
+    color: #7367f0 !important;
+    box-shadow: none !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+}
+</style>
 
 
 <!-- JavaScript for Interactive Features -->
