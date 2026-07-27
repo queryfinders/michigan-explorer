@@ -214,6 +214,7 @@ class BlogController extends Controller
         }
 
         // Create new author
+        $authorData['email'] = \Illuminate\Support\Str::slug($authorName) . '_' . time() . '@example.com';
         $author = Author::create($authorData);
         return $author->id;
     }
