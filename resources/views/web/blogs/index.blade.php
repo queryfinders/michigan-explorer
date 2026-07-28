@@ -48,23 +48,20 @@
 </section>
 
 {{-- 2. FILTER BAR --}}
-<section class="filter-bar bg-white border-bottom sticky-top shadow-sm py-3 transition-all" id="stickyFilterBar" style="z-index:1000; top: 78px;">
+<section class="category-filter-bar-sticky py-3 border-bottom bg-white shadow-sm transition-all" id="stickyFilterBar" style="z-index:1000; top: 78px;">
     <div class="container">
-        <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3">
-            <div class="category-bar-inner d-flex flex-column align-items-start gap-2 flex-grow-1 overflow-hidden" style="max-width: 100%;">
-                <h6 class="text-uppercase text-muted fw-bold small mb-0 tracking-wider text-nowrap">Browse by Category</h6>
-                <div class="category-filter-wrapper d-flex align-items-center flex-nowrap gap-2 w-100" style="max-width: 100%;">
+        <div class="category-bar-inner d-flex flex-column gap-2">
+            <h6 class="text-uppercase text-muted fw-bold small mb-0 tracking-wider text-nowrap">Browse by Category</h6>
+            <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 w-100">
+                <div class="category-filter-wrapper d-flex align-items-center flex-nowrap gap-1 overflow-x-auto hide-scrollbar flex-grow-1" style="max-width: 100%;">
                     
-                    <a href="{{ route('web.blogs.index', array_merge(request()->query(), ['category' => null])) }}" class="category-pill {{ !request('category') ? 'active' : '' }}">
+                    <a href="{{ $activeSort ? route('web.blogs.sort', $activeSort) : route('web.blogs.index') }}" class="category-pill {{ !$activeCategory ? 'active' : '' }}">
                         <span class="cat-name">All Articles</span>
                         <span class="cat-count">{{ $totalBlogs }}</span>
                     </a>
 
                     @php
-                        $selectedCategory = null;
-                        if (request('category')) {
-                            $selectedCategory = $categories->firstWhere('slug', request('category'));
-                        }
+                        $selectedCategory = $activeCategory;
                         
                         $displayCategories = $categories->take(4);
                         
@@ -74,7 +71,7 @@
                     @endphp
 
                     @foreach($displayCategories as $cat)
-                    <a href="{{ route('web.blogs.index', array_merge(request()->query(), ['category' => $cat->slug])) }}" class="category-pill {{ request('category') == $cat->slug ? 'active' : '' }}">
+                    <a href="{{ $activeSort ? route('web.blogs.category.sort', [$cat->slug, $activeSort]) : route('web.blogs.category', $cat->slug) }}" class="category-pill {{ ($activeCategory && $activeCategory->id == $cat->id) ? 'active' : '' }}">
                         <span class="cat-name">{{ $cat->name }}</span>
                         <span class="cat-count">{{ $cat->blogs_count }}</span>
                     </a>
@@ -94,13 +91,13 @@
                     @endif
 
                 </div>
-            </div>
-            <div class="d-flex justify-content-lg-end align-items-center flex-shrink-0 mt-3">
-                <div class="sort-tabs">
-                    <span class="text-muted small fw-bold me-2 ms-2 d-none d-sm-inline">Sort:</span>
-                    <a href="{{ route('web.blogs.index', array_merge(request()->query(), ['sort' => 'latest'])) }}" class="sort-tab {{ request('sort', 'latest') == 'latest' ? 'active' : '' }}">Latest</a>
-                    <a href="{{ route('web.blogs.index', array_merge(request()->query(), ['sort' => 'popular'])) }}" class="sort-tab {{ request('sort') == 'popular' ? 'active' : '' }}">Popular</a>
-                    <a href="{{ route('web.blogs.index', array_merge(request()->query(), ['sort' => 'oldest'])) }}" class="sort-tab {{ request('sort') == 'oldest' ? 'active' : '' }}">Oldest</a>
+                <div class="d-flex justify-content-lg-end align-items-center flex-shrink-0">
+                    <div class="sort-tabs">
+                        <span class="text-muted small fw-bold me-2 ms-2 d-none d-sm-inline">Sort:</span>
+                        <a href="{{ $activeCategory ? route('web.blogs.category.sort', [$activeCategory->slug, 'latest']) : route('web.blogs.sort', 'latest') }}" class="sort-tab {{ $activeSort == 'latest' ? 'active' : '' }}">Latest</a>
+                        <a href="{{ $activeCategory ? route('web.blogs.category.sort', [$activeCategory->slug, 'popular']) : route('web.blogs.sort', 'popular') }}" class="sort-tab {{ $activeSort == 'popular' ? 'active' : '' }}">Popular</a>
+                        <a href="{{ $activeCategory ? route('web.blogs.category.sort', [$activeCategory->slug, 'oldest']) : route('web.blogs.sort', 'oldest') }}" class="sort-tab {{ $activeSort == 'oldest' ? 'active' : '' }}">Oldest</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -108,7 +105,7 @@
 </section>
 
 {{-- 3. MAIN CONTENT --}}
-<section class="py-5 bg-body-tertiary">
+<section class="py-5 bg-body-tertiary" id="all-blogs">
     <div class="container py-3">
         <div class="row g-5">
             <div class="col-lg-8">
@@ -126,7 +123,7 @@
                         <div class="col-md-6 p-4 p-lg-5 d-flex flex-column justify-content-center bg-white position-relative">
                             <div class="position-absolute top-0 end-0 p-3"><div class="featured-star-badge" data-bs-toggle="tooltip" title="Featured Story"><i class="fas fa-star"></i></div></div>
                             @if($featuredBlog->category)
-                            <a href="?category={{ $featuredBlog->category->slug }}" class="blog-cat-badge mb-3 align-self-start">
+                            <a href="{{ route('web.blogs.category', $featuredBlog->category->slug) }}" class="blog-cat-badge mb-3 align-self-start">
                                 @if($featuredBlog->category->icon)<i class="{{ $featuredBlog->category->icon }} me-1"></i>@endif{{ $featuredBlog->category->name }}
                             </a>
                             @endif
@@ -161,16 +158,8 @@
                                     <a href="{{ route('web.blogs.show', $blog->slug) }}">
                                         <img src="{{ $blog->featured_image ? asset($blog->featured_image) : 'https://placehold.co/600x400/e9ecef/495057?text=No+Image' }}" loading="lazy" class="blog-card-img blog-img-zoom" alt="{{ $blog->title }}">
                                     </a>
-                                    @if($blog->category)
-                                    <a href="?category={{ $blog->category->slug }}" class="blog-card-cat-badge">
-                                        @if($blog->category->icon)<i class="{{ $blog->category->icon }} me-1"></i>@endif{{ $blog->category->name }}
-                                    </a>
-                                    @endif
+                                
                                     <div class="reading-time-badge"><i class="far fa-clock me-1"></i>{{ $blog->reading_time ?? ceil(str_word_count(strip_tags($blog->content)) / 200) }} min</div>
-                                    <div class="blog-card-actions">
-                                        <button class="blog-action-btn" data-bs-toggle="tooltip" title="Bookmark"><i class="far fa-bookmark"></i></button>
-                                        <button class="blog-action-btn" data-bs-toggle="tooltip" title="Share"><i class="fas fa-share-alt"></i></button>
-                                    </div>
                                 </div>
                                 <div class="blog-card-body">
                                     <div class="d-flex align-items-center gap-3 text-muted mb-2" style="font-size:.78rem;font-weight:600;">
@@ -309,7 +298,7 @@
 
 <!-- Categories Modal -->
 <div class="modal fade" id="categoriesModal" tabindex="-1" aria-labelledby="categoriesModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0 shadow-lg rounded-4">
             <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
                 <h5 class="modal-title fw-bold fs-4" id="categoriesModalLabel">All Blog Categories</h5>
@@ -317,14 +306,20 @@
             </div>
             <div class="modal-body p-4">
                 
+                <!-- Large Search Input -->
+                <div class="position-relative mb-4">
+                    <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-4 text-muted fs-5"></i>
+                    <input type="text" id="categorySearch" class="form-control form-control-lg rounded-pill ps-5 bg-light border-0 py-3" placeholder="Search blog categories..." autocomplete="off">
+                </div>
+
                 <!-- Flat Grid Categories -->
                 <div id="categoryListContainer">
                     <div class="row g-3">
                         @foreach($categories->sortBy('name') as $cat)
-                        <div class="col-12 category-item" data-name="{{ strtolower($cat->name) }}">
-                            <a href="{{ route('web.blogs.index', array_merge(request()->query(), ['category' => $cat->slug])) }}" class="modal-category-card">
+                        <div class="col-md-3 col-sm-6 category-item" data-name="{{ strtolower($cat->name) }}">
+                            <a href="{{ route('web.blogs.category', $cat->slug) }}" class="modal-category-card">
                                 <div>
-                                    <div class="fw-bold text-heading" style="font-size: 0.95rem;">
+                                    <div class="fw-bold text-heading" style="font-size: 0.9rem;">
                                         @if($cat->icon)<i class="{{ $cat->icon }} me-2 opacity-75 text-primary"></i>@endif{{ $cat->name }}
                                     </div>
                                     <div class="text-muted fs-xs mt-1">{{ $cat->blogs_count }} {{ Str::plural('Article', $cat->blogs_count) }}</div>
@@ -334,6 +329,13 @@
                         </div>
                         @endforeach
                     </div>
+                </div>
+
+                <!-- No Results State -->
+                <div id="noResultsState" class="text-center py-5 d-none">
+                    <i class="fas fa-search fa-3x text-muted mb-3 opacity-25"></i>
+                    <h5 class="fw-bold text-secondary">No categories found</h5>
+                    <p class="text-muted">Try adjusting your search terms.</p>
                 </div>
 
             </div>
@@ -379,8 +381,8 @@
 .blog-action-btn { width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.9);border:none;color:#555;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.8rem;transition:all .2s;box-shadow:0 2px 6px rgba(0,0,0,.12); }
 .blog-action-btn:hover { background:var(--primary-color);color:#fff; }
 .blog-card-body { padding:20px;flex:1;display:flex;flex-direction:column; }
-.blog-card-title { font-size:.95rem;font-weight:700;margin-bottom:8px;line-height:1.4; }
-.blog-card-excerpt { color:#6c757d;font-size:.85rem;line-height:1.6;flex:1;margin-bottom:16px; }
+.blog-card-title { font-size:.95rem;font-weight:700;margin-bottom:8px;line-height:1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; max-height: 2.8em; }
+.blog-card-excerpt { color:#6c757d;font-size:.85rem;line-height:1.6;flex:1;margin-bottom:16px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; max-height: 3.2em; }
 .blog-card-footer { display:flex;align-items:center;justify-content:space-between;border-top:1px solid #f0f0f5;padding-top:14px;margin-top:auto; }
 .sidebar-widget { background:#fff;border-radius:16px;box-shadow:0 2px 16px rgba(0,0,0,.07);overflow:hidden; }
 .sidebar-widget-header { font-size:.95rem;font-weight:700;padding:18px 20px;border-bottom:1px solid #f5f5f8;display:flex;align-items:center; }
@@ -433,9 +435,41 @@ document.addEventListener('DOMContentLoaded', function() {
         }, {threshold:0.5});
         statEls.forEach(function(el){ obs.observe(el); });
     } else { statEls.forEach(animateCounter); }
+    document.querySelectorAll('.category-pill, .sort-tab, .modal-category-card').forEach(function(el) {
+        el.addEventListener('click', function() {
+            sessionStorage.setItem('scrollToGrid', '1');
+        });
+    });
+
+    const modalSearchInput = document.getElementById('categorySearch');
+    if (modalSearchInput) {
+        modalSearchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            const categoryItems = document.querySelectorAll('#categoriesModal .category-item');
+            const noResultsState = document.getElementById('noResultsState');
+            let totalMatches = 0;
+            
+            categoryItems.forEach(item => {
+                const name = item.getAttribute('data-name');
+                if (name.includes(searchTerm)) {
+                    item.style.setProperty('display', 'block', 'important');
+                    totalMatches++;
+                } else {
+                    item.style.setProperty('display', 'none', 'important');
+                }
+            });
+            
+            if (totalMatches === 0) {
+                noResultsState.classList.remove('d-none');
+            } else {
+                noResultsState.classList.add('d-none');
+            }
+        });
+    }
+
     if(sessionStorage.getItem('scrollToGrid')==='1') {
         sessionStorage.removeItem('scrollToGrid');
-        var grid = document.querySelector('.blog-card, .blog-featured-card');
+        var grid = document.querySelector('.blog-card, .blog-featured-card, .blog-empty-state');
         if(grid) setTimeout(function(){ grid.scrollIntoView({behavior:'smooth',block:'start'}); }, 200);
     }
 });

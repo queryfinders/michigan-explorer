@@ -16,11 +16,7 @@
     <h3 class="mb-1 fw-bold">Add Blog</h3>
     <p class="text-muted mb-0 small">Create a new blog post or article.</p>
   </div>
-  <div class="d-flex gap-2">
-    <a href="{{ route('blogs.index') }}" class="btn btn-outline-secondary">
-      <i class="ti ti-arrow-left me-1"></i> Back
-    </a>
-  </div>
+ 
 </div>
 
 <div class="card mb-4">
@@ -147,39 +143,65 @@
             <div class="col-md-4">
               <label class="form-label fw-semibold">Tags</label>
               <div class="blog-tag-wrapper" id="blogTagWrapper">
-                <div class="blog-tag-trigger" id="blogTagTrigger" onclick="toggleTagDropdown()">
-                  <div class="blog-tags-area" id="blogTagsArea">
-                    <span class="blog-tag-placeholder" id="blogTagPlaceholder">
-                      <i class="ti ti-tag me-1 text-muted"></i>Select tags...
-                    </span>
-                  </div>
-                  <i class="ti ti-chevron-down blog-tag-arrow" id="blogTagArrow"></i>
+                <div class="form-control d-flex flex-wrap align-items-center gap-1" id="blogTagInputContainer" style="min-height: 40px; cursor: text;" onclick="document.getElementById('blogTagInput').focus()">
+                  <!-- Chips will go here -->
+                  <input type="text" class="border-0 outline-none flex-grow-1" id="blogTagInput" placeholder="Type tag and press Enter" style="outline: none; min-width: 120px; font-size: 0.9rem;" autocomplete="off" />
                 </div>
-                <div class="blog-tag-panel" id="blogTagPanel" style="display:none;">
-                  <div class="blog-tag-search-wrap">
-                    <i class="ti ti-search blog-tag-search-icon"></i>
-                    <input type="text" class="blog-tag-search-input" id="blogTagSearchInput"
-                           placeholder="Search tags..." oninput="filterTags(this.value)" autocomplete="off" />
+                <div id="blogTagInputsHidden" class="d-none">
+                  <!-- Hidden inputs for form submission -->
+                  @foreach($tags as $tag)
+                    @if(is_array(old('tags')) && in_array($tag->id, old('tags')))
+                      <input type="hidden" name="tags[]" value="{{ $tag->id }}" id="hidden_tag_{{ $tag->id }}" data-name="{{ $tag->name }}">
+                    @endif
+                  @endforeach
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            {{-- STATUS --}}
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" for="status">Status</label>
+              <input type="hidden" name="status" id="status" value="{{ old('status', 'published') }}" />
+              <div class="status-dropdown-wrapper" id="statusDropWrapper">
+                <div class="status-dropdown-trigger" id="statusDropTrigger" onclick="toggleStatusDrop()">
+                  <div class="status-selected-display" id="statusSelectedDisplay">
+                    <span class="status-label">Published</span>
                   </div>
-                  <div class="blog-tag-divider"></div>
-                  <div class="blog-tag-items" id="blogTagItems">
-                    @foreach($tags as $tag)
-                    <label class="blog-tag-item" id="tag-label-{{ $tag->id }}">
-                      <input type="checkbox" name="tags[]" value="{{ $tag->id }}"
-                             id="tag_cb_{{ $tag->id }}" class="tag-cb d-none"
-                             data-name="{{ $tag->name }}"
-                             {{ is_array(old('tags')) && in_array($tag->id, old('tags')) ? 'checked' : '' }}
-                             onchange="onTagChange(this)" />
-                      <span class="blog-tag-item-name">{{ $tag->name }}</span>
-                      <span class="blog-tag-item-check"><i class="ti ti-check"></i></span>
-                    </label>
-                    @endforeach
-                    <div class="blog-tag-no-results d-none" id="blogTagNoResults">
-                      <i class="ti ti-search-off me-1"></i>No tags found
+                  <i class="ti ti-chevron-down status-arrow" id="statusArrow"></i>
+                </div>
+                <div class="status-dropdown-panel" id="statusDropPanel" style="display:none;">
+                  <div class="status-option active" data-value="published" data-name="Published" data-dot="published" onclick="onStatusChange(this)">
+                    <div class="status-opt-info">
+                      <span class="status-opt-name">Published</span>
+                      <span class="status-opt-desc">Visible to everyone immediately</span>
                     </div>
+                    <span class="status-opt-check"><i class="ti ti-check"></i></span>
+                  </div>
+                  <div class="status-option" data-value="draft" data-name="Draft" data-dot="draft" onclick="onStatusChange(this)">
+                    <div class="status-opt-info">
+                      <span class="status-opt-name">Draft</span>
+                      <span class="status-opt-desc">Saved as draft, not visible publicly</span>
+                    </div>
+                    <span class="status-opt-check"><i class="ti ti-check"></i></span>
+                  </div>
+                  <div class="status-option" data-value="scheduled" data-name="Scheduled" data-dot="scheduled" onclick="onStatusChange(this)">
+                    <div class="status-opt-info">
+                      <span class="status-opt-name">Scheduled</span>
+                      <span class="status-opt-desc">Publish automatically at a future date</span>
+                    </div>
+                    <span class="status-opt-check"><i class="ti ti-check"></i></span>
                   </div>
                 </div>
               </div>
+            </div>
+
+            {{-- PUBLISH DATE --}}
+            <div class="col-md-6" id="publish-date-wrapper" style="display: {{ old('status', 'published') == 'scheduled' ? 'block' : 'none' }};">
+              <label class="form-label fw-semibold" for="published_at">Publish Date & Time</label>
+              <input type="datetime-local" class="form-control" id="published_at" name="published_at" value="{{ old('published_at') }}" />
+              <div class="text-danger small mt-1 d-none" id="pubdate-error-msg">Please select a publish date and time for scheduled post.</div>
             </div>
           </div>
 
@@ -406,6 +428,7 @@
   display: inline-flex; align-items: center; gap: 4px;
   background: #f0edff; color: #7367f0; border: 1px solid #d5ccff;
   border-radius: 20px; padding: 2px 10px; font-size: 0.8rem; font-weight: 500;
+  white-space: nowrap;
 }
 .blog-tag-chip-remove { cursor: pointer; font-size: 0.75rem; color: #7367f0; }
 .blog-tag-chip-remove:hover { color: #ff3e1d; }
@@ -434,6 +457,44 @@
 .blog-tag-item-check { color: #7367f0; display: none; }
 .blog-tag-item.selected .blog-tag-item-check { display: inline; }
 .blog-tag-no-results { padding: 12px; text-align: center; color: #aaa; font-size: 0.88rem; }
+
+/* ── Status Dropdown ── */
+.status-dropdown-wrapper { position: relative; }
+.status-dropdown-trigger {
+  display: flex; align-items: center; justify-content: space-between;
+  border: 1px solid #d9dee3; border-radius: 6px; padding: 10px 14px;
+  cursor: pointer; background: #fff; min-height: 42px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.status-dropdown-trigger:hover { border-color: #7367f0; }
+.status-dropdown-trigger.open { border-color: #7367f0; box-shadow: 0 0 0 3px rgba(115,103,240,.12); }
+.status-selected-display { display: flex; align-items: center; gap: 10px; }
+.status-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; background: #ccc; }
+.status-dot.draft     { background: #a8b1c0; }
+.status-dot.published { background: #28c76f; }
+.status-dot.scheduled { background: #ff9f43; }
+.status-selected-display .status-label { font-size: 0.9rem; font-weight: 500; color: #333; }
+.status-arrow { color: #aaa; transition: transform 0.2s; font-size: 1rem; }
+.status-dropdown-panel {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 1060;
+  background: #fff; border: 1px solid #e0e0e0; border-radius: 10px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.13); overflow: hidden;
+}
+.status-option {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px; cursor: pointer; transition: background 0.15s;
+}
+.status-option:hover  { background: #f8f7ff; }
+.status-option.active { background: #f0edff; }
+.status-opt-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.status-opt-dot.draft     { background: #a8b1c0; }
+.status-opt-dot.published { background: #28c76f; }
+.status-opt-dot.scheduled { background: #ff9f43; }
+.status-opt-info  { display: flex; flex-direction: column; flex: 1; }
+.status-opt-name  { font-size: 0.88rem; font-weight: 600; color: #333; }
+.status-opt-desc  { font-size: 0.78rem; color: #999; }
+.status-opt-check { color: #7367f0; display: none; font-size: 0.95rem; }
+.status-option.active .status-opt-check { display: inline; }
 </style>
 
 @endsection
@@ -479,42 +540,68 @@ function filterTags(val) {
   });
   document.getElementById('blogTagNoResults').classList.toggle('d-none', found > 0);
 }
-function onTagChange(cb) {
-  const tagsArea  = document.getElementById('blogTagsArea');
-  const ph        = document.getElementById('blogTagPlaceholder');
-  const allCbs    = document.querySelectorAll('#blogTagItems .tag-cb');
-  const allItems  = document.querySelectorAll('#blogTagItems .blog-tag-item');
 
-  // Update selected visual on list item
-  allItems.forEach(item => {
-    const innerCb = item.querySelector('.tag-cb');
-    item.classList.toggle('selected', innerCb && innerCb.checked);
-  });
 
-  // Rebuild chips
-  tagsArea.querySelectorAll('.blog-tag-chip').forEach(c => c.remove());
-  const selectedCbs = Array.from(allCbs).filter(c => c.checked);
-  ph.style.display = selectedCbs.length ? 'none' : '';
-  selectedCbs.forEach(c => {
+// Non-dropdown dynamic tag handlers
+document.addEventListener('DOMContentLoaded', function() {
+  const tagInput = document.getElementById('blogTagInput');
+  const hiddenContainer = document.getElementById('blogTagInputsHidden');
+
+  function renderInitialChips() {
+    if (!hiddenContainer) return;
+    hiddenContainer.querySelectorAll('input').forEach(input => {
+      const val = input.value;
+      const name = input.getAttribute('data-name') || val;
+      addTagChip(val, name);
+    });
+  }
+
+  function addTagChip(val, name) {
+    const container = document.getElementById('blogTagInputContainer');
+    if (!container || container.querySelector(`[data-val="${val}"]`)) return;
     const chip = document.createElement('span');
     chip.className = 'blog-tag-chip';
-    chip.innerHTML = `${c.dataset.name}<span class="blog-tag-chip-remove" onclick="removeTag(${c.id.replace('tag_cb_', '')})">&times;</span>`;
-    tagsArea.insertBefore(chip, ph);
-  });
-}
-function removeTag(id) {
-  const cb = document.getElementById('tag_cb_' + id);
-  if (cb) { cb.checked = false; onTagChange(cb); }
-}
-window.toggleTagDropdown = toggleTagDropdown;
-window.closeTagDropdown  = closeTagDropdown;
-window.filterTags        = filterTags;
-window.onTagChange       = onTagChange;
-window.removeTag         = removeTag;
+    chip.setAttribute('data-val', val);
+    chip.innerHTML = `${name}<span class="blog-tag-chip-remove" onclick="removeBlogTag('${val}')">&times;</span>`;
+    container.insertBefore(chip, tagInput);
+  }
 
-document.addEventListener('click', function(e) {
-  const wrapper = document.getElementById('blogTagWrapper');
-  if (wrapper && !wrapper.contains(e.target)) closeTagDropdown();
+  window.removeBlogTag = function(val) {
+    const container = document.getElementById('blogTagInputContainer');
+    if (container) {
+      const chip = container.querySelector(`[data-val="${val}"]`);
+      if (chip) chip.remove();
+    }
+    const input = hiddenContainer.querySelector(`input[value="${val}"]`);
+    if (input) input.remove();
+  };
+
+  if (tagInput) {
+    tagInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const val = this.value.trim();
+        if (!val) return;
+        const cleanVal = val.replace(/[^a-zA-Z0-9\s-]/g, '');
+        const exists = Array.from(hiddenContainer.querySelectorAll('input')).some(input => {
+          return input.value.toLowerCase() === cleanVal.toLowerCase() || (input.getAttribute('data-name') && input.getAttribute('data-name').toLowerCase() === cleanVal.toLowerCase());
+        });
+
+        if (!exists) {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = 'tags[]';
+          input.value = cleanVal;
+          input.setAttribute('data-name', cleanVal);
+          hiddenContainer.appendChild(input);
+          addTagChip(cleanVal, cleanVal);
+        }
+        this.value = '';
+      }
+    });
+  }
+
+  renderInitialChips();
 });
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -592,10 +679,58 @@ document.addEventListener('DOMContentLoaded', function() {
     closeCatDrop();
   }
   window.toggleCatDrop = toggleCatDrop; window.closeCatDrop = closeCatDrop;
-  window.filterCat = filterCat; window.onCatChange = onCatChange;
+  function togglePublishDate(val) {
+    const wrapper = document.getElementById('publish-date-wrapper');
+    if (wrapper) {
+      wrapper.style.display = val === 'scheduled' ? 'block' : 'none';
+    }
+  }
+  window.togglePublishDate = togglePublishDate;
+
+  /* Status Dropdown JS */
+  function toggleStatusDrop() {
+    const p = document.getElementById('statusDropPanel'), a = document.getElementById('statusArrow'), t = document.getElementById('statusDropTrigger');
+    const open = p.style.display !== 'none';
+    p.style.display = open ? 'none' : 'block';
+    t.classList.toggle('open', !open);
+    if (open) {
+      a.style.transform = 'rotate(0deg)';
+    } else {
+      a.style.transform = 'rotate(180deg)';
+    }
+  }
+  function closeStatusDrop() {
+    const p = document.getElementById('statusDropPanel'), a = document.getElementById('statusArrow'), t = document.getElementById('statusDropTrigger');
+    if (p) {
+      p.style.display = 'none';
+      t.classList.remove('open');
+      a.style.transform = 'rotate(0deg)';
+    }
+  }
+  function onStatusChange(opt) {
+    const val = opt.getAttribute('data-value');
+    const name = opt.getAttribute('data-name');
+    const dotClass = opt.getAttribute('data-dot');
+    
+    document.getElementById('status').value = val;
+    
+    const display = document.getElementById('statusSelectedDisplay');
+    display.innerHTML = `<span class="status-label">${name}</span>`;
+    
+    document.querySelectorAll('#statusDropPanel .status-option').forEach(item => {
+      item.classList.toggle('active', item.getAttribute('data-value') === val);
+    });
+    
+    closeStatusDrop();
+    togglePublishDate(val);
+  }
+  window.toggleStatusDrop = toggleStatusDrop;
+  window.closeStatusDrop = closeStatusDrop;
+  window.onStatusChange = onStatusChange;
 
   document.addEventListener('click', function(e) {
     if (!document.getElementById('catDropWrapper')?.contains(e.target)) closeCatDrop();
+    if (!document.getElementById('statusDropWrapper')?.contains(e.target)) closeStatusDrop();
   });
 
   /* ── Auto slug ── */
@@ -613,6 +748,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Category
     const catRb = document.querySelector('#catItemsList .cat-rb:checked');
     if (catRb) onCatChange(catRb);
+    
+    // Status
+    const savedStatus = document.getElementById('status').value;
+    const opt = document.querySelector(`#statusDropPanel .status-option[data-value="${savedStatus}"]`);
+    if (opt) onStatusChange(opt);
   })();
 
   // Dynamic FAQs

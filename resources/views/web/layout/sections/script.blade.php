@@ -172,12 +172,13 @@
         });
         
         // Auto-scroll to category results if category slug is in the URL or scroll=1 param is present on page load
-        if (window.location.pathname.includes('/category/') || window.location.search.includes('scroll=1')) {
+        if (window.location.pathname.includes('/category/') || window.location.pathname.includes('/sort/') || window.location.search.includes('scroll=1')) {
             setTimeout(() => {
                 const target = document.getElementById("all-hotels") || 
                                document.getElementById("all-restaurants") || 
                                document.getElementById("all-attractions") || 
-                               document.getElementById("all-events");
+                               document.getElementById("all-events") ||
+                               document.getElementById("all-blogs");
                 if (target) {
                     const offset = 180; // offset for sticky headers
                     const elementPosition = target.getBoundingClientRect().top;
@@ -228,7 +229,7 @@ function shareCurrentPage(title) {
 
     function updatePillVisibility() {
         const rect = categoryBar.getBoundingClientRect();
-        const isStuck = rect.top <= 76 && window.scrollY > 50;
+        const isStuck = rect.top <= 80 && window.scrollY > 50;
         const w = window.innerWidth;
 
         // Calculate max visible regular pills so More... button NEVER overflows on any screen size
@@ -241,8 +242,10 @@ function shareCurrentPage(title) {
             maxPills = 4;
         } else if (w < 1200) {
             maxPills = 5;
-        } else if (isStuck) {
-            maxPills = 6;
+        }
+
+        if (isStuck) {
+            maxPills = Math.min(maxPills, 4);
         }
 
         regularPills.forEach(function(pill, i) {

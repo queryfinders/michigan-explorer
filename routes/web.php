@@ -133,7 +133,9 @@ Route::group(['middleware' => 'admin_auth'], function () {
 
     // Blogs Module
     Route::resource('/admin/blog-categories', \App\Http\Controllers\Admin\BlogCategoryController::class);
+    Route::get('/admin/blog-categories/status/{id}/{status}', [\App\Http\Controllers\Admin\BlogCategoryController::class, 'changeStatus'])->name('blog-categories.status');
     Route::resource('/admin/blogs', \App\Http\Controllers\Admin\BlogController::class);
+    Route::get('/admin/blogs/status/{id}/{status}', [\App\Http\Controllers\Admin\BlogController::class, 'changeStatus'])->name('blogs.status');
 
     // Pages & Settings
     Route::resource('/admin/contact-messages', \App\Http\Controllers\Admin\ContactMessageController::class)->only(['index', 'show', 'destroy']);
@@ -183,6 +185,9 @@ Route::get('/events/{slug}', [\App\Http\Controllers\Frontend\EventController::cl
 
 // Blogs
 Route::get('/blog', [\App\Http\Controllers\Frontend\BlogController::class, 'index'])->name('web.blogs.index');
+Route::get('/blog/sort/{sort}', [\App\Http\Controllers\Frontend\BlogController::class, 'index'])->name('web.blogs.sort');
+Route::get('/blog/category/{categorySlug}', [\App\Http\Controllers\Frontend\BlogController::class, 'index'])->name('web.blogs.category');
+Route::get('/blog/category/{categorySlug}/sort/{sort}', [\App\Http\Controllers\Frontend\BlogController::class, 'index'])->name('web.blogs.category.sort');
 Route::get('/blog/{slug}', [\App\Http\Controllers\Frontend\BlogController::class, 'show'])->name('web.blogs.show');
 
 // Pages
