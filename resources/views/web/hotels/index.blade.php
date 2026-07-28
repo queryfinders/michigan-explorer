@@ -121,30 +121,14 @@
         </div>
 
         <div class="row g-4" id="all-hotels">
-            @forelse($hotels as $index => $hotel)
-            <!-- Hotel Card -->
-            <div class="col-lg-4 col-md-6">
-                <x-hotel-card :hotel="$hotel" :featured="($hotel->is_featured ?? 0) == 1" />
-            </div>
-            @empty
-            <!-- Static Fallback Data for Empty State -->
-            @for($i=1; $i<=6; $i++)
-            <div class="col-lg-4 col-md-6">
-                <x-hotel-card :hotel="(object)[
-                    'name' => 'The Grand Resort & Spa',
-                    'city' => 'Michigan City',
-                    'description' => 'Experience true comfort and luxury in this beautifully appointed property in the heart of Michigan.',
-                    'starting_price' => '249',
-                    'affiliate_url' => '#'
-                ]" :featured="$i === 1" />
-            </div>
-            @endfor
-            @endforelse
+            @include('web.hotels._hotels_grid')
         </div>
 
-        <!-- 4. Pagination -->
-        <div class="d-flex justify-content-center mt-5 pt-4 border-top">
-            {{ $hotels->links('pagination::bootstrap-5') }}
+        <!-- Infinite Scroll Loading Spinner -->
+        <div class="d-none justify-content-center mt-5" id="infinite-scroll-spinner">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
         </div>
         
     </div>
@@ -225,5 +209,53 @@
             }
         });
     });
+
+    let isLoading = false;
+
+    // Detect scroll to bottom
+    $(window).scroll(function() {
+        if ($(window).scrollTop() + $(window).height() >= $(document).height() - 400) {
+            const nextLink = $('#next-page-link');
+            if (nextLink.length > 0 && !isLoading) {
+                loadMoreHotels(nextLink.attr('href'));
+            }
+        }
+    });
+
+    function loadMoreHotels(url) {
+        isLoading = true;
+        $('#infinite-scroll-spinner').removeClass('d-none').addClass('d-flex');
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'html',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function(response) {
+                const tempDiv = $('<div>').html(response);
+                
+                // Remove the old pagination wrapper
+                $('#infinite-scroll-pagination-wrapper').remove();
+
+                // Append new hotel cards
+                const newItems = tempDiv.find('.hotel-card-item');
+                $('#all-hotels').append(newItems);
+
+                // Add the new pagination wrapper at the bottom
+                const newPagination = tempDiv.find('#infinite-scroll-pagination-wrapper');
+                $('#all-hotels').append(newPagination);
+
+                isLoading = false;
+                $('#infinite-scroll-spinner').removeClass('d-flex').addClass('d-none');
+            },
+            error: function(xhr) {
+                console.error("AJAX failed to load more hotels.", xhr);
+                isLoading = false;
+                $('#infinite-scroll-spinner').removeClass('d-flex').addClass('d-none');
+            }
+        });
+    }
 </script>
 @endsection

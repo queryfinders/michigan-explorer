@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('restaurants', function (Blueprint $table) {
-            $table->string('featured_image_alt')->nullable()->after('featured_image');
-        });
+        if (!Schema::hasColumn('restaurants', 'featured_image_alt')) {
+            Schema::table('restaurants', function (Blueprint $table) {
+                $table->string('featured_image_alt')->nullable()->after('featured_image');
+            });
+        }
     }
 
     /**
@@ -21,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('restaurants', function (Blueprint $table) {
-            $table->dropColumn('featured_image_alt');
-        });
+        if (Schema::hasColumn('restaurants', 'featured_image_alt')) {
+            Schema::table('restaurants', function (Blueprint $table) {
+                $table->dropColumn('featured_image_alt');
+            });
+        }
     }
 };

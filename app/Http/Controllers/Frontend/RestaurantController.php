@@ -7,29 +7,39 @@ use Illuminate\Http\Request;
 
 class RestaurantController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $restaurants = \App\Models\Restaurant::with(['category', 'features', 'cuisines'])->where('status', 1)->paginate(12);
+        $restaurants = \App\Models\Restaurant::with(['category', 'features', 'cuisines'])->where('status', 1)->paginate(9);
         $currentCategory = null;
         $featuredCategories = \App\Models\RestaurantCategory::withCount(['restaurants' => fn($q) => $q->where('status', 1)])->where('is_featured', 1)->take(7)->get();
         $allCategories    = \App\Models\RestaurantCategory::withCount(['restaurants' => fn($q) => $q->where('status', 1)])->where('status', 1)->orderBy('name')->get();
         $totalRestaurants = \App\Models\Restaurant::where('status', 1)->count();
         $page = \App\Models\Page::with('seo')->where('slug', 'restaurants')->first();
+
+        if ($request->ajax()) {
+            return view('web.restaurants._restaurants_grid', compact('restaurants'))->render();
+        }
+
         return view('web.restaurants.index', compact('restaurants', 'currentCategory', 'featuredCategories', 'allCategories', 'totalRestaurants', 'page'));
     }
 
-    public function category($slug)
+    public function category(Request $request, $slug)
     {
         $category = \App\Models\RestaurantCategory::where('slug', $slug)->first();
         if (!$category) {
             abort(404);
         }
-        $restaurants = \App\Models\Restaurant::with(['category', 'features', 'cuisines'])->where('restaurant_category_id', $category->id)->where('status', 1)->paginate(12);
+        $restaurants = \App\Models\Restaurant::with(['category', 'features', 'cuisines'])->where('restaurant_category_id', $category->id)->where('status', 1)->paginate(9);
         $currentCategory = $category;
         $featuredCategories = \App\Models\RestaurantCategory::withCount(['restaurants' => fn($q) => $q->where('status', 1)])->where('is_featured', 1)->take(7)->get();
         $allCategories    = \App\Models\RestaurantCategory::withCount(['restaurants' => fn($q) => $q->where('status', 1)])->where('status', 1)->orderBy('name')->get();
         $totalRestaurants = \App\Models\Restaurant::where('status', 1)->count();
         $page = \App\Models\Page::with('seo')->where('slug', 'restaurants')->first();
+
+        if ($request->ajax()) {
+            return view('web.restaurants._restaurants_grid', compact('restaurants'))->render();
+        }
+
         return view('web.restaurants.index', compact('restaurants', 'currentCategory', 'featuredCategories', 'allCategories', 'totalRestaurants', 'page'));
     }
 

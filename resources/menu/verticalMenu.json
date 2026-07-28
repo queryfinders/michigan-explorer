@@ -6,7 +6,6 @@
       "icon": "menu-icon tf-icons ti ti-smart-home",
       "slug": "dashboard"
     },
-      
     {
       "name": "Users",
       "url": "/admin/user",
@@ -16,7 +15,13 @@
     {
       "name": "Hotels",
       "icon": "menu-icon tf-icons ti ti-building",
-      "slug": ["hotels", "hotel-categories", "amenities", "booking-features", "hotel-policies"],
+      "slug": [
+        "hotels",
+        "hotel-categories",
+        "amenities",
+        "booking-features",
+        "hotel-policies"
+      ],
       "submenu": [
         {
           "name": "All Hotels",
@@ -53,7 +58,11 @@
     {
       "name": "Restaurants",
       "icon": "menu-icon tf-icons ti ti-tools-kitchen-2",
-      "slug": ["restaurants", "restaurant-categories", "cuisines"],
+      "slug": [
+        "restaurants",
+        "restaurant-categories",
+        "cuisines"
+      ],
       "submenu": [
         {
           "name": "All Restaurants",
@@ -78,7 +87,10 @@
     {
       "name": "Attractions",
       "icon": "menu-icon tf-icons ti ti-map-pin",
-      "slug": ["attractions", "attraction-categories"],
+      "slug": [
+        "attractions",
+        "attraction-categories"
+      ],
       "submenu": [
         {
           "name": "All Attractions",
@@ -97,7 +109,10 @@
     {
       "name": "Events",
       "icon": "menu-icon tf-icons ti ti-calendar-event",
-      "slug": ["events", "event-categories"],
+      "slug": [
+        "events",
+        "event-categories"
+      ],
       "submenu": [
         {
           "name": "All Events",
@@ -116,7 +131,10 @@
     {
       "name": "Blogs",
       "icon": "menu-icon tf-icons ti ti-file-text",
-      "slug": ["blogs", "blog-categories"],
+      "slug": [
+        "blogs",
+        "blog-categories"
+      ],
       "submenu": [
         {
           "name": "All Blogs",
@@ -141,20 +159,12 @@
     {
       "name": "Settings",
       "icon": "menu-icon tf-icons ti ti-settings",
-      "slug": ["settings", "social-links", "search-shortcuts"],
+      "slug": [
+        "settings",
+        "social-links",
+        "search-shortcuts"
+      ],
       "submenu": [
-        {
-          "name": "Settings",
-          "url": "/admin/settings",
-          "icon": "menu-icon tf-icons ti ti-settings-automation",
-          "slug": "settings.index"
-        },
-        {
-          "name": "Social Links",
-          "url": "/admin/social-links",
-          "icon": "menu-icon tf-icons ti ti-share",
-          "slug": "social-links.index"
-        },
         {
           "name": "Search Shortcuts",
           "url": "/admin/search-shortcuts",

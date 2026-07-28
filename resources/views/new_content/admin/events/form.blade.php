@@ -1,0 +1,617 @@
+<!-- Tabs Navigation -->
+<ul class="nav nav-tabs mb-4" id="eventFormTabs" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="basic-tab" data-bs-toggle="tab" data-bs-target="#basic-pane" type="button" role="tab" aria-controls="basic-pane" aria-selected="true">Basic Info</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="featured-tab" data-bs-toggle="tab" data-bs-target="#featured-pane" type="button" role="tab" aria-controls="featured-pane" aria-selected="false">Featured Image & Video</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="faqs-tab" data-bs-toggle="tab" data-bs-target="#faqs-pane" type="button" role="tab" aria-controls="faqs-pane" aria-selected="false">FAQs</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="seo-tab" data-bs-toggle="tab" data-bs-target="#seo-pane" type="button" role="tab" aria-controls="seo-pane" aria-selected="false">SEO & Schema</button>
+  </li>
+</ul>
+
+<!-- Tabs Content -->
+<div class="tab-content p-0" id="eventFormTabsContent">
+  
+  <!-- Tab 1: Basic Info -->
+  <div class="tab-pane fade show active" id="basic-pane" role="tabpanel" aria-labelledby="basic-tab">
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label class="form-label fw-semibold" for="event_category_id">Category <span class="text-danger">*</span></label>
+        <input type="hidden" name="event_category_id" id="event_category_id" value="{{ old('event_category_id', isset($event) ? $event->event_category_id : '') }}" required />
+        @error('event_category_id') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+
+        <div class="cuisine-dropdown-wrapper" id="categoryDropdownWrapper">
+          <div class="cuisine-dropdown-trigger" id="categoryTrigger" onclick="toggleCategoryDropdown()">
+            <div class="cuisine-tags-area" id="categoryTagsArea">
+              <span class="cuisine-placeholder" id="categoryPlaceholder">
+                <i class="fas fa-layer-group me-2 text-muted"></i>Click to select category...
+              </span>
+            </div>
+            <i class="fas fa-chevron-down cuisine-dropdown-arrow" id="categoryArrow"></i>
+          </div>
+          <div class="cuisine-dropdown-panel" id="categoryDropdownPanel" style="display:none;">
+            <div class="cuisine-search-wrap">
+              <i class="fas fa-search cuisine-search-icon"></i>
+              <input type="text" class="cuisine-search-input" id="categorySearchInput"
+                     placeholder="Search categories..." oninput="filterCategories(this.value)" autocomplete="off" />
+            </div>
+            <div class="cuisine-divider"></div>
+            <div class="cuisine-items-list" id="categoryItemsList">
+              @foreach($categories as $cat)
+              <label class="cuisine-item" id="cat-label-{{ $cat->id }}">
+                <input type="radio" name="_cat_radio" value="{{ $cat->id }}"
+                       id="cat_rb_{{ $cat->id }}"
+                       class="cat-rb d-none"
+                       data-name="{{ $cat->name }}"
+                       data-id="{{ $cat->id }}"
+                       {{ old('event_category_id', isset($event) ? $event->event_category_id : '') == $cat->id ? 'checked' : '' }}
+                       onchange="onCategoryChange(this)" />
+                <span class="cuisine-item-name">{{ $cat->name }}</span>
+                <span class="cuisine-item-check"><i class="fas fa-check"></i></span>
+              </label>
+              @endforeach
+              <div class="cuisine-no-results d-none" id="categoryNoResults">
+                <i class="fas fa-search-minus me-2"></i>No categories found
+              </div>
+            </div>
+            <div class="cuisine-divider"></div>
+            <div class="cuisine-panel-footer">
+              <button type="button" class="btn btn-sm btn-link p-0 text-primary fw-semibold"
+                      data-bs-toggle="modal" data-bs-target="#addCategoryModal" onclick="closeCategoryDropdown()">
+                <i class="fas fa-plus-circle me-1"></i>Add New Category
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label fw-semibold" for="name">Name <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="name" name="name" value="{{ old('name', isset($event) ? $event->name : '') }}" required placeholder="e.g. Grand Rapids Art Festival" />
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label fw-semibold" for="slug">Slug <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="slug" name="slug" value="{{ old('slug', isset($event) ? $event->slug : '') }}" required placeholder="e.g. grand-rapids-art-festival" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label fw-semibold" for="start_date">Start Date & Time</label>
+        <input type="datetime-local" class="form-control" id="start_date" name="start_date" value="{{ old('start_date', (isset($event) && $event->start_date) ? date('Y-m-d\TH:i', strtotime($event->start_date)) : '') }}" />
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label fw-semibold" for="end_date">End Date & Time</label>
+        <input type="datetime-local" class="form-control" id="end_date" name="end_date" value="{{ old('end_date', (isset($event) && $event->end_date) ? date('Y-m-d\TH:i', strtotime($event->end_date)) : '') }}" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label class="form-label fw-semibold" for="venue_name">Venue Name</label>
+        <input type="text" class="form-control" id="venue_name" name="venue_name" value="{{ old('venue_name', isset($event) ? $event->venue_name : '') }}" placeholder="e.g. Calder Plaza" />
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label fw-semibold" for="city">City</label>
+        <input type="hidden" name="city" id="city_hidden" value="{{ old('city', isset($event) ? $event->city : '') }}" />
+        <div class="cuisine-dropdown-wrapper" id="cityDropdownWrapper">
+          <div class="cuisine-dropdown-trigger" id="cityTrigger" onclick="toggleCityDropdown()">
+            <div class="cuisine-tags-area" id="cityTagsArea">
+              <span class="cuisine-placeholder" id="cityPlaceholder">
+                Click to select city...
+              </span>
+            </div>
+            <div class="cuisine-dropdown-arrow" id="cityArrow">
+              <i class="fas fa-chevron-down"></i>
+            </div>
+          </div>
+          <div class="cuisine-dropdown-panel" id="cityDropdownPanel" style="display: none;">
+            <div class="cuisine-search-wrap">
+              <i class="fas fa-search cuisine-search-icon"></i>
+              <input type="text" class="cuisine-search-input" id="citySearchInput" placeholder="Search city..." onkeyup="filterCities(this.value)">
+            </div>
+            <div class="cuisine-divider"></div>
+            <div class="cuisine-items-list" id="cityItemsList">
+              @foreach(config('michigan_cities') as $m_city)
+                @php $m_city_slug = Str::slug($m_city); @endphp
+                <label class="cuisine-item" id="city-label-{{ $m_city_slug }}">
+                  <input type="radio" name="_city_radio" value="{{ $m_city }}" id="city_rb_{{ $m_city_slug }}" class="city-rb d-none" data-name="{{ $m_city }}" {{ old('city', isset($event) ? $event->city : '') == $m_city ? 'checked' : '' }} onchange="onCityChange(this)" />
+                  <span class="cuisine-item-name">{{ $m_city }}</span>
+                  <span class="cuisine-item-check"><i class="fas fa-check"></i></span>
+                </label>
+              @endforeach
+            </div>
+            <div class="cuisine-no-results d-none" id="cityNoResults">
+              No cities found.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12 mb-3">
+        <label class="form-label fw-semibold" for="map_iframe">Map Iframe Code</label>
+        <textarea class="form-control" id="map_iframe" name="map_iframe" rows="3" placeholder="Paste Google Maps iframe code here">{{ old('map_iframe', isset($event) ? $event->map_iframe : '') }}</textarea>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label fw-semibold" for="description">Description</label>
+      <textarea class="form-control tinymce" id="description" name="description" rows="6">{{ old('description', isset($event) ? $event->description : '') }}</textarea>
+    </div>
+    <div class="mb-3">
+      <div class="form-check form-switch mt-2">
+        <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" value="1" {{ old('is_featured', isset($event) ? $event->is_featured : 0) ? 'checked' : '' }}>
+        <label class="form-check-label fw-semibold" for="is_featured">Featured Event (Shows on Home Page)</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 2: Featured Image & Video -->
+  <div class="tab-pane fade" id="featured-pane" role="tabpanel" aria-labelledby="featured-tab">
+    <div class="mb-3">
+      <label class="form-label fw-semibold" for="featured_image">Featured Image</label>
+      <input type="file" class="form-control" id="featured_image" name="featured_image" accept="image/*" onchange="previewFeaturedImage(event)" />
+      <div class="form-text">Max 4MB. JPG, PNG, WebP supported. Leave blank to keep current image.</div>
+      @if(isset($event) && $event->featured_image)
+        <div class="mt-2" id="current-featured-img">
+          <img src="{{ asset($event->featured_image) }}" alt="Featured Image" class="img-thumbnail" style="max-height: 150px;">
+        </div>
+      @endif
+    </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold" for="featured_image_alt">Featured Image Alt Text</label>
+      <input type="text" class="form-control" id="featured_image_alt" name="featured_image_alt" value="{{ old('featured_image_alt', isset($event) ? $event->featured_image_alt : '') }}" placeholder="Describe the image for SEO" />
+      <div class="form-text">Alt text helps search engines understand the image content.</div>
+    </div>
+    <div class="mb-3" id="featured-preview-new" style="display:none;">
+      <label class="form-label text-muted small">Preview</label>
+      <div>
+        <img id="featured-preview-img" src="" alt="Preview" class="img-thumbnail" style="max-height:220px;" />
+      </div>
+    </div>
+    <div class="mb-3 border-top pt-3">
+      <label class="form-label fw-semibold" for="video_url">YouTube Video URL</label>
+      <input type="url" class="form-control" id="video_url" name="video_url" value="{{ old('video_url', (isset($event) && str_starts_with($event->video ?? '', 'http')) ? $event->video : '') }}" placeholder="e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ" />
+      <div class="form-text">Paste a YouTube link directly.</div>
+    </div>
+  </div>
+
+  <!-- Tab 3: FAQs -->
+  <div class="tab-pane fade" id="faqs-pane" role="tabpanel" aria-labelledby="faqs-tab">
+    <div id="faqs-container">
+      @if(isset($event) && $event->faqs)
+        @foreach($event->faqs as $index => $faq)
+        <div class="card mb-3 faq-item border-info" id="faq_{{ $index }}">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h6 class="card-title mb-0 text-info fw-bold"><i class="fas fa-question-circle me-1"></i> FAQ</h6>
+              <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeFaq('faq_{{ $index }}')"><i class="fas fa-trash me-1"></i> Remove</button>
+            </div>
+            <input type="hidden" name="faqs[{{ $index }}][id]" value="{{ $faq->id }}">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Question</label>
+              <input type="text" class="form-control" name="faqs[{{ $index }}][question]" value="{{ old('faqs.'.$index.'.question', $faq->question) }}" required>
+            </div>
+            <div class="mb-2">
+              <label class="form-label fw-semibold">Answer</label>
+              <textarea class="form-control tinymce-faq" id="faq_answer_{{ $index }}" name="faqs[{{ $index }}][answer]">{{ old('faqs.'.$index.'.answer', $faq->answer) }}</textarea>
+            </div>
+          </div>
+        </div>
+        @endforeach
+      @endif
+    </div>
+    <button type="button" class="btn btn-outline-primary mt-3" onclick="addFaq()">+ Add FAQ</button>
+  </div>
+
+  <!-- Tab 4: SEO & Schema -->
+  <div class="tab-pane fade" id="seo-pane" role="tabpanel" aria-labelledby="seo-tab">
+    <div class="mb-3">
+      <label class="form-label fw-semibold" for="meta_title">Meta Title</label>
+      <input type="text" class="form-control" id="meta_title" name="meta_title" value="{{ old('meta_title', isset($event) && $event->seo ? $event->seo->meta_title : '') }}" placeholder="e.g. Best Festival in GR | Michigan Explorer" />
+    </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold" for="meta_description">Meta Description</label>
+      <textarea class="form-control" id="meta_description" name="meta_description" rows="2" placeholder="e.g. Discover the best festival...">{{ old('meta_description', isset($event) && $event->seo ? $event->seo->meta_description : '') }}</textarea>
+    </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold" for="og_title">OG Title</label>
+      <input type="text" class="form-control" id="og_title" name="og_title" value="{{ old('og_title', isset($event) && $event->seo ? $event->seo->og_title : '') }}" />
+    </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold" for="og_description">OG Description</label>
+      <textarea class="form-control" id="og_description" name="og_description" rows="2">{{ old('og_description', isset($event) && $event->seo ? $event->seo->og_description : '') }}</textarea>
+    </div>
+    <div class="mb-3">
+      <label class="form-label" for="schema_markup">Schema Markup (JSON-LD) - <span class="text-info">Auto-generated</span></label>
+      <textarea class="form-control" id="schema_markup" name="schema_markup" rows="8" placeholder="Auto-generated on save" readonly disabled>{{ old('schema_markup', isset($event) && $event->seo ? $event->seo->schema_markup : '') }}</textarea>
+    </div>
+  </div>
+</div>
+
+<div class="mt-4 pt-3 border-top">
+  <button type="submit" class="btn btn-primary">{{ isset($event) ? 'Update' : 'Save' }}</button>
+  <a href="{{ route('events.index') }}" class="btn btn-secondary">Cancel</a>
+</div>
+
+{{-- ===== Add Category Modal ===== --}}
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addCategoryModalLabel"><i class="fas fa-plus-circle me-2 text-primary"></i>Add New Category</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="category-modal-alert" class="d-none"></div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="new_category_name">Category Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="new_category_name" onkeyup="document.getElementById('new_category_slug').value = this.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="new_category_slug">Slug <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="new_category_slug" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="saveNewCategory()">
+          <span id="saveCategoryBtnText"><i class="fas fa-plus me-1"></i>Add Category</span>
+          <span id="saveCategoryBtnSpinner" class="d-none"><span class="spinner-border spinner-border-sm me-1"></span>Saving...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section('page-style')
+<style>
+    /* Custom dropdown styles */
+    .cuisine-dropdown-wrapper { position: relative; width: 100%; }
+    .cuisine-dropdown-trigger {
+      display: flex; align-items: center; justify-content: space-between;
+      min-height: 38px; padding: 6px 12px; border: 1px solid #dee2e6;
+      border-radius: 6px; background: #fff; cursor: pointer;
+      transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out; gap: 10px; user-select: none;
+      width: 100%;
+    }
+    .cuisine-dropdown-trigger:hover { border-color: #7367f0; }
+    .cuisine-dropdown-trigger.open { border-color: #7367f0; box-shadow: 0 0 0 3px rgba(115,103,240,.15); }
+    .cuisine-tags-area { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; align-items: center; min-height: 28px; }
+    .cuisine-placeholder { color: #9ea5b1; font-size: .92rem; display: flex; align-items: center; }
+    .cuisine-dropdown-arrow { font-size: .8rem; color: #9ea5b1; transition: transform .25s; flex-shrink: 0; }
+    .cuisine-dropdown-arrow.rotated { transform: rotate(180deg); }
+    .cuisine-dropdown-panel {
+      position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+      background: #fff; border: 1.5px solid #d5d9e0; border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0,0,0,.12); z-index: 1055; overflow: hidden;
+      animation: dropdownFade .18s ease;
+    }
+    .cuisine-search-wrap { display: flex; align-items: center; padding: 10px 14px; gap: 10px; background: #f8f7ff; }
+    .cuisine-search-icon { color: #9ea5b1; font-size: .9rem; flex-shrink: 0; }
+    .cuisine-search-input { border: none; outline: none; background: transparent; font-size: .9rem; width: 100%; color: #3a3a3a; }
+    .cuisine-search-input::placeholder { color: #b0b8c9; }
+    .cuisine-divider { height: 1px; background: #eeedf5; }
+    .cuisine-items-list { max-height: 240px; overflow-y: auto; padding: 6px 0; }
+    .cuisine-items-list::-webkit-scrollbar { width: 4px; }
+    .cuisine-items-list::-webkit-scrollbar-thumb { background: #d5d9e0; border-radius: 4px; }
+    .cuisine-item {
+      display: flex; align-items: center; gap: 10px; padding: 9px 16px;
+      cursor: pointer; margin: 0; font-weight: 400; transition: background .13s;
+    }
+    .cuisine-item:hover { background: #f4f2ff; }
+    .cuisine-item.selected { background: #ede9ff; }
+    .cuisine-item.selected:hover { background: #e4dfff; }
+    .cuisine-item input[type="radio"] { display: none; }
+    .cuisine-item-name { flex: 1; font-size: .9rem; color: #3a3a3a; }
+    .cuisine-item.selected .cuisine-item-name { color: #5a50d6; font-weight: 600; }
+    .cuisine-item-check { font-size: .8rem; color: #7367f0; display: none; }
+    .cuisine-item.selected .cuisine-item-check { display: block; }
+    .cuisine-no-results { padding: 16px; text-align: center; color: #9ea5b1; font-size: .88rem; }
+    .cuisine-panel-footer { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: #f8f7ff; }
+    @keyframes dropdownFade { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+</style>
+@endsection
+
+@section('page-script')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js" referrerpolicy="origin"></script>
+
+<script>
+  $(document).ready(function() {
+    tinymce.init({
+      selector: 'textarea.tinymce',
+      plugins: 'advlist autolink lists link image charmap preview anchor pagebreak',
+      toolbar_mode: 'floating',
+      height: 300,
+      setup: function (editor) {
+        editor.on('change', function () {
+          editor.save();
+        });
+      }
+    });
+
+    tinymce.init({
+      selector: 'textarea.tinymce-faq',
+      plugins: 'advlist autolink lists link image charmap preview anchor pagebreak',
+      toolbar_mode: 'floating',
+      height: 200,
+      setup: function (editor) {
+        editor.on('change', function () {
+          editor.save();
+        });
+      }
+    });
+  });
+
+  let faqIndex = {{ isset($event) ? 'Date.now()' : '0' }};
+  function addFaq() {
+    const container = document.getElementById('faqs-container');
+    const id = 'faq_' + faqIndex;
+    const html = `
+      <div class="card mb-3 faq-item border-info" id="${id}">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="card-title mb-0 text-info fw-bold"><i class="fas fa-question-circle me-1"></i> New FAQ</h6>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeFaq('${id}')"><i class="fas fa-trash me-1"></i> Remove</button>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Question</label>
+            <input type="text" class="form-control" name="faqs[${faqIndex}][question]" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label fw-semibold">Answer</label>
+            <textarea class="form-control tinymce-faq" id="faq_answer_${faqIndex}" name="faqs[${faqIndex}][answer]"></textarea>
+          </div>
+        </div>
+      </div>
+    `;
+    container.insertAdjacentHTML('beforeend', html);
+    
+    // Initialize TinyMCE for the new textarea
+    tinymce.init({
+      selector: '#faq_answer_' + faqIndex,
+      plugins: 'advlist autolink lists link image charmap preview anchor pagebreak',
+      toolbar_mode: 'floating',
+      height: 200,
+      setup: function (editor) {
+        editor.on('change', function () {
+          editor.save();
+        });
+      }
+    });
+    
+    faqIndex++;
+  }
+
+  function removeFaq(id) {
+    document.getElementById(id).remove();
+  }
+</script>
+
+<script>
+  function saveNewCategory() {
+    const name = document.getElementById('new_category_name').value.trim();
+    const slug = document.getElementById('new_category_slug').value.trim();
+    const alertBox = document.getElementById('category-modal-alert');
+    if (!name || !slug) { alertBox.className = 'alert alert-danger'; alertBox.textContent = 'Please enter name and slug.'; return; }
+    alertBox.className = 'd-none';
+    document.getElementById('saveCategoryBtnText').classList.add('d-none');
+    document.getElementById('saveCategoryBtnSpinner').classList.remove('d-none');
+    $.ajax({
+      url: '{{ route("event-categories.quick-store") }}', type: 'POST',
+      data: { _token: '{{ csrf_token() }}', name, slug, status: 1 },
+      success: function(response) {
+        if (response.success) {
+          const cat = response.category;
+          const list = document.getElementById('categoryItemsList');
+          const lbl = document.createElement('label');
+          lbl.className = 'cuisine-item';
+          lbl.id = 'cat-label-' + cat.id;
+          lbl.innerHTML = `
+            <input type="radio" name="_cat_radio" value="${cat.id}" id="cat_rb_${cat.id}" class="cat-rb d-none" data-name="${cat.name}" data-id="${cat.id}" onchange="onCategoryChange(this)" />
+            <span class="cuisine-item-name">${cat.name}</span>
+            <span class="cuisine-item-check"><i class="fas fa-check"></i></span>
+          `;
+          list.insertBefore(lbl, list.firstChild);
+          
+          const newRb = lbl.querySelector('input[type="radio"]');
+          newRb.checked = true;
+          onCategoryChange(newRb);
+
+          document.getElementById('new_category_name').value = '';
+          document.getElementById('new_category_slug').value = '';
+          alertBox.className = 'alert alert-success'; alertBox.textContent = 'Category added!';
+          bootstrap.Modal.getInstance(document.getElementById('addCategoryModal')).hide();
+        } else { alertBox.className = 'alert alert-danger'; alertBox.textContent = response.message || 'Failed.'; }
+      },
+      error: function(xhr) {
+        alertBox.className = 'alert alert-danger';
+        const errors = xhr.responseJSON?.errors;
+        alertBox.textContent = errors ? Object.values(errors).flat().join(' ') : 'An error occurred.';
+      },
+      complete: function() {
+        document.getElementById('saveCategoryBtnText').classList.remove('d-none');
+        document.getElementById('saveCategoryBtnSpinner').classList.add('d-none');
+      }
+    });
+  }
+
+  function toggleCategoryDropdown() {
+    const panel  = document.getElementById('categoryDropdownPanel');
+    const arrow  = document.getElementById('categoryArrow');
+    const isOpen = panel.style.display !== 'none';
+    panel.style.display = isOpen ? 'none' : 'block';
+    arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+    if (!isOpen) document.getElementById('categorySearchInput').focus();
+  }
+  function closeCategoryDropdown() {
+    const panel = document.getElementById('categoryDropdownPanel');
+    if(panel) { panel.style.display = 'none'; document.getElementById('categoryArrow').style.transform = 'rotate(0deg)'; }
+  }
+  function filterCategories(val) {
+    const term  = val.toLowerCase();
+    const items = document.querySelectorAll('#categoryItemsList .cuisine-item');
+    let   found = 0;
+    items.forEach(item => {
+      const name = item.querySelector('.cuisine-item-name').textContent.toLowerCase();
+      const show = name.includes(term);
+      item.style.display = show ? '' : 'none';
+      if (show) found++;
+    });
+    document.getElementById('categoryNoResults').classList.toggle('d-none', found > 0);
+  }
+  function onCategoryChange(rb) {
+    const id    = rb.dataset.id;
+    const name  = rb.dataset.name;
+    const hidden= document.getElementById('event_category_id');
+    const tags  = document.getElementById('categoryTagsArea');
+    const ph    = document.getElementById('categoryPlaceholder');
+
+    hidden.value = id;
+    document.querySelectorAll('#categoryItemsList .cuisine-item').forEach(l => l.classList.remove('selected'));
+    const label = rb.closest('.cuisine-item');
+    if(label) label.classList.add('selected');
+
+    ph.style.display = 'none';
+    let existing = tags.querySelector('.category-selected-text');
+    if (!existing) {
+      existing = document.createElement('span');
+      existing.className = 'category-selected-text';
+      existing.style.cssText = 'font-size:0.9rem; font-weight:500; color:#333;';
+      tags.insertBefore(existing, ph);
+    }
+    existing.textContent = name;
+    closeCategoryDropdown();
+  }
+
+  function toggleCityDropdown() {
+    const panel  = document.getElementById('cityDropdownPanel');
+    const arrow  = document.getElementById('cityArrow');
+    const isOpen = panel.style.display !== 'none';
+    panel.style.display = isOpen ? 'none' : 'block';
+    arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+    if (!isOpen) document.getElementById('citySearchInput').focus();
+  }
+  function closeCityDropdown() {
+    const panel = document.getElementById('cityDropdownPanel');
+    if(panel) { panel.style.display = 'none'; document.getElementById('cityArrow').style.transform = 'rotate(0deg)'; }
+  }
+  function filterCities(val) {
+    const term  = val.toLowerCase();
+    const items = document.querySelectorAll('#cityItemsList .cuisine-item');
+    let   found = 0;
+    items.forEach(item => {
+      const name = item.querySelector('.cuisine-item-name').textContent.toLowerCase();
+      const show = name.includes(term);
+      item.style.display = show ? '' : 'none';
+      if (show) found++;
+    });
+    document.getElementById('cityNoResults').classList.toggle('d-none', found > 0);
+  }
+  function onCityChange(rb) {
+    const val   = rb.value;
+    const name  = rb.dataset.name;
+    const hidden= document.getElementById('city_hidden');
+    const tags  = document.getElementById('cityTagsArea');
+    const ph    = document.getElementById('cityPlaceholder');
+
+    hidden.value = val;
+    document.querySelectorAll('#cityItemsList .cuisine-item').forEach(l => l.classList.remove('selected'));
+    const label = rb.closest('.cuisine-item');
+    if(label) label.classList.add('selected');
+
+    ph.style.display = 'none';
+    let existing = tags.querySelector('.city-selected-text');
+    if (!existing) {
+      existing = document.createElement('span');
+      existing.className = 'city-selected-text';
+      existing.style.cssText = 'font-size:0.9rem; font-weight:500; color:#333;';
+      tags.insertBefore(existing, ph);
+    }
+    existing.textContent = name;
+    closeCityDropdown();
+  }
+
+  window.toggleCityDropdown = toggleCityDropdown;
+  window.closeCityDropdown = closeCityDropdown;
+  window.filterCities = filterCities;
+  window.onCityChange = onCityChange;
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const preselectedCat = document.getElementById('event_category_id').value;
+    if (preselectedCat) {
+      const rb = document.getElementById('cat_rb_' + preselectedCat);
+      if (rb) { rb.checked = true; onCategoryChange(rb); }
+    }
+
+    const preselectedCity = document.getElementById('city_hidden').value;
+    if (preselectedCity) {
+      const slug = preselectedCity.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+      const rb = document.getElementById('city_rb_' + slug);
+      if (rb) { rb.checked = true; onCityChange(rb); }
+    }
+  });
+
+  document.addEventListener('click', function(e) {
+    const wrapper = document.getElementById('categoryDropdownWrapper');
+    if (wrapper && !wrapper.contains(e.target)) closeCategoryDropdown();
+    const cityWrapper = document.getElementById('cityDropdownWrapper');
+    if (cityWrapper && !cityWrapper.contains(e.target)) closeCityDropdown();
+  });
+
+  // Slug Autogenerator
+  function generateSlug(text) {
+    return text.toString().toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w\-]+/g, '')
+      .replace(/\-\-+/g, '-')
+      .replace(/^-+/, '')
+      .replace(/-+$/, '');
+  }
+
+  const nameInput = document.getElementById('name');
+  if (nameInput) {
+    nameInput.addEventListener('input', function() {
+      const slugInput = document.getElementById('slug');
+      if (slugInput) slugInput.value = generateSlug(this.value);
+    });
+  }
+
+  // Preview Uploads
+  function previewFeaturedImage(event) {
+    const file = event.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.getElementById('featured-preview-img').src = e.target.result;
+      document.getElementById('featured-preview-new').style.display = 'block';
+      const existing = document.getElementById('current-featured-img');
+      if (existing) existing.style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  }
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function updateCount(inputId, countId) {
+        const input = document.getElementById(inputId);
+        const count = document.getElementById(countId);
+        if (input && count) {
+            const update = () => {
+                count.textContent = `(${input.value.length} / 160)`;
+            };
+            input.addEventListener('input', update);
+            update(); // Init on load
+        }
+    }
+    updateCount('meta_description', 'meta_desc_count');
+    updateCount('og_description', 'og_desc_count');
+});
+</script>
+@endsection

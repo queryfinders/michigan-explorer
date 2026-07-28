@@ -36,20 +36,26 @@
 <!-- 2. Main Content Area -->
 <section class="py-5 bg-light">
     <div class="container">
-        <div class="row g-5">
+        <div class="row g-5 align-items-start">
             
             <!-- Left Column: Details & Gallery -->
             <div class="col-lg-8">
                 
                 <!-- Quick Info Bar -->
-                <div class="bg-white rounded-4 shadow-sm p-4 mb-4 d-flex flex-wrap gap-4 align-items-center justify-content-between">
-                    <div class="d-flex align-items-center">
+                <div class="bg-white rounded-4 shadow-sm p-4 mb-4 d-flex flex-wrap gap-4 align-items-center justify-content-start">
+                    <div class="d-flex align-items-center me-5">
                         <div class="icon-wrapper rounded-circle d-flex align-items-center justify-content-center me-3 auto-style-49">
                             <i class="fas fa-calendar-alt"></i>
                         </div>
                         <div>
                             <div class="text-muted small fw-bold text-uppercase">Date</div>
-                            <div class="fw-bold">{{ $date->format('l, F j, Y') }}</div>
+                            <div class="fw-bold">
+                                @if($date->format('Y-m-d') === $endDate->format('Y-m-d'))
+                                    {{ $date->format('l, F j, Y') }}
+                                @else
+                                    {{ $date->format('F j, Y') }} - {{ $endDate->format('F j, Y') }}
+                                @endif
+                            </div>
                         </div>
                     </div>
                     
@@ -59,17 +65,13 @@
                         </div>
                         <div>
                             <div class="text-muted small fw-bold text-uppercase">Time</div>
-                            <div class="fw-bold">{{ $date->format('g:i A') }} - {{ $endDate->format('g:i A') }}</div>
-                        </div>
-                    </div>
-                    
-                    <div class="d-flex align-items-center">
-                        <div class="icon-wrapper rounded-circle d-flex align-items-center justify-content-center me-3 auto-style-49">
-                            <i class="fas fa-ticket-alt"></i>
-                        </div>
-                        <div>
-                            <div class="text-muted small fw-bold text-uppercase">Tickets</div>
-                            <div class="fw-bold">{{ $event->price > 0 ? '$' . number_format($event->price, 2) : 'Free Entry' }}</div>
+                            <div class="fw-bold">
+                                @if($date->format('g:i A') === $endDate->format('g:i A'))
+                                    {{ $date->format('g:i A') }}
+                                @else
+                                    {{ $date->format('g:i A') }} - {{ $endDate->format('g:i A') }}
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -114,58 +116,34 @@
                 </div>
 
                 <!-- FAQ Section -->
+                @if(isset($event->faqs) && $event->faqs->count() > 0)
                 <div class="bg-white rounded-4 shadow-sm p-4 p-md-5 mb-4">
                     <h3 class="fw-bold mb-4 auto-style-7">Frequently Asked Questions</h3>
                     <div class="accordion accordion-flush" id="eventFaq">
-                        <div class="accordion-item border rounded-3 mb-2 overflow-hidden">
+                        @foreach($event->faqs as $index => $faq)
+                        <div class="accordion-item border rounded-3 {{ !$loop->last ? 'mb-2' : '' }} overflow-hidden">
                             <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-                                    Is parking available?
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq{{ $index }}">
+                                    {{ $faq->question }}
                                 </button>
                             </h2>
-                            <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#eventFaq">
-                                <div class="accordion-body text-muted lh-18">Public parking is available near the venue. We recommend arriving early as spots fill up quickly during events.</div>
+                            <div id="faq{{ $index }}" class="accordion-collapse collapse" data-bs-parent="#eventFaq">
+                                <div class="accordion-body text-muted lh-18">{!! $faq->answer !!}</div>
                             </div>
                         </div>
-                        <div class="accordion-item border rounded-3 mb-2 overflow-hidden">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
-                                    Can I bring my own food and drinks?
-                                </button>
-                            </h2>
-                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#eventFaq">
-                                <div class="accordion-body text-muted lh-18">Outside food and beverages are generally not permitted unless otherwise specified by the venue. Vendors will be available on-site.</div>
-                            </div>
-                        </div>
-                        <div class="accordion-item border rounded-3 overflow-hidden">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
-                                    Is the event wheelchair accessible?
-                                </button>
-                            </h2>
-                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#eventFaq">
-                                <div class="accordion-body text-muted lh-18">Yes, the venue is fully ADA compliant and wheelchair accessible. Dedicated seating areas are available upon request.</div>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
+                @endif
             </div>
             
             <!-- Right Column: Sidebar Information -->
-            <div class="col-lg-4">
-                
+            <div class="col-lg-4" style="align-self: start; position: sticky; top: 90px;">
                 <!-- Event Booking Card -->
-                <div class="card border-0 shadow-sm rounded-4 mb-4 sticky-top auto-style-16">
+                <div class="card border-0 shadow-sm rounded-4 mb-4 auto-style-16">
                     <div class="card-body p-4">
-                        <div class="text-center mb-4">
-                            <div class="text-muted small fw-bold text-uppercase mb-1">General Admission</div>
-                            <h2 class="fw-bolder text-primary mb-0 auto-style-7">
-                                {{ $event->price > 0 ? '$' . number_format($event->price, 2) : 'Free' }}
-                            </h2>
-                        </div>
-                        
                         <a href="{{ $event->website ?? '#' }}" target="_blank" class="btn btn-primary w-100 rounded-pill fw-bold py-3 shadow-sm d-flex justify-content-center align-items-center mb-3 text-uppercase auto-style-50">
-                            <i class="fas fa-ticket-alt me-2"></i> Get Tickets
+                            <i class="fas fa-external-link-alt me-2"></i> Visit Event Website
                         </a>
                         
                         <button class="btn btn-outline-secondary w-100 rounded-pill fw-bold py-2 d-flex justify-content-center align-items-center" onclick="shareCurrentPage('{{ addslashes($event->name) }}')">
@@ -200,8 +178,89 @@
                             </li>
                             @endif
                         </ul>
+                    </div>{{-- end card-body --}}
+                </div>{{-- end booking card --}}
+
+                {{-- Sidebar Widget 1: Latest Upcoming Event --}}
+                @if($latestUpcomingEvent)
+                <div class="card border-0 shadow-sm rounded-4 mb-4" style="margin-top: 0;">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold text-uppercase text-muted mb-3" style="font-size: 0.75rem; letter-spacing: 0.05em;">
+                            <i class="fas fa-bolt me-1 text-warning"></i> Latest Upcoming Event
+                        </h6>
+                        @php
+                            $lupDate = $latestUpcomingEvent->start_date ? \Carbon\Carbon::parse($latestUpcomingEvent->start_date) : null;
+                        @endphp
+                        <a href="{{ route('web.events.show', $latestUpcomingEvent->slug) }}" class="text-decoration-none d-block">
+                            <div class="d-flex align-items-start gap-3">
+                                @if($latestUpcomingEvent->featured_image)
+                                <img src="{{ asset($latestUpcomingEvent->featured_image) }}" alt="{{ $latestUpcomingEvent->featured_image_alt ?? $latestUpcomingEvent->name }}"
+                                     class="rounded-3 object-fit-cover flex-shrink-0" style="width: 70px; height: 70px; object-fit: cover;">
+                                @else
+                                <div class="rounded-3 bg-primary bg-opacity-10 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 70px; height: 70px;">
+                                    <i class="fas fa-calendar-alt text-primary fs-4"></i>
+                                </div>
+                                @endif
+                                <div class="overflow-hidden">
+                                    <div class="fw-bold text-dark mb-1" style="font-size: 0.9rem; line-height: 1.3;">{{ Str::limit($latestUpcomingEvent->name, 55) }}</div>
+                                    @if($lupDate)
+                                    <div class="small text-primary fw-semibold"><i class="fas fa-calendar-alt me-1"></i>{{ $lupDate->format('M j, Y') }}</div>
+                                    @endif
+                                    @if($latestUpcomingEvent->venue_name)
+                                    <div class="small text-muted text-truncate"><i class="fas fa-map-marker-alt me-1"></i>{{ $latestUpcomingEvent->venue_name }}</div>
+                                    @endif
+                                </div>
+                            </div>
+                        </a>
+                        <a href="{{ route('web.events.show', $latestUpcomingEvent->slug) }}" class="btn btn-outline-primary rounded-pill w-100 mt-3 btn-sm fw-semibold">
+                            View Event <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
                     </div>
                 </div>
+                @endif
+
+                {{-- Sidebar Widget 2: More in This Category --}}
+                @if($categoryEvents->count() > 0)
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold text-uppercase text-muted mb-3" style="font-size: 0.75rem; letter-spacing: 0.05em;">
+                            <i class="fas fa-layer-group me-1 text-primary"></i>
+                            More in {{ $event->category->name ?? 'This Category' }}
+                        </h6>
+                        <div class="d-flex flex-column gap-3">
+                            @foreach($categoryEvents as $catEvent)
+                            @php
+                                $catEventDate = $catEvent->start_date ? \Carbon\Carbon::parse($catEvent->start_date) : null;
+                            @endphp
+                            <a href="{{ route('web.events.show', $catEvent->slug) }}" class="text-decoration-none d-flex align-items-start gap-3">
+                                @if($catEvent->featured_image)
+                                <img src="{{ asset($catEvent->featured_image) }}" alt="{{ $catEvent->featured_image_alt ?? $catEvent->name }}"
+                                     class="rounded-3 object-fit-cover flex-shrink-0" style="width: 60px; height: 60px; object-fit: cover;">
+                                @else
+                                <div class="rounded-3 bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 60px; height: 60px;">
+                                    <i class="fas fa-calendar text-secondary"></i>
+                                </div>
+                                @endif
+                                <div class="overflow-hidden">
+                                    <div class="fw-semibold text-dark mb-1" style="font-size: 0.85rem; line-height: 1.3;">{{ Str::limit($catEvent->name, 45) }}</div>
+                                    @if($catEventDate)
+                                    <div class="small text-primary"><i class="fas fa-calendar-alt me-1"></i>{{ $catEventDate->format('M j, Y') }}</div>
+                                    @endif
+                                </div>
+                            </a>
+                            @if(!$loop->last)
+                            <hr class="my-0 opacity-15">
+                            @endif
+                            @endforeach
+                        </div>
+                        @if(isset($event->category))
+                        <a href="{{ route('web.events.category', $event->category->slug) }}" class="btn btn-outline-secondary rounded-pill w-100 mt-3 btn-sm fw-semibold">
+                            View All {{ $event->category->name }} Events <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                        @endif
+                    </div>
+                </div>
+                @endif
 
             </div>
         </div>
@@ -210,8 +269,23 @@
         <div class="bg-white rounded-4 shadow-sm p-4 p-md-5 mt-4">
             <h3 class="fw-bold mb-4 auto-style-7">Venue Map</h3>
             <p class="text-muted mb-4"><i class="fas fa-map-marker-alt me-2 text-primary"></i> {{ $event->venue_name ?? '' }} - {{ $event->address ?? '' }}, {{ $event->city ?? '' }}, {{ $event->state ?? 'MI' }}</p>
-            <div class="rounded-3 overflow-hidden bg-light auto-style-51">
-                <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q={{ urlencode(($event->venue_name ?? '') . ' ' . ($event->city ?? 'Michigan')) }}&t=&z=14&ie=UTF8&iwloc=&output=embed"></iframe>
+            <div class="rounded-3 overflow-hidden bg-light auto-style-51 map-wrapper" style="height: 400px; width: 100%;">
+                <style>
+                    .map-wrapper iframe {
+                        width: 100% !important;
+                        height: 100% !important;
+                        border: 0;
+                    }
+                </style>
+                @if(!empty($event->map_iframe))
+                    @if(str_contains($event->map_iframe, '<iframe'))
+                        {!! $event->map_iframe !!}
+                    @else
+                        <iframe width="100%" height="100%" frameborder="0" style="border:0;" src="{{ $event->map_iframe }}"></iframe>
+                    @endif
+                @else
+                    <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q={{ urlencode(($event->venue_name ?? '') . ' ' . ($event->city ?? 'Michigan')) }}&t=&z=14&ie=UTF8&iwloc=&output=embed"></iframe>
+                @endif
             </div>
         </div>
 

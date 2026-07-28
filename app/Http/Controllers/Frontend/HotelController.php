@@ -7,29 +7,39 @@ use Illuminate\Http\Request;
 
 class HotelController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $hotels = \App\Models\Hotel::with('category')->where('status', 1)->paginate(12);
+        $hotels = \App\Models\Hotel::with('category')->where('status', 1)->paginate(9);
         $totalHotelsCount = \App\Models\Hotel::where('status', 1)->count();
         $currentCategory = null;
         $featuredCategories = \App\Models\HotelCategory::withCount('hotels')->where('is_featured', 1)->take(10)->get();
         $allCategories = \App\Models\HotelCategory::withCount('hotels')->where('status', 1)->orderBy('name')->get();
         $page = \App\Models\Page::with('seo')->where('slug', 'hotels')->first();
+
+        if ($request->ajax()) {
+            return view('web.hotels._hotels_grid', compact('hotels'))->render();
+        }
+
         return view('web.hotels.index', compact('hotels', 'totalHotelsCount', 'currentCategory', 'featuredCategories', 'allCategories', 'page'));
     }
 
-    public function category($slug)
+    public function category(Request $request, $slug)
     {
         $category = \App\Models\HotelCategory::where('slug', $slug)->first();
         if (!$category) {
             abort(404);
         }
-        $hotels = \App\Models\Hotel::with('category')->where('hotel_category_id', $category->id)->where('status', 1)->paginate(12);
+        $hotels = \App\Models\Hotel::with('category')->where('hotel_category_id', $category->id)->where('status', 1)->paginate(9);
         $totalHotelsCount = \App\Models\Hotel::where('status', 1)->count();
         $currentCategory = $category;
         $featuredCategories = \App\Models\HotelCategory::withCount('hotels')->where('is_featured', 1)->take(10)->get();
         $allCategories = \App\Models\HotelCategory::withCount('hotels')->where('status', 1)->orderBy('name')->get();
         $page = \App\Models\Page::with('seo')->where('slug', 'hotels')->first();
+
+        if ($request->ajax()) {
+            return view('web.hotels._hotels_grid', compact('hotels'))->render();
+        }
+
         return view('web.hotels.index', compact('hotels', 'totalHotelsCount', 'currentCategory', 'featuredCategories', 'allCategories', 'page'));
     }
 

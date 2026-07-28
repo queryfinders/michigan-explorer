@@ -142,6 +142,59 @@
     </div>
 </section>
 
+{{-- Latest Upcoming Event Strip: below Featured Hotels --}}
+@if(isset($upcomingEventsWidget) && $upcomingEventsWidget->count() > 0)
+@php $latestStripEv = $upcomingEventsWidget->first(); @endphp
+<section class="section-padding-upcoming bg-light overflow-hidden">
+<div class="container">
+    <a href="{{ route('web.events.show', $latestStripEv->slug) }}" class="text-decoration-none d-block ev-bottom-strip rounded-4 overflow-hidden" style="background: #fff; border: 1.5px solid #e9ecef; box-shadow: 0 2px 16px rgba(0,0,0,0.06);">
+        <div class="d-flex align-items-stretch" style="min-height: 120px;">
+            {{-- Thumbnail --}}
+            <div class="flex-shrink-0 position-relative overflow-hidden" style="width: 190px;">
+                @if($latestStripEv->featured_image)
+                <img src="{{ asset($latestStripEv->featured_image) }}" alt="{{ $latestStripEv->featured_image_alt ?? $latestStripEv->name }}"
+                     class="ev-strip-img w-100 h-100 position-absolute top-0 start-0" style="object-fit: cover;">
+                @else
+                <div class="w-100 h-100 d-flex align-items-center justify-content-center position-absolute top-0 start-0" style="background: #fff3cd;">
+                    <i class="fas fa-calendar-star text-warning fs-2"></i>
+                </div>
+                @endif
+            </div>
+            {{-- Content --}}
+            <div class="px-4 py-3 d-flex flex-column justify-content-center flex-grow-1">
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <span class="fw-bold text-uppercase" style="background: #fff3cd; color: #e67e00; font-size: 0.68rem; letter-spacing: 0.07em; padding: 3px 10px; border-radius: 100px;">
+                        <i class="fas fa-bolt me-1"></i> Latest Upcoming
+                    </span>
+                    @if($latestStripEv->category)
+                    <span class="text-muted" style="font-size: 0.75rem;">{{ $latestStripEv->category->name }}</span>
+                    @endif
+                </div>
+                <h5 class="fw-bold text-dark mb-1" style="font-size: 1.05rem; line-height: 1.3;">{{ $latestStripEv->name }}</h5>
+                <div class="d-flex flex-wrap gap-3 text-muted" style="font-size: 0.8rem;">
+                    @if($latestStripEv->start_date)
+                    <span><i class="fas fa-calendar-alt me-1 text-warning"></i>{{ \Carbon\Carbon::parse($latestStripEv->start_date)->format('l, M j, Y') }}</span>
+                    @endif
+                    @if($latestStripEv->venue_name)
+                    <span><i class="fas fa-map-marker-alt me-1 text-primary"></i>{{ $latestStripEv->venue_name }}</span>
+                    @endif
+                    @if($latestStripEv->city)
+                    <span><i class="fas fa-city me-1 text-primary"></i>{{ $latestStripEv->city }}, MI</span>
+                    @endif
+                </div>
+            </div>
+            {{-- CTA --}}
+            <div class="flex-shrink-0 d-flex align-items-center px-4">
+                <span class="btn btn-warning rounded-pill px-4 fw-bold btn-sm">
+                    See Event <i class="fas fa-arrow-right ms-1"></i>
+                </span>
+            </div>
+        </div>
+    </a>
+</div>
+</section>
+@endif
+
 
 <!-- 4. Featured Restaurants (Component-Driven) -->
 <section class="overflow-hidden">
@@ -342,6 +395,153 @@
         </div>
     </div>
 </section>
+
+<!-- Upcoming Events Widget: Large Banner + Side Cards -->
+@if(isset($upcomingEventsWidget) && $upcomingEventsWidget->count() > 0)
+@php
+    $featuredEv  = $upcomingEventsWidget->first();
+    $sideEvs     = $upcomingEventsWidget->skip(1)->take(3);
+    $bottomEv    = $upcomingEventsWidget->skip(1)->first(); // single latest after featured
+@endphp
+<style>
+    /* Hover: main banner image zoom */
+    .ev-banner-link .ev-banner-img {
+        transition: transform 0.5s cubic-bezier(.25,.8,.25,1);
+    }
+    .ev-banner-link:hover .ev-banner-img {
+        transform: scale(1.06);
+    }
+    /* Hover: side cards glow */
+    .ev-side-card {
+        transition: background 0.25s, border-color 0.25s, transform 0.2s, box-shadow 0.25s;
+    }
+    .ev-side-card:hover {
+        background: rgba(255,159,28,0.12) !important;
+        border-color: rgba(255,159,28,0.45) !important;
+        transform: translateX(4px);
+        box-shadow: 0 4px 24px rgba(255,159,28,0.15);
+    }
+    /* Hover: bottom strip */
+    .ev-bottom-strip {
+        transition: background 0.3s, box-shadow 0.3s;
+    }
+    .ev-bottom-strip:hover {
+        background: rgba(255,255,255,0.07) !important;
+        box-shadow: 0 0 0 2px rgba(255,159,28,0.35);
+    }
+    .ev-bottom-strip:hover .ev-strip-img {
+        transform: scale(1.04);
+    }
+    .ev-strip-img {
+        transition: transform 0.4s ease;
+    }
+</style>
+
+<section class="section-padding" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f2027 100%);">
+    <div class="container">
+
+        <!-- Section Header -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-5">
+            <div>
+                <span class="badge rounded-pill px-3 py-2 mb-2 d-inline-block fw-semibold" style="background: rgba(255,159,28,0.18); color: #ff9f1c; font-size: 0.75rem; letter-spacing: 0.08em;">
+                    <i class="fas fa-fire me-1"></i> DON'T MISS OUT
+                </span>
+                <h2 class="fw-bold text-white mb-1" style="font-size: 2rem;">Upcoming Events in Michigan</h2>
+                <p class="text-white opacity-50 mb-0">Live concerts, festivals, cultural gatherings &amp; more.</p>
+            </div>
+            <a href="{{ route('web.events.index') }}" class="btn btn-outline-light rounded-pill px-4 fw-semibold mt-3 mt-md-0">
+                View All Events <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+
+        <!-- Main Grid: Featured Banner + Side Cards -->
+        <div class="row g-4 align-items-stretch">
+
+            <!-- Left: Featured Event Banner with hover zoom -->
+            <div class="col-lg-7">
+                <a href="{{ route('web.events.show', $featuredEv->slug) }}" class="text-decoration-none d-block h-100 ev-banner-link">
+                    <div class="position-relative rounded-4 overflow-hidden h-100" style="min-height: 420px;">
+                        @if($featuredEv->featured_image)
+                        <img src="{{ asset($featuredEv->featured_image) }}" alt="{{ $featuredEv->featured_image_alt ?? $featuredEv->name }}"
+                             class="w-100 h-100 position-absolute top-0 start-0 ev-banner-img" style="object-fit: cover;">
+                        @else
+                        <div class="w-100 h-100 position-absolute top-0 start-0 ev-banner-img" style="background: linear-gradient(135deg, #1a1a2e, #16213e);"></div>
+                        @endif
+                        <!-- Gradient Overlay -->
+                        <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.35) 50%, transparent 100%);"></div>
+                        <!-- Content -->
+                        <div class="position-absolute bottom-0 start-0 p-4 p-md-5 w-100">
+                            @if($featuredEv->category)
+                            <span class="badge rounded-pill px-3 py-2 mb-3 d-inline-block fw-semibold" style="background: #ff9f1c; color: #fff; font-size: 0.75rem;">
+                                @if($featuredEv->category->icon)<i class="{{ $featuredEv->category->icon }} me-1"></i>@endif
+                                {{ $featuredEv->category->name }}
+                            </span>
+                            @endif
+                            <h3 class="fw-bold text-white mb-2" style="font-size: 1.6rem; line-height: 1.25;">{{ $featuredEv->name }}</h3>
+                            <div class="d-flex flex-wrap gap-3 text-white opacity-75 mb-3" style="font-size: 0.875rem;">
+                                @if($featuredEv->start_date)
+                                <span><i class="fas fa-calendar-alt me-1 text-warning"></i>{{ \Carbon\Carbon::parse($featuredEv->start_date)->format('M j, Y') }}</span>
+                                @endif
+                                @if($featuredEv->venue_name)
+                                <span><i class="fas fa-map-marker-alt me-1 text-warning"></i>{{ $featuredEv->venue_name }}</span>
+                                @endif
+                                @if($featuredEv->city)
+                                <span><i class="fas fa-city me-1 text-warning"></i>{{ $featuredEv->city }}</span>
+                                @endif
+                            </div>
+                            <span class="btn btn-warning btn-sm rounded-pill px-4 fw-bold">
+                                View Details <i class="fas fa-arrow-right ms-1"></i>
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Right: Stacked Event Cards with hover glow -->
+            <div class="col-lg-5 d-flex flex-column gap-3">
+                @foreach($sideEvs as $sideEv)
+                <a href="{{ route('web.events.show', $sideEv->slug) }}" class="text-decoration-none d-block flex-fill">
+                    <div class="ev-side-card rounded-4 overflow-hidden d-flex align-items-stretch h-100" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09); min-height: 110px;">
+                        <!-- Thumbnail -->
+                        @if($sideEv->featured_image)
+                        <img src="{{ asset($sideEv->featured_image) }}" alt="{{ $sideEv->featured_image_alt ?? $sideEv->name }}"
+                             class="flex-shrink-0" style="width: 110px; object-fit: cover;">
+                        @else
+                        <div class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 110px; background: rgba(255,159,28,0.12);">
+                            <i class="fas fa-calendar-alt text-warning fs-3"></i>
+                        </div>
+                        @endif
+                        <!-- Text -->
+                        <div class="p-3 d-flex flex-column justify-content-center overflow-hidden flex-grow-1">
+                            @if($sideEv->category)
+                            <span class="small fw-semibold mb-1" style="color: #ff9f1c; font-size: 0.7rem; letter-spacing: 0.05em; text-transform: uppercase;">{{ $sideEv->category->name }}</span>
+                            @endif
+                            <div class="fw-bold text-white mb-1" style="font-size: 0.95rem; line-height: 1.3;">{{ Str::limit($sideEv->name, 50) }}</div>
+                            <div class="d-flex flex-wrap gap-2 text-white" style="opacity: 0.55; font-size: 0.78rem;">
+                                @if($sideEv->start_date)
+                                <span><i class="fas fa-calendar me-1"></i>{{ \Carbon\Carbon::parse($sideEv->start_date)->format('M j, Y') }}</span>
+                                @endif
+                                @if($sideEv->city)
+                                <span><i class="fas fa-map-marker-alt me-1"></i>{{ $sideEv->city }}</span>
+                                @endif
+                            </div>
+                        </div>
+                        <!-- Arrow -->
+                        <div class="flex-shrink-0 d-flex align-items-center px-3" style="color: rgba(255,159,28,0.5);">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </a>
+                @endforeach
+            </div>
+
+        </div>{{-- end main grid row --}}
+
+        {{-- (bottom strip moved above Featured Hotels) --}}
+
+    </div>
+</section>
+@endif
 
 <!-- 9. Newsletter Strip -->
 <section class="py-5 bg-primary">

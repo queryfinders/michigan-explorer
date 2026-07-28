@@ -7,29 +7,39 @@ use Illuminate\Http\Request;
 
 class AttractionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $attractions = \App\Models\Attraction::with('category')->where('status', 1)->paginate(12);
+        $attractions = \App\Models\Attraction::with('category')->where('status', 1)->paginate(9);
         $currentCategory = null;
         $featuredCategories = \App\Models\AttractionCategory::withCount('attractions')->where('is_featured', 1)->take(10)->get();
         $allCategories = \App\Models\AttractionCategory::withCount('attractions')->where('status', 1)->orderBy('name')->get();
         $totalAttractionsCount = \App\Models\Attraction::where('status', 1)->count();
         $page = \App\Models\Page::with('seo')->where('slug', 'attractions')->first();
+        
+        if ($request->ajax()) {
+            return view('web.attractions._attractions_grid', compact('attractions'))->render();
+        }
+
         return view('web.attractions.index', compact('attractions', 'currentCategory', 'featuredCategories', 'allCategories', 'totalAttractionsCount', 'page'));
     }
 
-    public function category($slug)
+    public function category(Request $request, $slug)
     {
         $category = \App\Models\AttractionCategory::where('slug', $slug)->first();
         if (!$category) {
             abort(404);
         }
-        $attractions = \App\Models\Attraction::with('category')->where('attraction_category_id', $category->id)->where('status', 1)->paginate(12);
+        $attractions = \App\Models\Attraction::with('category')->where('attraction_category_id', $category->id)->where('status', 1)->paginate(9);
         $currentCategory = $category;
         $featuredCategories = \App\Models\AttractionCategory::withCount('attractions')->where('is_featured', 1)->take(10)->get();
         $allCategories = \App\Models\AttractionCategory::withCount('attractions')->where('status', 1)->orderBy('name')->get();
         $totalAttractionsCount = \App\Models\Attraction::where('status', 1)->count();
         $page = \App\Models\Page::with('seo')->where('slug', 'attractions')->first();
+
+        if ($request->ajax()) {
+            return view('web.attractions._attractions_grid', compact('attractions'))->render();
+        }
+
         return view('web.attractions.index', compact('attractions', 'currentCategory', 'featuredCategories', 'allCategories', 'totalAttractionsCount', 'page'));
     }
 

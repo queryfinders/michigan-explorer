@@ -41,7 +41,7 @@
         @foreach($attractions as $attraction)
         <tr>
           <td>{{ $loop->iteration }}</td>
-          <td>{{ $attraction->name }}</td>
+          <td><strong>{{ $attraction->name }}</strong></td>
           <td>{{ $attraction->category ? $attraction->category->name : 'N/A' }}</td>
           <td>{{ $attraction->city }}</td>
           <td>

@@ -41,9 +41,14 @@
         @foreach($categories as $category)
         <tr>
           <td>{{ $loop->iteration }}</td>
-          <td>{{ $category->name }}</td>
+          <td><strong>{{ $category->name }}</strong></td>
           <td>{{ $category->slug }}</td>
-          <td>{{ $category->status ? 'Active' : 'Inactive' }}</td>
+          <td>
+            <label class="switch">
+              <input type="checkbox" class="switch-input category-status-switch" data-id="{{ $category->id }}" data-status="{{ $category->status }}" {{ $category->status == 1 ? 'checked' : '' }}>
+              <span class="switch-toggle-slider"></span>
+            </label>
+          </td>
           <td>
             <a href="{{ route('event-categories.edit', $category->id) }}" class="btn btn-sm btn-primary"><i class="fa fa-edit"></i></a>
             <form action="{{ route('event-categories.destroy', $category->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure?');">
@@ -68,4 +73,28 @@
 </div>
 @endsection
 
-
+@section('page-script')
+<script>
+  $(document).ready(function() {
+      $(document).on('change', '.category-status-switch', function (e) {
+          e.preventDefault();
+          var id = $(this).data('id');
+          var status = $(this).data('status');
+          var $switch = $(this);
+          
+          var newStatus = status == 1 ? 0 : 1;
+          
+          $.ajax({
+              url: '{{ url("admin/event-categories/status") }}/' + id + '/' + newStatus,
+              type: 'GET',
+              success: function (response) {
+                  $switch.data('status', newStatus);
+              },
+              error: function (xhr, status, error) {
+                  console.error(error);
+              }
+          });
+      });
+  });
+</script>
+@endsection

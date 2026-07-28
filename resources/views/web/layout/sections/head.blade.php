@@ -8,7 +8,7 @@
         @yield('title')
     @endif
 </title>
-<link rel="icon" href="{!! asset('website/assets/images/favicon/favicon.png') !!}">
+<link rel="icon" href="{{ asset('assets/img/favicon/favicon.png') }}">
 <meta name="msapplication-TileColor" content="#79bde9">
 <meta name="msapplication-TileImage" content="/mstile-144x144.png">
 <meta name="theme-color" content="#ffffff">
@@ -39,9 +39,7 @@
     @yield('canonical')
 @endif
 
-<link rel="icon" href="{{ asset('website/assets/images/favicon/favicon-32x32.png') }}" sizes="32x32">
-<link rel="icon" href="{{ asset('website/assets/images/favicon/favicon-192x192.png') }}" sizes="192x192">
-<link rel="apple-touch-icon" href="{{ asset('website/assets/images/favicon/favicon-180x180.png') }}" sizes="180x180">
+<link rel="apple-touch-icon" href="{{ asset('assets/img/favicon/favicon.png') }}">
 
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">

@@ -1,4 +1,4 @@
-<footer class="main-footer position-relative pt-5 pb-4 border-top">
+<footer class="main-footer position-relative pt-5 border-top">
     <div class="container pt-4">
         <div class="row g-5 mb-5">
             <div class="col-lg-4 col-md-6 pe-lg-5">
@@ -29,7 +29,7 @@
                     <li class="mb-3"><a href="{{ route('web.contact') }}" class="text-white-50 text-decoration-none transition-base">Contact Us</a></li>
                     <li class="mb-3"><a href="#" class="text-white-50 text-decoration-none transition-base">Privacy Policy</a></li>
                     <li class="mb-3"><a href="#" class="text-white-50 text-decoration-none transition-base">Terms & Conditions</a></li>
-                    <li class="mb-3"><a href="{{ route('web.sitemap') }}" class="text-white-50 text-decoration-none transition-base">Sitemap</a></li>
+                    <!-- <li class="mb-3"><a href="{{ route('web.sitemap') }}" class="text-white-50 text-decoration-none transition-base">Sitemap</a></li> -->
                 </ul>
             </div>
             
@@ -50,7 +50,7 @@
             <div class="d-flex gap-3 small">
                 <a href="#" class="text-white-50 text-decoration-none transition-base">Privacy</a>
                 <a href="#" class="text-white-50 text-decoration-none transition-base">Terms</a>
-                <a href="#" class="text-white-50 text-decoration-none transition-base">Sitemap</a>
+                <!-- <a href="#" class="text-white-50 text-decoration-none transition-base">Sitemap</a> -->
             </div>
         </div>
     </div>

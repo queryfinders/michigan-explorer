@@ -30,6 +30,22 @@ class EventCategoryController extends Controller
         return redirect()->route('event-categories.index')->with('success', 'Category created successfully.');
     }
 
+    public function quickStore(\Illuminate\Http\Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:event_categories'
+        ]);
+
+        $category = \App\Models\EventCategory::create([
+            'name' => $request->name,
+            'slug' => $request->slug,
+            'status' => $request->status ?? 1
+        ]);
+
+        return response()->json(['success' => true, 'category' => $category]);
+    }
+
     public function edit(\App\Models\EventCategory $eventCategory)
     {
         return view('new_content.admin.event_categories.edit', compact('eventCategory'));
@@ -51,5 +67,14 @@ class EventCategoryController extends Controller
     {
         $eventCategory->delete();
         return redirect()->route('event-categories.index')->with('success', 'Category deleted successfully.');
+    }
+
+    public function changeStatus($id, $status)
+    {
+        $category = \App\Models\EventCategory::findOrFail($id);
+        $category->status = $status;
+        $category->save();
+
+        return response()->json(['success' => true]);
     }
 }
