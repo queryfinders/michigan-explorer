@@ -41,10 +41,15 @@
         @foreach($blogs as $blog)
         <tr>
           <td>{{ $loop->iteration }}</td>
-          <td>{{ $blog->title }}</td>
+          <td><strong>{{ $blog->title }}</strong></td>
           <td>{{ $blog->category ? $blog->category->name : 'N/A' }}</td>
-          <td><span class="badge bg-{{ $blog->status == 'published' ? 'success' : ($blog->status == 'draft' ? 'secondary' : 'warning') }}">{{ ucfirst($blog->status) }}</span></td>
-          <td>{{ $blog->published_at ? \Carbon\Carbon::parse($blog->published_at)->format('M d, Y') : 'N/A' }}</td>
+          <td>
+            <label class="switch">
+              <input type="checkbox" class="switch-input blog-status-switch" data-id="{{ $blog->id }}" data-status="{{ $blog->status }}" {{ $blog->status == 'published' ? 'checked' : '' }}>
+              <span class="switch-toggle-slider"></span>
+            </label>
+          </td>
+          <td id="pub-date-{{ $blog->id }}">{{ $blog->published_at ? \Carbon\Carbon::parse($blog->published_at)->format('M d, Y') : 'N/A' }}</td>
           <td>
             <a href="{{ route('blogs.edit', $blog->id) }}" class="btn btn-sm btn-primary"><i class="fa fa-edit"></i></a>
             <form action="{{ route('blogs.destroy', $blog->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure?');">
@@ -67,6 +72,43 @@
     </div>
   </div>
 </div>
+@endsection
+
+@section('page-script')
+<script>
+  $(document).ready(function() {
+      $(document).on('change', '.blog-status-switch', function (e) {
+          e.preventDefault();
+          var id = $(this).data('id');
+          var status = $(this).data('status');
+          var $switch = $(this);
+
+          $.ajax({
+              url: '{{ url("admin/blogs/status") }}/' + id + '/' + status,
+              type: 'GET',
+              success: function (response) {
+                  if (response.success) {
+                      $switch.data('status', response.status);
+                      
+                      // Update date if active
+                      if (response.status === 'published') {
+                          var now = new Date();
+                          var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                          var dateStr = months[now.getMonth()] + ' ' + String(now.getDate()).padStart(2, '0') + ', ' + now.getFullYear();
+                          $('#pub-date-' + id).text(dateStr);
+                      } else {
+                          // Optional: keep it or show N/A when draft
+                          // Let's reload page or just update text if preferred, keeping it simple
+                      }
+                  }
+              },
+              error: function (xhr, status, error) {
+                  console.error(error);
+              }
+          });
+      });
+  });
+</script>
 @endsection
 
 

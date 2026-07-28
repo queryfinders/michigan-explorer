@@ -10,8 +10,20 @@ use App\Models\BlogTag;
 
 class BlogController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, $param1 = null, $param2 = null)
     {
+        $categorySlug = null;
+        $sort = null;
+
+        if ($request->routeIs('web.blogs.sort')) {
+            $sort = $param1;
+        } elseif ($request->routeIs('web.blogs.category.sort')) {
+            $categorySlug = $param1;
+            $sort = $param2;
+        } else {
+            $categorySlug = $param1;
+        }
+
         $query = Blog::with(['category', 'author'])
             ->where('status', 'published')
             ->where(function($q) {
@@ -25,26 +37,31 @@ class BlogController extends Controller
         }
 
         // Filtering by category
-        if ($request->has('category') && $request->category != '') {
+        $activeCategory = null;
+        if ($categorySlug) {
+            $category = BlogCategory::where('slug', $categorySlug)->firstOrFail();
+            $query->where('blog_category_id', $category->id);
+            $activeCategory = $category;
+        } elseif ($request->has('category') && $request->category != '') {
             $catSlug = $request->get('category');
             $category = BlogCategory::where('slug', $catSlug)->first();
             if ($category) {
                 $query->where('blog_category_id', $category->id);
+                $activeCategory = $category;
             }
         }
 
         // Sorting
-        $sort = $request->get('sort', 'latest');
-        if ($sort == 'popular') {
+        $activeSort = $sort ?: $request->get('sort', 'latest');
+        if ($activeSort == 'popular') {
             $query->orderBy('views', 'desc');
-        } elseif ($sort == 'trending') {
-            // Placeholder for trending logic, for now order by views and recent
-            $query->orderBy('views', 'desc')->orderBy('published_at', 'desc');
-        } elseif ($sort == 'oldest') {
-            $query->orderBy('published_at', 'asc');
+        } elseif ($activeSort == 'trending') {
+            $query->orderBy('views', 'desc')->orderBy('created_at', 'desc');
+        } elseif ($activeSort == 'oldest') {
+            $query->orderBy('created_at', 'asc');
         } else {
-            // Default latest
-            $query->orderBy('published_at', 'desc');
+            // Default latest (Show newly added blogs first)
+            $query->orderBy('created_at', 'desc');
         }
 
         $blogs = $query->paginate(12);
@@ -90,7 +107,7 @@ class BlogController extends Controller
                 $q->whereNull('published_at')->orWhere('published_at', '<=', now());
             })->sum('views');
 
-        return view('web.blogs.index', compact('blogs', 'featuredBlog', 'categories', 'tags', 'recentBlogs', 'mostViewedBlogs', 'page', 'totalBlogs', 'totalViews'));
+        return view('web.blogs.index', compact('blogs', 'featuredBlog', 'categories', 'tags', 'recentBlogs', 'mostViewedBlogs', 'page', 'totalBlogs', 'totalViews', 'activeCategory', 'activeSort'));
     }
 
     public function show($slug)

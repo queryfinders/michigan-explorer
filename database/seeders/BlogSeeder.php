@@ -17,7 +17,7 @@ class BlogSeeder extends Seeder
         // 1. Create Authors
         $authors = [
             ['name' => 'Sarah Jenkins', 'email' => 'sarah@example.com', 'bio' => 'Travel enthusiast and local Michigan guide with 10 years of experience.', 'avatar' => 'storage/demo/author1.jpg'],
-            ['name' => 'Michael Chen', 'email' => 'michael@example.com', 'bio' => 'Food critic and weekend adventurer exploring the best of the Midwest.', 'avatar' => 'storage/demo/author2.jpg'],
+            ['name' => 'Michael Ch', 'email' => 'michael@example.com', 'bio' => 'Food critic and weekend adventurer exploring the best of the Midwest.', 'avatar' => 'storage/demo/author2.jpg'],
         ];
 
         $authorIds = [];

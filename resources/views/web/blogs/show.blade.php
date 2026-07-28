@@ -128,22 +128,7 @@
         <div class="row w-100 justify-content-center">
             <div class="col-lg-10 col-xl-9 d-flex flex-column align-items-center">
                 
-                <!-- Breadcrumbs -->
-                <nav aria-label="breadcrumb" class="mb-4 fade-up-anim auto-style-19">
-                    <ol class="breadcrumb justify-content-center text-white opacity-75 small text-uppercase letter-spacing-1 mb-0">
-                        <li class="breadcrumb-item"><a href="{{ route('web.home') }}" class="text-white text-decoration-none hover-text-accent">Home</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('web.blogs.index') }}" class="text-white text-decoration-none hover-text-accent">Travel Guides</a></li>
-                        @if($blog->category)
-                        <li class="breadcrumb-item"><a href="{{ route('web.blogs.index') }}?category={{ $blog->category->slug }}" class="text-white text-decoration-none hover-text-accent">{{ $blog->category->name }}</a></li>
-                        @endif
-                    </ol>
-                </nav>
-                
-                @if($blog->category)
-                <div class="fade-up-anim auto-style-32">
-                    <a href="{{ route('web.blogs.index') }}?category={{ $blog->category->slug }}" class="badge bg-white text-primary text-uppercase px-3 py-2 rounded-pill fw-bold text-decoration-none mb-3 shadow-sm border border-white border-opacity-25">{{ $blog->category->name }}</a>
-                </div>
-                @endif
+
                 
                 <h1 class="display-3 fw-bold text-white mb-4 editorial-title fade-up-anim auto-style-33">{{ $blog->title }}</h1>
                 
@@ -176,21 +161,29 @@
     <div class="container">
         <div class="row">
             
-            <!-- Left: Floating Share Bar -->
+            <!-- Left: Floating Author Social Bar -->
+            @if($blog->author && ($blog->author->facebook || $blog->author->twitter || $blog->author->linkedin || $blog->author->instagram))
             <div class="col-lg-1 d-none d-lg-block">
                 <div class="sticky-top pt-4 auto-style-16">
                     <div class="d-flex flex-column gap-3 align-items-center share-sidebar">
                         <span class="text-muted small fw-bold text-uppercase letter-spacing-1 mb-2 auto-style-36">Share</span>
                         <div class="bg-primary text-white w-100 h-1px mb-2"></div>
-                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($canonicalUrl) }}" target="_blank" class="share-btn facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="https://twitter.com/intent/tweet?text={{ urlencode($blog->title) }}&url={{ urlencode($canonicalUrl) }}" target="_blank" class="share-btn twitter"><i class="fab fa-x-twitter"></i></a>
-                        <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ urlencode($canonicalUrl) }}&title={{ urlencode($blog->title) }}" target="_blank" class="share-btn linkedin"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="https://pinterest.com/pin/create/button/?url={{ urlencode($canonicalUrl) }}&media={{ urlencode($heroImage) }}&description={{ urlencode($blog->title) }}" target="_blank" class="share-btn pinterest"><i class="fab fa-pinterest-p"></i></a>
-                        <a href="https://api.whatsapp.com/send?text={{ urlencode($blog->title . ' ' . $canonicalUrl) }}" target="_blank" class="share-btn whatsapp"><i class="fab fa-whatsapp"></i></a>
-                        <button onclick="if(navigator.clipboard){ navigator.clipboard.writeText('{{ $canonicalUrl }}').then(() => alert('Link Copied!')); } else { var temp = document.createElement('input'); document.body.appendChild(temp); temp.value = '{{ $canonicalUrl }}'; temp.select(); document.execCommand('copy'); document.body.removeChild(temp); alert('Link Copied!'); }" class="share-btn copy-link"><i class="fas fa-link"></i></button>
+                        @if($blog->author->facebook)
+                        <a href="{{ Str::startsWith($blog->author->facebook, ['http://', 'https://']) ? $blog->author->facebook : 'https://' . $blog->author->facebook }}" target="_blank" class="share-btn facebook"><i class="fab fa-facebook-f"></i></a>
+                        @endif
+                        @if($blog->author->twitter)
+                        <a href="{{ Str::startsWith($blog->author->twitter, ['http://', 'https://']) ? $blog->author->twitter : 'https://' . $blog->author->twitter }}" target="_blank" class="share-btn twitter"><i class="fab fa-x-twitter"></i></a>
+                        @endif
+                        @if($blog->author->linkedin)
+                        <a href="{{ Str::startsWith($blog->author->linkedin, ['http://', 'https://']) ? $blog->author->linkedin : 'https://' . $blog->author->linkedin }}" target="_blank" class="share-btn linkedin"><i class="fab fa-linkedin-in"></i></a>
+                        @endif
+                        @if($blog->author->instagram)
+                        <a href="{{ Str::startsWith($blog->author->instagram, ['http://', 'https://']) ? $blog->author->instagram : 'https://' . $blog->author->instagram }}" target="_blank" class="share-btn instagram"><i class="fab fa-instagram"></i></a>
+                        @endif
                     </div>
                 </div>
             </div>
+            @endif
 
             <!-- Center: Blog Content -->
             <div class="col-lg-8 col-xl-7 px-lg-4 px-xl-5">
@@ -229,15 +222,7 @@
                 </div>
                 @endif
 
-                <!-- Tags -->
-                <div class="d-flex flex-wrap align-items-center gap-2 mb-5 pb-4 border-bottom">
-                    <span class="fw-bold text-muted me-2 text-uppercase small letter-spacing-1">Tags:</span>
-                    @forelse($blog->tags as $tag)
-                        <a href="#" class="tag-chip">{{ $tag->name }}</a>
-                    @empty
-                        <span class="text-muted small">No tags</span>
-                    @endforelse
-                </div>
+
                 
                 <!-- Mobile Share (Hidden on Desktop) -->
                 <div class="d-flex d-lg-none flex-wrap align-items-center gap-2 mb-5">
@@ -263,10 +248,9 @@
                         <div class="flex-grow-1">
                             <span class="text-primary fw-bold text-uppercase small letter-spacing-1 mb-1 d-block">{{ $blog->author->designation ?? 'Author & Explorer' }}</span>
                             <h3 class="fw-bold mb-2">{{ $blog->author->name }}</h3>
-                            <p class="text-muted mb-3">{{ $blog->author->bio ?? 'Passionate traveler and local expert sharing the best of Michigan\'s hidden gems and iconic destinations.' }}</p>
+                            <!-- <p class="text-muted mb-3">{{ $blog->author->bio ?? 'Passionate traveler and local expert sharing the best of Michigan\'s hidden gems and iconic destinations.' }}</p> -->
                             <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-3">
-                                <a href="#" class="btn btn-outline-primary btn-sm rounded-pill px-4 fw-bold">View Profile</a>
-                                <div class="d-flex gap-3 align-items-center">
+                                <!-- <div class="d-flex gap-3 align-items-center">
                                     @if($blog->author->facebook)
                                     <a href="{{ Str::startsWith($blog->author->facebook, ['http://', 'https://']) ? $blog->author->facebook : 'https://' . $blog->author->facebook }}" target="_blank" class="text-muted hover-text-primary"><i class="fab fa-facebook-f fs-5"></i></a>
                                     @endif
@@ -279,7 +263,7 @@
                                     @if($blog->author->instagram)
                                     <a href="{{ Str::startsWith($blog->author->instagram, ['http://', 'https://']) ? $blog->author->instagram : 'https://' . $blog->author->instagram }}" target="_blank" class="text-muted hover-text-primary"><i class="fab fa-instagram fs-5"></i></a>
                                     @endif
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                     </div>
@@ -396,12 +380,26 @@
                     </div>
                     @endif
 
+                    <!-- Tags Sidebar Widget -->
+                    <div class="card border-0 rounded-4 shadow-sm mt-4 bg-white border border-light p-4">
+                        <h6 class="text-uppercase fw-bold letter-spacing-1 mb-3 text-primary d-flex align-items-center">
+                            <i class="fas fa-tags me-2"></i> Tags
+                        </h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            @forelse($blog->tags as $tag)
+                                <a href="#" class="tag-chip">{{ $tag->name }}</a>
+                            @empty
+                                <span class="text-muted small">No tags</span>
+                            @endforelse
+                        </div>
+                    </div>
+
                     <!-- Sidebar Ad / Promo Placeholder -->
-                    <div class="mt-4 rounded-4 overflow-hidden position-relative shadow-sm group hover-shadow-lg transition-all" style="border: 1px solid #f1f5f9;">
+                    <!-- <div class="mt-4 rounded-4 overflow-hidden position-relative shadow-sm group hover-shadow-lg transition-all" style="border: 1px solid #f1f5f9;">
                         <a href="#" class="d-block">
                             <img src="{{ asset('images/michigan_explorer_ad.png') }}" class="w-100 object-fit-cover hover-zoom auto-style-45" alt="Explore Michigan Explorer Premium" style="transition: transform 0.3s ease;">
                         </a>
-                    </div>
+                    </div> -->
 
                 </div>
             </div>
@@ -476,11 +474,11 @@
     font-weight: 500 !important;
     color: #475569 !important;
     background: linear-gradient(135deg, #f8fafc, #f1f5f9) !important;
-    border-left: 4px solid #7367f0 !important;
+    border-left: 4px solid var(--primary-color) !important;
     padding: 1.75rem 2rem !important;
     border-radius: 12px !important;
     border-bottom: none !important;
-    margin-bottom: 3rem !important;
+    margin-bottom: 1.75rem !important;
     box-shadow: 0 10px 25px rgba(0,0,0,0.02) !important;
 }
 
@@ -489,8 +487,8 @@
     font-size: 2rem !important;
     font-weight: 800 !important;
     letter-spacing: -0.5px !important;
-    margin-top: 1.85rem !important;
-    margin-bottom: 0.75rem !important;
+    margin-top: 1.5rem !important;
+    margin-bottom: 0.2rem !important;
     position: relative;
     padding-left: 15px;
 }
@@ -501,7 +499,7 @@
     top: 15%;
     height: 70%;
     width: 4px;
-    background: #7367f0;
+    background: var(--primary-color);
     border-radius: 4px;
 }
 
@@ -510,6 +508,14 @@
     font-weight: 700 !important;
     margin-top: 1.6rem !important;
     margin-bottom: 0.6rem !important;
+}
+
+/* Hide redundant line breaks and empty tags causing extra space */
+.blog-editorial-content br {
+    display: none !important;
+}
+.blog-editorial-content p:empty {
+    display: none !important;
 }
 
 /* Floating Share Bar */
@@ -543,6 +549,7 @@
 .share-btn.facebook:hover { background: #3b5998; border-color: #3b5998; }
 .share-btn.twitter:hover { background: #1da1f2; border-color: #1da1f2; }
 .share-btn.linkedin:hover { background: #0077b5; border-color: #0077b5; }
+.share-btn.instagram:hover { background: #e1306c; border-color: #e1306c; }
 .share-btn.pinterest:hover { background: #bd081c; border-color: #bd081c; }
 .share-btn.whatsapp:hover { background: #25d366; border-color: #25d366; }
 .share-btn.copy-link:hover { background: #475569; border-color: #475569; }
@@ -562,11 +569,11 @@
     transition: all 0.2s ease;
 }
 .tag-chip:hover {
-    background: #7367f0;
+    background: var(--primary-color);
     color: #fff !important;
-    border-color: #7367f0;
+    border-color: var(--primary-color);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(115, 103, 240, 0.2);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
 }
 
 .hover-zoom {
@@ -600,7 +607,7 @@
     transition: all 0.2s ease;
 }
 .author-premium-card .hover-text-primary:hover {
-    background: #7367f0;
+    background: var(--primary-color);
     color: #fff !important;
 }
 
@@ -621,8 +628,8 @@
     padding-left: 12px;
 }
 .toc-nav a:hover, .toc-nav a.active {
-    color: #7367f0 !important;
-    border-left-color: #7367f0;
+    color: var(--primary-color) !important;
+    border-left-color: var(--primary-color);
     font-weight: 600;
     padding-left: 16px;
 }
@@ -648,7 +655,7 @@
 }
 .accordion-button:not(.collapsed) {
     background-color: #f8fafc !important;
-    color: #7367f0 !important;
+    color: var(--primary-color) !important;
     box-shadow: none !important;
     border-bottom: 1px solid #f1f5f9 !important;
 }

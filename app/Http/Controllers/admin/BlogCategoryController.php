@@ -54,4 +54,13 @@ class BlogCategoryController extends Controller
         $blogCategory->delete();
         return redirect()->route('blog-categories.index')->with('success', 'Category deleted successfully.');
     }
+
+    public function changeStatus($id, $status)
+    {
+        $category = \App\Models\BlogCategory::findOrFail($id);
+        $category->status = $status == 1 ? 0 : 1;
+        $category->save();
+
+        return response()->json(['success' => true, 'message' => 'Status updated successfully.', 'status' => $category->status]);
+    }
 }

@@ -60,6 +60,7 @@ class BlogController extends Controller
 
         $data['author_id'] = $authorId;
         $data['status'] = $request->input('status', 'published');
+        $data['published_at'] = $request->input('published_at') ?: now();
 
         if ($request->hasFile('featured_image_file')) {
             $path = $request->file('featured_image_file')->store('blogs', 'public');
@@ -72,8 +73,19 @@ class BlogController extends Controller
         $blog->seo()->create($seoData);
 
         if ($request->has('tags')) {
-            foreach ($request->tags as $tagId) {
-                BlogTagMap::create(['blog_id' => $blog->id, 'blog_tag_id' => $tagId]);
+            foreach ($request->tags as $tagVal) {
+                if (is_numeric($tagVal)) {
+                    $tag = BlogTag::find($tagVal);
+                    if ($tag) {
+                        BlogTagMap::create(['blog_id' => $blog->id, 'blog_tag_id' => $tag->id]);
+                        continue;
+                    }
+                }
+                $tag = BlogTag::firstOrCreate(
+                    ['slug' => Str::slug($tagVal)],
+                    ['name' => $tagVal]
+                );
+                BlogTagMap::create(['blog_id' => $blog->id, 'blog_tag_id' => $tag->id]);
             }
         }
 
@@ -136,6 +148,14 @@ class BlogController extends Controller
         $data['author_id'] = $authorId;
         $data['status'] = $request->input('status', 'published');
 
+        if ($data['status'] === 'published') {
+            $data['published_at'] = $request->input('published_at') ?: ($blog->published_at ?: now());
+        } elseif ($data['status'] === 'scheduled') {
+            $data['published_at'] = $request->input('published_at') ?: now();
+        } else {
+            $data['published_at'] = null;
+        }
+
         if ($request->hasFile('featured_image_file')) {
             $path = $request->file('featured_image_file')->store('blogs', 'public');
             $data['featured_image'] = 'storage/' . $path;
@@ -153,8 +173,19 @@ class BlogController extends Controller
         // Sync tags
         BlogTagMap::where('blog_id', $blog->id)->delete();
         if ($request->has('tags')) {
-            foreach ($request->tags as $tagId) {
-                BlogTagMap::create(['blog_id' => $blog->id, 'blog_tag_id' => $tagId]);
+            foreach ($request->tags as $tagVal) {
+                if (is_numeric($tagVal)) {
+                    $tag = BlogTag::find($tagVal);
+                    if ($tag) {
+                        BlogTagMap::create(['blog_id' => $blog->id, 'blog_tag_id' => $tag->id]);
+                        continue;
+                    }
+                }
+                $tag = BlogTag::firstOrCreate(
+                    ['slug' => Str::slug($tagVal)],
+                    ['name' => $tagVal]
+                );
+                BlogTagMap::create(['blog_id' => $blog->id, 'blog_tag_id' => $tag->id]);
             }
         }
 
@@ -217,5 +248,19 @@ class BlogController extends Controller
         $authorData['email'] = \Illuminate\Support\Str::slug($authorName) . '_' . time() . '@example.com';
         $author = Author::create($authorData);
         return $author->id;
+    }
+
+    public function changeStatus($id, $status)
+    {
+        $blog = \App\Models\Blog::findOrFail($id);
+        $blog->status = $status === 'published' ? 'draft' : 'published';
+        
+        if ($blog->status === 'published' && !$blog->published_at) {
+            $blog->published_at = now();
+        }
+        
+        $blog->save();
+
+        return response()->json(['success' => true, 'message' => 'Status updated successfully.', 'status' => $blog->status]);
     }
 }

@@ -2477,14 +2477,17 @@ border-bottom: 2px solid #e2e8f0;
 font-family: var(--font-heading);
 color: #0f172a;
 font-weight: 700;
-margin-top: 3rem;
-margin-bottom: 1.5rem;
+margin-top: 1.75rem;
+margin-bottom: 0.75rem;
 line-height: 1.3;
 }
 .blog-editorial-content h2 { font-size: 2.2rem; }
 .blog-editorial-content h3 { font-size: 1.75rem; }
 .blog-editorial-content p {
-margin-bottom: 1.75rem;
+margin-bottom: 1.15rem;
+}
+.blog-editorial-content p:empty {
+display: none;
 }
 /* Lists */
 .blog-editorial-content ul, 
@@ -2500,7 +2503,7 @@ margin-bottom: 0.75rem;
 width: 100%;
 height: auto;
 border-radius: 16px;
-margin: 2.5rem 0;
+margin: 1.5rem 0;
 box-shadow: 0 10px 30px rgba(0,0,0,0.08);
 }
 /* Blockquotes */
