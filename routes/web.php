@@ -153,7 +153,14 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::post('/admin/search-shortcuts/reorder', [\App\Http\Controllers\Admin\SearchShortcutController::class, 'reorder'])->name('search-shortcuts.reorder');
     Route::get('/admin/search-shortcuts/status/{searchShortcut}/{status}', [\App\Http\Controllers\Admin\SearchShortcutController::class, 'changeStatus'])->name('search-shortcuts.status');
     Route::resource('/admin/search-shortcuts', \App\Http\Controllers\Admin\SearchShortcutController::class);
+
+    // Affiliate Links
+    Route::get('/admin/affiliate-links/status/{id}/{status}', [\App\Http\Controllers\Admin\AffiliateLinkController::class, 'changeStatus'])->name('affiliate-links.status');
+    Route::resource('/admin/affiliate-links', \App\Http\Controllers\Admin\AffiliateLinkController::class);
 });
+
+// Click Tracking Redirect Route
+Route::get('/go/{type}/{id}', [\App\Http\Controllers\AffiliateRedirectController::class, 'redirect'])->name('affiliate.redirect');
 
 //web
 Route::get('/', [HomeController::class, 'index'])->name('web.home');
