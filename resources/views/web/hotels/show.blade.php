@@ -201,33 +201,19 @@
             <!-- Location & Map removed from here -->
 
             <!-- Nearby Attractions -->
+            @if(isset($nearbyAttractions) && $nearbyAttractions->count() > 0)
             <div class="content-card">
                 <h3 class="mb-4">Nearby Attractions</h3>
                 <div class="row g-4">
+                    @foreach($nearbyAttractions as $attraction)
                     <div class="col-md-6">
-                        <x-attraction-card :attraction="(object)[
-                            'name' => 'Sleeping Bear Dunes',
-                            'distance' => '2.5 miles away',
-                            'travel_time_car' => '10 min drive',
-                            'travel_time_walk' => '45 min walk',
-                            'description' => 'Experience towering sand dunes and spectacular views of Lake Michigan at this national lakeshore.',
-                            'slug' => 'demo',
-                            'featured_image' => asset('storage/demo/michigan_sleeping_bear_1783683642640.png')
-                        ]" />
+                        <x-attraction-card :attraction="$attraction" />
                     </div>
-                    <div class="col-md-6">
-                        <x-attraction-card :attraction="(object)[
-                            'name' => 'Grand Haven Lighthouse',
-                            'distance' => '1.2 miles away',
-                            'travel_time_car' => '5 min drive',
-                            'travel_time_walk' => '20 min walk',
-                            'description' => 'A historic red lighthouse located on the pier, offering a scenic walk and beautiful sunset views over the water.',
-                            'slug' => 'demo',
-                            'featured_image' => asset('storage/demo/michigan_lighthouse_1783683652511.png')
-                        ]" />
-                    </div>
+                    @endforeach
                 </div>
             </div>
+            @endif
+
 
             <!-- FAQ Section -->
             @if($hotel->faqs && count($hotel->faqs) > 0)
@@ -272,8 +258,8 @@
                     <p class="text-muted small mb-0">Check availability and book securely through our official affiliate partner for the best guaranteed rate.</p>
                 </div>
 
-                @if($hotel->affiliate_url)
-                <a href="{{ $hotel->affiliate_url }}" class="btn-affiliate-book" target="_blank">
+                @if($hotel->affiliate_link_id)
+                <a href="{{ route('affiliate.redirect', ['type' => 'hotel', 'id' => $hotel->id]) }}" class="btn-affiliate-book" target="_blank">
                     Check Availability & Book <i class="fas fa-external-link-alt ms-2"></i>
                 </a>
                 @else
@@ -325,6 +311,9 @@
     </div>
     
 </div>
+
+{{-- Hotel Detail Promotion Banner --}}
+<x-promo-banner :promotion="$detailPromotion ?? null" />
 
 <!-- Related Hotels Section -->
 @if(isset($relatedHotels) && $relatedHotels->count() > 0)

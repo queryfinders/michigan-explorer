@@ -32,8 +32,7 @@ $customizerHidden = 'customizer-hide';
           <!-- Logo -->
           <div class="app-brand justify-content-center mb-4 mt-2">
             <a href="{{url('/')}}" class="app-brand-link gap-2">
-              <span class="app-brand-logo demo" id="app-brand-logo"><img src="{!! asset('assets/img/QF-logo-main.webp') !!}" class="logoVertical"  alt=""></span>
-              <!-- <span class="app-brand-text demo text-body fw-bold ms-1">{{ config('variables.templateName') }}</span> -->
+              <span class="fw-bold fs-3 text-primary font-heading" style="font-family: 'Poppins', sans-serif; letter-spacing: -0.5px;">Michigan Explorer</span>
             </a>
           </div>
           <!-- /Logo -->
@@ -109,6 +108,9 @@ $customizerHidden = 'customizer-hide';
                 },
             },
             submitHandler: function(form) {
+                var $btn = $(form).find('button[type="submit"]');
+                $btn.prop('disabled', true);
+                $btn.html('Resetting...');
                 form.submit();
             }
         });

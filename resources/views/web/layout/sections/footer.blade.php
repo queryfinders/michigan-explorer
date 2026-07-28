@@ -1,3 +1,15 @@
+@php
+    // Only show footer_banner on pages that don't already render their own detail promotion.
+    // Detail pages (hotel, restaurant, attraction, blog) pass $detailPromotion via their controller.
+    $showFooterBanner = !isset($detailPromotion) || is_null($detailPromotion);
+    $footerPromotion = $showFooterBanner
+        ? \App\Models\AffiliatePromotion::forPlacement('footer_banner')
+        : null;
+@endphp
+@if($footerPromotion)
+    <x-promo-banner :promotion="$footerPromotion" />
+@endif
+
 <footer class="main-footer position-relative pt-5 border-top">
     <div class="container pt-4">
         <div class="row g-5 mb-5">
@@ -36,9 +48,11 @@
             <div class="col-lg-4 col-md-6">
                 <h4 class="text-white mb-4 fw-bold text-uppercase tracking-wider fs-6">Stay Updated</h4>
                 <p class="text-white-50 mb-4">Subscribe to our newsletter for the latest luxury guides and exclusive escapes.</p>
-                <form action="#" class="footer-newsletter">
+                <form id="footerNewsletterForm" method="POST" action="{{ route('newsletter.subscribe') }}" class="footer-newsletter">
+                    @csrf
+                    <input type="hidden" name="source" value="footer">
                     <div class="input-group p-1 bg-white rounded-pill overflow-hidden shadow-sm">
-                        <input type="email" class="form-control border-0 shadow-none px-4 text-dark" placeholder="Email address" required>
+                        <input type="email" name="email" class="form-control border-0 shadow-none px-4 text-dark" placeholder="Email address" required>
                         <button class="btn btn-primary rounded-pill px-4 fw-bold" type="submit">Join</button>
                     </div>
                 </form>

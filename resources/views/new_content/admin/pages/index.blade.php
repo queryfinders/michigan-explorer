@@ -40,7 +40,7 @@
         @foreach($pages as $page)
         <tr>
           <td>{{ $loop->iteration }}</td>
-          <td>{{ $page->title }}</td>
+          <td><strong>{{ $page->title }}</strong></td>
           <td>{{ $page->slug }}</td>
           <td>
             <label class="switch">

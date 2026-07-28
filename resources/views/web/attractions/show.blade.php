@@ -306,6 +306,9 @@
 </section>
 @endif
 
+{{-- Attraction Detail Promotion Banner --}}
+<x-promo-banner :promotion="$detailPromotion ?? null" />
+
 <!-- Custom Fullscreen Gallery Lightbox -->
 <div id="customGalleryLightbox" class="custom-lightbox" style="display: none;">
     <button class="lightbox-close" onclick="closeCustomGallery()"><i class="fas fa-times"></i></button>

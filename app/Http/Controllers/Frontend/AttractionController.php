@@ -70,7 +70,8 @@ class AttractionController extends Controller
         }
         $nearbyHotels = \App\Models\Hotel::where('city', $attraction->city)->where('status', 1)->take(4)->get();
         $nearbyRestaurants = \App\Models\Restaurant::where('city', $attraction->city)->where('status', 1)->take(4)->get();
-        
-        return view('web.attractions.show', compact('attraction', 'nearbyHotels', 'nearbyRestaurants'));
+        $detailPromotion = \App\Models\AffiliatePromotion::forPlacement('attraction_detail');
+
+        return view('web.attractions.show', compact('attraction', 'nearbyHotels', 'nearbyRestaurants', 'detailPromotion'));
     }
 }

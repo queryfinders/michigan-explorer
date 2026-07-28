@@ -269,3 +269,96 @@ function shareCurrentPage(title) {
     });
 })();
 </script>
+
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.all.min.js"></script>
+
+<!-- AJAX Newsletter Subscription Handler -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const handleSubscribe = function (e) {
+        e.preventDefault();
+        const form = this;
+        const emailInput = form.querySelector('input[type="email"]');
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const email = emailInput.value.trim();
+        const source = form.querySelector('input[name="source"]').value;
+        const csrfToken = form.querySelector('input[name="_token"]').value;
+
+        if (!email) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Please enter a valid email address.',
+                confirmButtonColor: '#7367f0'
+            });
+            return;
+        }
+
+        // Disable submit button
+        const originalBtnHtml = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({
+                email: email,
+                source: source
+            })
+        })
+        .then(response => {
+            if (response.status === 429) {
+                throw new Error('Too many subscription attempts. Maximum 5 per hour.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnHtml;
+
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Verification Sent',
+                    text: data.message,
+                    confirmButtonColor: '#7367f0'
+                });
+                form.reset();
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Subscription Status',
+                    text: data.message,
+                    confirmButtonColor: '#7367f0'
+                });
+            }
+        })
+        .catch(err => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnHtml;
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: err.message || 'An error occurred. Please try again.',
+                confirmButtonColor: '#7367f0'
+            });
+        });
+    };
+
+    const explorerForm = document.getElementById('explorerClubForm');
+    const footerForm = document.getElementById('footerNewsletterForm');
+
+    if (explorerForm) {
+        explorerForm.addEventListener('submit', handleSubscribe);
+    }
+    if (footerForm) {
+        footerForm.addEventListener('submit', handleSubscribe);
+    }
+});
+</script>

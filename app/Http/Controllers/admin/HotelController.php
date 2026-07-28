@@ -37,7 +37,7 @@ class HotelController extends Controller
             'featured_image_alt'    => 'nullable|string|max:255',
             'email'                 => 'nullable|email',
             'website'               => 'nullable|url',
-            'affiliate_url'         => 'nullable|url',
+            'affiliate_link_id'     => 'nullable|exists:affiliate_links,id',
             'map_iframe'            => 'nullable|string',
             'amenities'             => 'nullable|array',
             'booking_features'      => 'nullable|array',
@@ -46,7 +46,7 @@ class HotelController extends Controller
             'gallery_alts.*'        => 'nullable|string|max:255',
         ]);
 
-        $data = $request->except('_token', '_method', 'featured_image_file', 'video_file', 'video_url', 'meta_title', 'meta_description', 'og_title', 'og_description', 'schema_markup', 'amenities', 'booking_features', 'hotel_policies', 'gallery_images', 'gallery_alts', 'faqs');
+        $data = $request->except('_token', '_method', 'featured_image_file', 'video_file', 'video_url', 'meta_title', 'meta_description', 'og_title', 'og_description', 'schema_markup', 'amenities', 'booking_features', 'hotel_policies', 'gallery_images', 'gallery_alts', 'faqs', 'affiliate_url');
         $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
 
         if ($request->hasFile('featured_image_file')) {

@@ -141,6 +141,7 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::get('/admin/blogs/status/{id}/{status}', [\App\Http\Controllers\Admin\BlogController::class, 'changeStatus'])->name('blogs.status');
 
     // Pages & Settings
+    Route::post('/admin/contact-messages/status/{id}', [\App\Http\Controllers\Admin\ContactMessageController::class, 'updateStatus'])->name('contact-messages.updateStatus');
     Route::resource('/admin/contact-messages', \App\Http\Controllers\Admin\ContactMessageController::class)->only(['index', 'show', 'destroy']);
     Route::resource('/admin/pages', \App\Http\Controllers\Admin\PageController::class);
     Route::get('/admin/pages/status/{id}/{status}', [\App\Http\Controllers\Admin\PageController::class, 'changeStatus'])->name('pages.status');
@@ -158,7 +159,18 @@ Route::group(['middleware' => 'admin_auth'], function () {
 
     // Affiliate Links
     Route::get('/admin/affiliate-links/status/{id}/{status}', [\App\Http\Controllers\Admin\AffiliateLinkController::class, 'changeStatus'])->name('affiliate-links.status');
+    Route::get('/admin/affiliate-links/{id}/export/{format}', [\App\Http\Controllers\Admin\AffiliateLinkController::class, 'export'])->name('admin.affiliate-links.export');
     Route::resource('/admin/affiliate-links', \App\Http\Controllers\Admin\AffiliateLinkController::class);
+
+    // Affiliate Promotions
+    Route::get('/admin/affiliate-promotions/status/{id}/{status}', [\App\Http\Controllers\Admin\AffiliatePromotionController::class, 'changeStatus'])->name('affiliate-promotions.status');
+    Route::resource('/admin/affiliate-promotions', \App\Http\Controllers\Admin\AffiliatePromotionController::class);
+
+    // Newsletter Subscribers
+    Route::post('/admin/subscribers/bulk', [\App\Http\Controllers\Admin\SubscriberController::class, 'bulkAction'])->name('subscribers.bulk');
+    Route::get('/admin/subscribers/export/{format}', [\App\Http\Controllers\Admin\SubscriberController::class, 'export'])->name('subscribers.export');
+    Route::get('/admin/subscribers/status/{id}/{status}', [\App\Http\Controllers\Admin\SubscriberController::class, 'changeStatus'])->name('subscribers.status');
+    Route::resource('/admin/subscribers', \App\Http\Controllers\Admin\SubscriberController::class);
 });
 
 // Click Tracking Redirect Route
@@ -173,7 +185,7 @@ Route::get('/search/autocomplete', [\App\Http\Controllers\Frontend\SearchControl
 
 Route::get('/sitemap.xml', [App\Http\Controllers\Frontend\SitemapController::class, 'index'])->name('web.sitemap');
 Route::get('/contact', [App\Http\Controllers\Frontend\ContactController::class, 'index'])->name('web.contact');
-Route::post('/contact', [App\Http\Controllers\Frontend\ContactController::class, 'submit'])->name('web.contact.submit');
+Route::middleware('throttle:999,60')->post('/contact', [\App\Http\Controllers\ContactController::class, 'store'])->name('web.contact.submit');
 Route::get('/hotels', [App\Http\Controllers\Frontend\HotelController::class, 'index'])->name('web.hotels.index');
 Route::get('/hotels/category/{slug}', [App\Http\Controllers\Frontend\HotelController::class, 'category'])->name('web.hotels.category');
 Route::get('/hotels/{slug}', [\App\Http\Controllers\Frontend\HotelController::class, 'show'])->name('web.hotels.show');
@@ -202,3 +214,9 @@ Route::get('/blog/{slug}', [\App\Http\Controllers\Frontend\BlogController::class
 
 // Pages
 Route::get('/{slug}', [\App\Http\Controllers\Frontend\PageController::class, 'show'])->name('web.pages.show');
+
+// Newsletter
+Route::middleware('throttle:5,60')->post('/newsletter/subscribe', [\App\Http\Controllers\NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
+Route::get('/newsletter/verify/{token}', [\App\Http\Controllers\NewsletterController::class, 'verify'])->name('newsletter.verify');
+Route::get('/newsletter/unsubscribe/{token}', [\App\Http\Controllers\NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
+

@@ -182,16 +182,95 @@
         <input type="number" class="form-control" id="starting_price" name="starting_price" value="{{ old('starting_price', isset($hotel) ? $hotel->starting_price : '') }}" placeholder="e.g. 199" />
       </div>
       <div class="col-md-6 mb-3">
-        <label class="form-label" for="affiliate_url">Booking Affiliate URL</label>
-        <input type="url" class="form-control" id="affiliate_url" name="affiliate_url" value="{{ old('affiliate_url', isset($hotel) ? $hotel->affiliate_url : '') }}" placeholder="e.g. https://booking.com/..." />
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-12 mb-3">
         <label class="form-label" for="map_iframe">Google Maps Embed Code (Iframe Link)</label>
         <textarea class="form-control" id="map_iframe" name="map_iframe" rows="1" placeholder="Paste the <iframe src='...'></iframe> embed code here">{{ old('map_iframe', isset($hotel) ? $hotel->map_iframe : '') }}</textarea>
       </div>
     </div>
+    <div class="row">
+      <div class="col-md-12 mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <label class="form-label fw-semibold mb-0">Booking Affiliate Link</label>
+          <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addAffiliateLinkModal">
+            <i class="fas fa-plus me-1"></i> Add Affiliate Link
+          </button>
+        </div>
+
+        {{-- Custom Affiliate Link Dropdown --}}
+        <div class="amenity-dropdown-wrapper" id="affiliateLinkDropdownWrapper">
+
+          {{-- Trigger Button --}}
+          <div class="amenity-dropdown-trigger" id="affiliateLinkTrigger" onclick="toggleAffiliateLinkDropdown()">
+            <div class="amenity-tags-area" id="affiliateLinkTagsArea">
+              <span class="amenity-placeholder" id="affiliateLinkPlaceholder">
+                <i class="fas fa-link me-2 text-muted"></i>Click to select an affiliate link...
+              </span>
+            </div>
+            <i class="fas fa-chevron-down amenity-dropdown-arrow" id="affiliateLinkArrow"></i>
+          </div>
+
+          {{-- Hidden input for selected value --}}
+          <input type="hidden" name="affiliate_link_id" id="affiliate_link_id_input"
+                 value="{{ old('affiliate_link_id', isset($hotel) ? $hotel->affiliate_link_id : '') }}">
+
+          {{-- Dropdown Panel --}}
+          <div class="amenity-dropdown-panel" id="affiliateLinkDropdownPanel" style="display:none;">
+            <div class="amenity-search-wrap">
+              <i class="fas fa-search amenity-search-icon"></i>
+              <input type="text" class="amenity-search-input" id="affiliateLinkSearchInput"
+                     placeholder="Search affiliate links..." oninput="filterAffiliateLinks(this.value)" autocomplete="off" />
+            </div>
+            <div class="amenity-divider"></div>
+            <div class="amenity-items-list" id="affiliateLinkItemsList">
+              {{-- None option --}}
+              <label class="amenity-item {{ old('affiliate_link_id', isset($hotel) ? $hotel->affiliate_link_id : '') == '' ? 'amenity-item--checked' : '' }}" id="afflink-label-0">
+                <input type="radio" name="_affiliate_link_radio" value="" id="afflink_rb_0" class="afflink-rb d-none"
+                       data-name="— None —"
+                       {{ old('affiliate_link_id', isset($hotel) ? $hotel->affiliate_link_id : '') == '' ? 'checked' : '' }}
+                       onchange="onAffiliateLinkChange(this)" />
+                <span class="amenity-item-icon"><i class="fas fa-ban"></i></span>
+                <span class="amenity-item-name">— None —</span>
+                <span class="amenity-item-check"><i class="fas fa-check"></i></span>
+              </label>
+              @php $selectedAffLinkId = old('affiliate_link_id', isset($hotel) ? $hotel->affiliate_link_id : ''); @endphp
+              @foreach(\App\Models\AffiliateLink::where('is_active', 1)->orderBy('name')->get() as $affLink)
+              @php $isSelected = $selectedAffLinkId == $affLink->id; @endphp
+              <label class="amenity-item {{ $isSelected ? 'amenity-item--checked' : '' }}" id="afflink-label-{{ $affLink->id }}">
+                <input type="radio" name="_affiliate_link_radio" value="{{ $affLink->id }}" id="afflink_rb_{{ $affLink->id }}" class="afflink-rb d-none"
+                       data-name="{{ $affLink->name }}{{ $affLink->provider ? ' (' . $affLink->provider . ')' : '' }}"
+                       {{ $isSelected ? 'checked' : '' }}
+                       onchange="onAffiliateLinkChange(this)" />
+                <span class="amenity-item-icon"><i class="fas fa-link"></i></span>
+                <span class="amenity-item-name">
+                  {{ $affLink->name }}
+                  @if($affLink->provider)<small class="text-muted ms-1">({{ $affLink->provider }})</small>@endif
+                </span>
+                <span class="amenity-item-check"><i class="fas fa-check"></i></span>
+              </label>
+              @endforeach
+              <div class="amenity-no-results d-none" id="affiliateLinkNoResults">
+                <i class="fas fa-search-minus me-2"></i>No affiliate links found
+              </div>
+            </div>
+            <div class="amenity-divider"></div>
+            <div class="amenity-panel-footer">
+              <button type="button" class="btn btn-sm btn-link p-0 text-primary fw-semibold"
+                      data-bs-toggle="modal" data-bs-target="#addAffiliateLinkModal" onclick="closeAffiliateLinkDropdown()">
+                <i class="fas fa-plus-circle me-1"></i>Add New Affiliate Link
+              </button>
+              @isset($hotel)
+                @if($hotel->affiliate_link_id && $hotel->affiliateLink)
+                <a href="{{ route('affiliate-links.show', $hotel->affiliate_link_id) }}" target="_blank"
+                   class="btn btn-sm btn-link p-0 text-success fw-semibold">
+                  <i class="fas fa-chart-line me-1"></i>{{ number_format($hotel->affiliateLink->total_clicks) }} clicks
+                </a>
+                @endif
+              @endisset
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
 
     <div class="row mt-3">
       <div class="col-md-6 mb-3">
@@ -1564,6 +1643,179 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+});
+</script>
+
+{{-- ===== Add Affiliate Link Modal ===== --}}
+<div class="modal fade" id="addAffiliateLinkModal" tabindex="-1" aria-labelledby="addAffiliateLinkModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addAffiliateLinkModalLabel"><i class="fas fa-plus-circle me-2 text-primary"></i>Add New Affiliate Link</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="afflink-modal-alert" class="d-none"></div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="new_afflink_name">Link Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="new_afflink_name" placeholder="e.g. Booking.com - Grand Hotel" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="new_afflink_provider">Provider</label>
+          <input type="text" class="form-control" id="new_afflink_provider" placeholder="e.g. Booking.com, Expedia" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="new_afflink_url">Affiliate URL <span class="text-danger">*</span></label>
+          <input type="url" class="form-control" id="new_afflink_url" placeholder="https://www.booking.com/hotel/..." />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="saveNewAffiliateLink()">
+          <span id="saveAfflinkBtnText"><i class="fas fa-plus me-1"></i>Add Link</span>
+          <span id="saveAfflinkBtnSpinner" class="d-none"><span class="spinner-border spinner-border-sm me-1"></span>Saving...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== Affiliate Link Custom Dropdown =====
+function toggleAffiliateLinkDropdown() {
+  const panel = document.getElementById('affiliateLinkDropdownPanel');
+  const arrow = document.getElementById('affiliateLinkArrow');
+  const isOpen = panel.style.display !== 'none';
+  // Close all other dropdowns
+  document.querySelectorAll('.amenity-dropdown-panel').forEach(p => {
+    if (p !== panel) { p.style.display = 'none'; }
+  });
+  document.querySelectorAll('.amenity-dropdown-arrow').forEach(a => {
+    if (a !== arrow) { a.classList.remove('open'); }
+  });
+  panel.style.display = isOpen ? 'none' : 'block';
+  arrow.classList.toggle('open', !isOpen);
+  if (!isOpen) { document.getElementById('affiliateLinkSearchInput').focus(); }
+}
+
+function closeAffiliateLinkDropdown() {
+  document.getElementById('affiliateLinkDropdownPanel').style.display = 'none';
+  document.getElementById('affiliateLinkArrow').classList.remove('open');
+}
+
+function onAffiliateLinkChange(radio) {
+  // Uncheck all visual labels
+  document.querySelectorAll('#affiliateLinkItemsList .amenity-item').forEach(l => l.classList.remove('amenity-item--checked'));
+  // Check clicked label
+  const lbl = document.getElementById('afflink-label-' + (radio.value || '0'));
+  if (lbl) lbl.classList.add('amenity-item--checked');
+  // Update hidden input
+  document.getElementById('affiliate_link_id_input').value = radio.value;
+  // Update tag display
+  renderAffiliateLinkTag(radio.dataset.name, radio.value);
+  // Close dropdown
+  closeAffiliateLinkDropdown();
+}
+
+function renderAffiliateLinkTag(name, value) {
+  const area = document.getElementById('affiliateLinkTagsArea');
+  const placeholder = document.getElementById('affiliateLinkPlaceholder');
+  if (!value) {
+    area.innerHTML = '';
+    area.appendChild(placeholder);
+    placeholder.style.display = '';
+    return;
+  }
+  placeholder.style.display = 'none';
+  area.innerHTML = '';
+  const tag = document.createElement('span');
+  tag.className = 'amenity-tag';
+  tag.innerHTML = `<i class="fas fa-link me-1"></i>${name} <span class="amenity-tag-remove" onclick="clearAffiliateLink(event)">×</span>`;
+  area.appendChild(tag);
+  area.appendChild(placeholder);
+}
+
+function clearAffiliateLink(e) {
+  e.stopPropagation();
+  // Select None
+  const noneRb = document.getElementById('afflink_rb_0');
+  if (noneRb) { noneRb.checked = true; onAffiliateLinkChange(noneRb); }
+}
+
+function filterAffiliateLinks(query) {
+  const q = query.toLowerCase();
+  const items = document.querySelectorAll('#affiliateLinkItemsList .amenity-item');
+  let found = 0;
+  items.forEach(item => {
+    const name = item.querySelector('.amenity-item-name')?.textContent.toLowerCase() || '';
+    const match = name.includes(q);
+    item.style.display = match ? '' : 'none';
+    if (match) found++;
+  });
+  const noResults = document.getElementById('affiliateLinkNoResults');
+  noResults.classList.toggle('d-none', found > 0);
+}
+
+function saveNewAffiliateLink() {
+  const name = document.getElementById('new_afflink_name').value.trim();
+  const provider = document.getElementById('new_afflink_provider').value.trim();
+  const link = document.getElementById('new_afflink_url').value.trim();
+  const alertBox = document.getElementById('afflink-modal-alert');
+  if (!name) { alertBox.className = 'alert alert-danger'; alertBox.textContent = 'Please enter a link name.'; return; }
+  if (!link) { alertBox.className = 'alert alert-danger'; alertBox.textContent = 'Please enter the affiliate URL.'; return; }
+  alertBox.className = 'd-none';
+  document.getElementById('saveAfflinkBtnText').classList.add('d-none');
+  document.getElementById('saveAfflinkBtnSpinner').classList.remove('d-none');
+  $.ajax({
+    url: '{{ route("affiliate-links.store") }}',
+    type: 'POST',
+    data: { _token: '{{ csrf_token() }}', name, provider, link, is_active: 1 },
+    success: function(response) {
+      if (response.success) {
+        const a = response.affiliateLink;
+        const list = document.getElementById('affiliateLinkItemsList');
+        const noResults = document.getElementById('affiliateLinkNoResults');
+        const newLabel = document.createElement('label');
+        newLabel.className = 'amenity-item amenity-item--checked';
+        newLabel.id = 'afflink-label-' + a.id;
+        newLabel.innerHTML = `<input type="radio" name="_affiliate_link_radio" value="${a.id}" id="afflink_rb_${a.id}" class="afflink-rb d-none" data-name="${a.name}${a.provider ? ' (' + a.provider + ')' : ''}" checked onchange="onAffiliateLinkChange(this)" /><span class="amenity-item-icon"><i class="fas fa-link"></i></span><span class="amenity-item-name">${a.name}${a.provider ? '<small class=\'text-muted ms-1\'>(' + a.provider + ')</small>' : ''}</span><span class="amenity-item-check"><i class="fas fa-check"></i></span>`;
+        list.insertBefore(newLabel, noResults);
+        // Select the new link
+        document.getElementById('affiliate_link_id_input').value = a.id;
+        renderAffiliateLinkTag(a.name + (a.provider ? ' (' + a.provider + ')' : ''), a.id);
+        // Uncheck all others
+        document.querySelectorAll('#affiliateLinkItemsList .amenity-item').forEach(l => l.classList.remove('amenity-item--checked'));
+        newLabel.classList.add('amenity-item--checked');
+        // Reset form
+        document.getElementById('new_afflink_name').value = '';
+        document.getElementById('new_afflink_provider').value = '';
+        document.getElementById('new_afflink_url').value = '';
+        bootstrap.Modal.getInstance(document.getElementById('addAffiliateLinkModal')).hide();
+      } else {
+        alertBox.className = 'alert alert-danger';
+        alertBox.textContent = response.message || 'Failed to save.';
+      }
+    },
+    error: function(xhr) {
+      alertBox.className = 'alert alert-danger';
+      const errors = xhr.responseJSON?.errors;
+      alertBox.textContent = errors ? Object.values(errors).flat().join(' ') : 'An error occurred.';
+    },
+    complete: function() {
+      document.getElementById('saveAfflinkBtnText').classList.remove('d-none');
+      document.getElementById('saveAfflinkBtnSpinner').classList.add('d-none');
+    }
+  });
+}
+
+// Init affiliate link tag on page load
+document.addEventListener('DOMContentLoaded', function() {
+  const hiddenInput = document.getElementById('affiliate_link_id_input');
+  const val = hiddenInput ? hiddenInput.value : '';
+  if (val) {
+    const rb = document.getElementById('afflink_rb_' + val);
+    if (rb) renderAffiliateLinkTag(rb.dataset.name, val);
+  }
 });
 </script>
 @endsection

@@ -41,4 +41,14 @@ class Restaurant extends Model
     {
         return $this->belongsToMany(RestaurantFeature::class, 'restaurant_feature', 'restaurant_id', 'feature_id');
     }
+
+    public function affiliateLink()
+    {
+        return $this->belongsTo(AffiliateLink::class);
+    }
+
+    public function getAffiliateUrlAttribute()
+    {
+        return $this->affiliateLink?->link;
+    }
 }

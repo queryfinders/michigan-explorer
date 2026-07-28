@@ -53,6 +53,9 @@ $customizerHidden = 'customizer-hide';
                 }
             },
             submitHandler: function(form) {
+                var $btn = $(form).find('button[type="submit"]');
+                $btn.prop('disabled', true);
+                $btn.html('Sign in...');
                 form.submit();
             }
         });

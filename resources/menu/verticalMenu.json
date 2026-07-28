@@ -162,7 +162,10 @@
       "slug": [
         "settings",
         "social-links",
-        "search-shortcuts"
+        "search-shortcuts",
+        "affiliate-links",
+        "affiliate-promotions",
+        "subscribers"
       ],
       "submenu": [
         {
@@ -170,6 +173,24 @@
           "url": "/admin/search-shortcuts",
           "icon": "menu-icon tf-icons ti ti-search",
           "slug": "search-shortcuts.index"
+        },
+        {
+          "name": "Affiliate Links",
+          "url": "/admin/affiliate-links",
+          "icon": "menu-icon tf-icons ti ti-link",
+          "slug": "affiliate-links.index"
+        },
+        {
+          "name": "Affiliate Promotions",
+          "url": "/admin/affiliate-promotions",
+          "icon": "menu-icon tf-icons ti ti-news",
+          "slug": "affiliate-promotions.index"
+        },
+        {
+          "name": "Subscribers",
+          "url": "/admin/subscribers",
+          "icon": "menu-icon tf-icons ti ti-mail",
+          "slug": "subscribers.index"
         }
       ]
     },

@@ -144,7 +144,8 @@ class BlogController extends Controller
             ->orderBy('views', 'desc')
             ->take(5)
             ->get();
+        $detailPromotion = \App\Models\AffiliatePromotion::forPlacement('blog_detail');
 
-        return view('web.blogs.show', compact('blog', 'relatedBlogs', 'categories', 'tags', 'recentBlogs', 'mostViewedBlogs'));
+        return view('web.blogs.show', compact('blog', 'relatedBlogs', 'categories', 'tags', 'recentBlogs', 'mostViewedBlogs', 'detailPromotion'));
     }
 }
