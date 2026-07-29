@@ -58,7 +58,7 @@
         <h5 class="mb-2 pt-1 text-break">Authenticator Apps</h5>
         <p class="mb-4">Using an authenticator app like Google Authenticator, Microsoft Authenticator, Authy, or 1Password, scan the QR code. It will generate a 6-digit code for you to enter below.</p>
         <div class="text-center">
-          <img src="{{asset('assets/img/icons/misc/authentication-QR.png') }}" alt="QR Code" width="140">
+          <img src="{{asset('assets/img/icons/misc/authentication-QR.jpg') }}" alt="QR Code" width="140">
         </div>
         <div class="alert alert-warning alert-dismissible my-3" role="alert">
           <h5 class="alert-heading mb-2 text-truncate">ASDLKNASDA9AHS678dGhASD78AB</h5>

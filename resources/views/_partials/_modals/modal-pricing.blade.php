@@ -33,7 +33,7 @@
               <div class="card border rounded shadow-none">
                 <div class="card-body">
                   <div class="my-3 pt-2 text-center">
-                    <img src="{{asset('assets/img/illustrations/page-pricing-basic.png') }}" alt="Basic Image" height="140">
+                    <img src="{{asset('assets/img/illustrations/page-pricing-basic.jpg') }}" alt="Basic Image" height="140">
                   </div>
                   <h3 class="card-title fw-semibold text-center text-capitalize mb-1">Basic</h3>
                   <p class="text-center">A simple start for everyone</p>
@@ -64,7 +64,7 @@
                     <span class="badge bg-label-primary">Popular</span>
                   </div>
                   <div class="my-3 pt-2 text-center">
-                    <img src="{{asset('assets/img/illustrations/page-pricing-standard.png')}}" alt="Standard Image" height="140">
+                    <img src="{{asset('assets/img/illustrations/page-pricing-standard.jpg')}}" alt="Standard Image" height="140">
                   </div>
                   <h3 class="card-title fw-semibold text-center text-capitalize mb-1">Pro</h3>
                   <p class="text-center">For small to medium businesses</p>
@@ -95,7 +95,7 @@
                 <div class="card-body">
 
                   <div class="my-3 pt-2 text-center">
-                    <img src="{{asset('assets/img/illustrations/page-pricing-enterprise.png')}}" alt="Enterprise Image" height="140">
+                    <img src="{{asset('assets/img/illustrations/page-pricing-enterprise.jpg')}}" alt="Enterprise Image" height="140">
                   </div>
                   <h3 class="card-title text-center text-capitalize fw-semibold mb-1">Enterprise</h3>
                   <p class="text-center">Solution for big organizations</p>

@@ -16,11 +16,18 @@
             <div class="col-lg-4 col-md-6 pe-lg-5">
                 <h3 class="text-white fw-bold mb-4 footer-title">Michigan Explorer</h3>
                 <p class="text-white-50 lh-lg mb-4 footer-description">Your premium guide to discovering the best hotels, fine dining, hidden attractions, and vibrant events across the beautiful state of Michigan.</p>
+                @php 
+                    $globalSettings = \App\Models\Setting::pluck('value', 'key');
+                    $fb = $globalSettings['social_facebook'] ?? '';
+                    $tw = $globalSettings['social_twitter'] ?? '';
+                    $ig = $globalSettings['social_instagram'] ?? '';
+                    $yt = $globalSettings['social_youtube'] ?? '';
+                @endphp
                 <div class="social-icons d-flex gap-3">
-                    <a href="#" aria-label="Facebook" class="d-flex align-items-center justify-content-center text-white text-decoration-none rounded-circle social-icon"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" aria-label="Twitter" class="d-flex align-items-center justify-content-center text-white text-decoration-none rounded-circle social-icon"><i class="fab fa-x-twitter"></i></a>
-                    <a href="#" aria-label="Instagram" class="d-flex align-items-center justify-content-center text-white text-decoration-none rounded-circle social-icon"><i class="fab fa-instagram"></i></a>
-                    <a href="#" aria-label="YouTube" class="d-flex align-items-center justify-content-center text-white text-decoration-none rounded-circle social-icon"><i class="fab fa-youtube"></i></a>
+                    @if($fb)<a href="{{ $fb }}" aria-label="Facebook" target="_blank" class="d-flex align-items-center justify-content-center text-white text-decoration-none rounded-circle social-icon"><i class="fab fa-facebook-f"></i></a>@endif
+                    @if($tw)<a href="{{ $tw }}" aria-label="X" target="_blank" class="d-flex align-items-center justify-content-center text-white text-decoration-none rounded-circle social-icon"><i class="fab fa-x-twitter"></i></a>@endif
+                    @if($ig)<a href="{{ $ig }}" aria-label="Instagram" target="_blank" class="d-flex align-items-center justify-content-center text-white text-decoration-none rounded-circle social-icon"><i class="fab fa-instagram"></i></a>@endif
+                    @if($yt)<a href="{{ $yt }}" aria-label="YouTube" target="_blank" class="d-flex align-items-center justify-content-center text-white text-decoration-none rounded-circle social-icon"><i class="fab fa-youtube"></i></a>@endif
                 </div>
             </div>
             

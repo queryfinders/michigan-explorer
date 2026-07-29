@@ -11,7 +11,7 @@
 <!-- 1. PREMIUM HERO SECTION -->
 <section class="hero-premium position-relative" style="min-height: 70vh; padding-top: 100px; overflow: visible !important;">
     <div class="hero-bg-parallax position-absolute start-0 w-100 overflow-hidden" style="top: 0; height: 100%;">
-        <div class="hero-bg-zoom" role="img" aria-label="Michigan Explorer Search" style="background-image: url('{{ asset('images/hero_banner_1783508250640.png') }}');"></div>
+        <div class="hero-bg-zoom" role="img" aria-label="Michigan Explorer Search" style="background-image: url('{{ asset('images/hero_banner_1783508250640.jpg') }}');"></div>
     </div>
 
     <div class="container position-relative text-white py-5">

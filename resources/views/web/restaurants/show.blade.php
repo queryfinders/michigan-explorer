@@ -58,7 +58,7 @@
         $hasDynamicGallery = $galleryItems->count() > 0;
         $featuredSrc = !empty($restaurant->featured_image) && (is_object($restaurant) && property_exists($restaurant, 'slug') ? $restaurant->slug !== 'demo' : true)
             ? asset($restaurant->featured_image)
-            : asset('images/fine_dining_1783508270763.png');
+            : asset('images/fine_dining_1783508270763.jpg');
         
         $allGalleryImages = [];
         $allGalleryImages[] = ['src' => $featuredSrc, 'alt' => $restaurant->featured_image_alt ?? $restaurant->name ?? 'Restaurant'];
@@ -68,10 +68,10 @@
             }
         } else {
             // Static demo thumbnails as fallback
-            $allGalleryImages[] = ['src' => asset('storage/demo/michigan_hotel_room_1_1783683598842.png'), 'alt' => 'Dining Area'];
-            $allGalleryImages[] = ['src' => asset('storage/demo/michigan_hotel_room_2_1783683609409.png'), 'alt' => 'Food Item'];
-            $allGalleryImages[] = ['src' => asset('storage/demo/michigan_hotel_lobby_1783683621508.png'), 'alt' => 'Interior'];
-            $allGalleryImages[] = ['src' => asset('storage/demo/michigan_hotel_pool_1783683632041.png'), 'alt' => 'Entrance'];
+            $allGalleryImages[] = ['src' => asset('storage/demo/michigan_hotel_room_1_1783683598842.jpg'), 'alt' => 'Dining Area'];
+            $allGalleryImages[] = ['src' => asset('storage/demo/michigan_hotel_room_2_1783683609409.jpg'), 'alt' => 'Food Item'];
+            $allGalleryImages[] = ['src' => asset('storage/demo/michigan_hotel_lobby_1783683621508.jpg'), 'alt' => 'Interior'];
+            $allGalleryImages[] = ['src' => asset('storage/demo/michigan_hotel_pool_1783683632041.jpg'), 'alt' => 'Entrance'];
         }
         $extraCount = count($allGalleryImages) - 5;
         

@@ -1,62 +1,64 @@
 @extends('layouts/layoutMaster')
+@php
+use App\Helpers\AccessRights;
+@endphp
 
 @section('title', 'Role List')
 
 @section('page-style')
-<!-- Page -->
 <link rel="stylesheet" href="{{asset('assets/vendor/css/pages/cards-advance.css')}}">
 @endsection
 
-@section('vendor-style')
-<link rel="stylesheet" href="{{asset('assets/vendor/libs/flatpickr/flatpickr.css')}}" />
-<link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
-<link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css')}}">
-<link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css')}}">
-<link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css')}}">
-<link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-rowgroup-bs5/rowgroup.bootstrap5.css')}}">
-@endsection
-
-@section('page-style')
-@endsection
-
-@section('vendor-script')
-<script src="{{asset('assets/vendor/libs/flatpickr/flatpickr.js')}}"></script>
-<script src="{{asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js')}}"></script>
-@endsection
-
 @section('content')
+<nav aria-label="breadcrumb" class="mb-1">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Dashboard</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Roles</li>
+  </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h3 class="mb-1 fw-bold">Role List</h3>
+    <p class="text-muted mb-0">Manage all roles in Michigan Explorer.</p>
+  </div>
+  <div class="d-flex align-items-center gap-2">
+    <input type="text" class="form-control global-search-input" id="roleSearch" placeholder="Search..." style="width: 220px;" />
+    <a href="{{ route('create-role') }}" class="btn btn-warning text-white">Add Role</a>
+  </div>
+</div>
+
+@include('layouts.messages')
 
 <div class="card">
-  @include('layouts.messages')
-  <h5 class="card-header">Role List</h5>
-  <div class="d-flex justify-content-end me-md-4">
-    <a href="{{ route('create-role') }}" type="button" class="btn btn-primary text-white me-3"> Add Role</a>
-  </div>
-  <div class="card-datatable table-responsive pt-0">
-    <table class="datatables-role table">
+  <div class="table-responsive pt-0">
+    <table class="table">
       <thead>
         <tr>
-        <th>#</th>
-        <th>Role Name</th>
-        <th>Action</th>
+          <th>SR NO</th>
+          <th>ROLE NAME</th>
+          <th>ACTION</th>
         </tr>
       </thead>
-      <tbody></tbody>
+      <tbody id="role-table-body">
+        <tr>
+          <td colspan="3" class="text-center">Loading roles...</td>
+        </tr>
+      </tbody>
     </table>
   </div>
 </div>
 @endsection
 
-
 @section('page-script')
 <script type="text/javascript">
   $(document).ready(function (e) {
-    //role list
-    var roleTable = $('.datatables-role').DataTable();
     var roleListRoute = "{{ route('role-list') }}";
     var roleEditRoute = "{{ route('edit-role', ':id') }}";
+    var allRoles = [];
 
     getRoleData();
+
     function getRoleData(){
         $.ajax({
             url: roleListRoute,
@@ -65,80 +67,49 @@
               "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
             },
             success: function (response) {
-                roleTable.clear().destroy();
-                roleTable = $('.datatables-role').DataTable({
-                    data: response.role,
-                    scrollX: true,
-                    ordering: false,
-                    dom: '<"row"' + '<"col-md-2"<"me-3"l>>' + '<"col-md-10"<"dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-3 mb-md-0"fB>>' + '>t' + '<"row mx-2"' + '<"col-sm-12 col-md-6"i>' + '<"col-sm-12 col-md-6"p>' + '>',
-                    displayLength: 10,
-                    lengthMenu: [10, 25, 50, 75, 100],
-                    columns: [
-                        {
-                            data: null,
-                            name: 'id',
-                            render: function(data, type, row, meta) {
-                                var index = meta.row + 1;
-                                return index;
-                            }
-                        },
-                        { data: 'role'},
-                        {
-                          data: null,
-                          render: function (data, type, row, meta) {
-                              // Render the action buttons column
-                              return '<div class="btn-group" role="group"><a href="' + roleEditRoute.replace(':id', data.id) + '" type="button" class="btn btn-sm btn-primary edit-btn" id="editrole"><i class="fa fa-edit"></i></a><button type="button" value="' + data.id + '" class="btn btn-sm btn-danger delete-btn" id="deleteRole"><i class="fa fa-trash"></i></button></div>';
-                          }
-                        },
-                    ],
-                    buttons: [
-                    {
-                        extend: 'collection',
-                        className: 'btn btn-label-primary dropdown-toggle me-2',
-                        text: '<i class="ti ti-file-export me-sm-1"></i> <span class="d-none d-sm-inline-block">Export</span>',
-                        buttons: [
-                            {
-                                extend: 'print',
-                                text: '<i class="ti ti-printer me-1" ></i>Print',
-                                className: 'dropdown-item',
-                                exportOptions: {
-                                    columns: [0],
-                                }
-                            },
-                            {
-                                extend: 'csv',
-                                text: '<i class="ti ti-file-text me-1" ></i>Csv',
-                                className: 'dropdown-item',
-                                exportOptions: {
-                                    columns: [0],
-                                }
-                            },
-                            {
-                                extend: 'excel',
-                                text: '<i class="ti ti-file-spreadsheet me-1"></i>Excel',
-                                className: 'dropdown-item',
-                                exportOptions: {
-                                    columns: [0],
-                                }
-                            },
-                            {
-                                extend: 'pdf',
-                                text: '<i class="ti ti-file-description me-1"></i>Pdf',
-                                className: 'dropdown-item',
-                                exportOptions: {
-                                    columns: [0],
-                                }
-                            }
-                        ]
-                    }
-                    ],
-                });
+                if(response.role) {
+                    allRoles = response.role;
+                    renderRoles(allRoles);
+                } else {
+                    $('#role-table-body').html('<tr><td colspan="3" class="text-center">No records found</td></tr>');
+                }
             },
             error: function (xhr, error, thrown) {
-                console.log('Error:', error);
+                $('#role-table-body').html('<tr><td colspan="3" class="text-center text-danger">Failed to load data.</td></tr>');
             }
         });
     }
+
+    function renderRoles(roles) {
+        var tbody = $('#role-table-body');
+        tbody.empty();
+        
+        if (roles.length > 0) {
+            $.each(roles, function(index, data) {
+                var srNo = index + 1;
+                var roleName = data.role || '';
+                var action = '<div class="btn-group" role="group"><a href="' + roleEditRoute.replace(':id', data.id) + '" type="button" class="btn btn-sm btn-primary edit-btn"><i class="fa fa-edit"></i></a><button type="button" value="' + data.id + '" class="btn btn-sm btn-danger delete-btn" id="deleteRole"><i class="fa fa-trash"></i></button></div>';
+                
+                var row = '<tr>' +
+                    '<td>' + srNo + '</td>' +
+                    '<td><strong>' + roleName + '</strong></td>' +
+                    '<td>' + action + '</td>' +
+                    '</tr>';
+                tbody.append(row);
+            });
+        } else {
+            tbody.html('<tr><td colspan="3" class="text-center">No records found</td></tr>');
+        }
+    }
+
+    // Client-side search since we removed DataTables
+    $('#roleSearch').on('keyup', function() {
+        var val = $(this).val().toLowerCase();
+        var filtered = allRoles.filter(function(r) {
+            return (r.role && r.role.toLowerCase().indexOf(val) > -1);
+        });
+        renderRoles(filtered);
+    });
 
     //delete role
     $(document).on("click","#deleteRole",function(e){
@@ -156,7 +127,6 @@
             });
         }
     });
-
-  })
+  });
 </script>
 @endsection

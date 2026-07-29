@@ -93,7 +93,7 @@
     "url": "{{ route('web.home') }}",
     "logo": {
       "@@type": "ImageObject",
-      "url": "{{ asset('images/logo.png') }}",
+      "url": "{{ asset('images/logo.jpg') }}",
       "width": 512,
       "height": 512
     }
@@ -452,7 +452,7 @@
                     <!-- Sidebar Ad / Promo Placeholder -->
                     <!-- <div class="mt-4 rounded-4 overflow-hidden position-relative shadow-sm group hover-shadow-lg transition-all" style="border: 1px solid #f1f5f9;">
                         <a href="#" class="d-block">
-                            <img src="{{ asset('images/michigan_explorer_ad.png') }}" class="w-100 object-fit-cover hover-zoom auto-style-45" alt="Explore Michigan Explorer Premium" style="transition: transform 0.3s ease;">
+                            <img src="{{ asset('images/michigan_explorer_ad.jpg') }}" class="w-100 object-fit-cover hover-zoom auto-style-45" alt="Explore Michigan Explorer Premium" style="transition: transform 0.3s ease;">
                         </a>
                     </div> -->
 

@@ -287,7 +287,7 @@
                 <h5 class="mb-2 mt-3">Submit</h5>
                 <p>Submit to kick start your project.</p>
                 <!-- image -->
-                <img src="{{asset('assets/img/illustrations/girl-with-laptop.png') }}" class="img-fluid" alt="Create App img" width="175">
+                <img src="{{asset('assets/img/illustrations/girl-with-laptop.jpg') }}" class="img-fluid" alt="Create App img" width="175">
                 <div class="col-12 d-flex justify-content-between mt-4 pt-2">
                   <button class="btn btn-label-secondary btn-prev"> <i class="ti ti-arrow-left ti-xs me-sm-1 me-0"></i> <span class="align-middle d-sm-inline-block d-none">Previous</span> </button>
                   <button class="btn btn-success btn-next btn-submit" data-bs-dismiss="modal" aria-label="Close"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Submit</span> <i class="ti ti-check ti-xs"></i></button>

@@ -8,7 +8,7 @@
         @yield('title')
     @endif
 </title>
-<link rel="icon" href="{{ asset('assets/img/favicon/favicon.png') }}">
+<link rel="icon" href="{{ asset('assets/img/favicon/favicon.jpg') }}">
 <meta name="msapplication-TileColor" content="#79bde9">
 <meta name="msapplication-TileImage" content="/mstile-144x144.png">
 <meta name="theme-color" content="#ffffff">
@@ -40,7 +40,7 @@
     @yield('canonical')
 @endif
 
-<link rel="apple-touch-icon" href="{{ asset('assets/img/favicon/favicon.png') }}">
+<link rel="apple-touch-icon" href="{{ asset('assets/img/favicon/favicon.jpg') }}">
 
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
