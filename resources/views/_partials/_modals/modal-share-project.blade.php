@@ -22,7 +22,7 @@
       <ul class="p-0 m-0">
         <li class="d-flex flex-wrap mb-3">
           <div class="avatar me-3">
-            <img src="{{asset('assets/img/avatars/1.png')}}" alt="avatar" class="rounded-circle">
+            <img src="{{asset('assets/img/avatars/1.jpg')}}" alt="avatar" class="rounded-circle">
           </div>
           <div class="d-flex justify-content-between flex-grow-1">
             <div class="me-2">
@@ -50,7 +50,7 @@
         </li>
         <li class="d-flex flex-wrap mb-3">
           <div class="avatar me-3">
-            <img src="{{asset('assets/img/avatars/2.png')}}" alt="avatar" class="rounded-circle">
+            <img src="{{asset('assets/img/avatars/2.jpg')}}" alt="avatar" class="rounded-circle">
           </div>
           <div class="d-flex justify-content-between flex-grow-1">
             <div class="me-2">
@@ -78,7 +78,7 @@
         </li>
         <li class="d-flex flex-wrap mb-3">
           <div class="avatar me-3">
-            <img src="{{asset('assets/img/avatars/3.png')}}" alt="avatar" class="rounded-circle">
+            <img src="{{asset('assets/img/avatars/3.jpg')}}" alt="avatar" class="rounded-circle">
           </div>
           <div class="d-flex justify-content-between flex-grow-1">
             <div class="me-2">
@@ -106,7 +106,7 @@
         </li>
         <li class="d-flex flex-wrap mb-3">
           <div class="avatar me-3">
-            <img src="{{asset('assets/img/avatars/4.png')}}" alt="avatar" class="rounded-circle">
+            <img src="{{asset('assets/img/avatars/4.jpg')}}" alt="avatar" class="rounded-circle">
           </div>
           <div class="d-flex justify-content-between flex-grow-1">
             <div class="me-2">
@@ -134,7 +134,7 @@
         </li>
         <li class="d-flex flex-wrap mb-3">
           <div class="avatar me-3">
-            <img src="{{asset('assets/img/avatars/5.png')}}" alt="avatar" class="rounded-circle">
+            <img src="{{asset('assets/img/avatars/5.jpg')}}" alt="avatar" class="rounded-circle">
           </div>
           <div class="d-flex justify-content-between flex-grow-1">
             <div class="me-2">
@@ -162,7 +162,7 @@
         </li>
         <li class="d-flex flex-wrap mb-3">
           <div class="avatar me-3">
-            <img src="{{asset('assets/img/avatars/6.png')}}" alt="avatar" class="rounded-circle">
+            <img src="{{asset('assets/img/avatars/6.jpg')}}" alt="avatar" class="rounded-circle">
           </div>
           <div class="d-flex justify-content-between flex-grow-1">
             <div class="me-2">
@@ -190,7 +190,7 @@
         </li>
         <li class="d-flex flex-wrap mb-3">
           <div class="avatar me-3">
-            <img src="{{asset('assets/img/avatars/7.png')}}" alt="avatar" class="rounded-circle">
+            <img src="{{asset('assets/img/avatars/7.jpg')}}" alt="avatar" class="rounded-circle">
           </div>
           <div class="d-flex justify-content-between flex-grow-1">
             <div class="me-2">
@@ -218,7 +218,7 @@
         </li>
         <li class="d-flex flex-wrap">
           <div class="avatar me-3">
-            <img src="{{asset('assets/img/avatars/8.png')}}" alt="avatar" class="rounded-circle">
+            <img src="{{asset('assets/img/avatars/8.jpg')}}" alt="avatar" class="rounded-circle">
           </div>
           <div class="d-flex justify-content-between flex-grow-1">
             <div class="me-2">

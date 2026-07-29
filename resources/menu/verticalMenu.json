@@ -4,7 +4,7 @@
       "name": "Dashboards",
       "url": "/dashboard",
       "icon": "menu-icon tf-icons ti ti-smart-home",
-      "slug": "dashboard"
+      "slug": "dashboard.index"
     },
     {
       "name": "Users",
@@ -168,6 +168,12 @@
         "subscribers"
       ],
       "submenu": [
+        {
+          "name": "General Settings",
+          "url": "/admin/settings",
+          "icon": "menu-icon tf-icons ti ti-adjustments",
+          "slug": "settings.index"
+        },
         {
           "name": "Search Shortcuts",
           "url": "/admin/search-shortcuts",

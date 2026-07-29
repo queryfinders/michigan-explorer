@@ -19,7 +19,7 @@ $configData = Helper::appClasses();
   @endif
 
 
-  <div class="menu-inner-shadow"></div>
+  <div class="menu-inner-shadow d-none"></div>
 
   <ul class="menu-inner py-1">
     @foreach ($menuData[0]->menu as $menu)

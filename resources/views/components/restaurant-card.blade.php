@@ -46,7 +46,7 @@
     <!-- Image Wrapper -->
     <div class="listing-img-wrapper position-relative h-240px overflow-hidden">
         @php
-            $imgUrl = asset('images/fine_dining_1783508270763.png');
+            $imgUrl = asset('images/fine_dining_1783508270763.jpg');
             if (!empty($restaurant->featured_image)) {
                 $imgUrl = str_starts_with($restaurant->featured_image, 'http') ? $restaurant->featured_image : asset($restaurant->featured_image);
             } elseif (!empty($restaurant->image)) {

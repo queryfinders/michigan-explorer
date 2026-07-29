@@ -28,7 +28,7 @@
 
 @section('webLayoutContent')
 @php
-    $bannerImage = ($page && $page->featured_image) ? asset($page->featured_image) : asset('images/luxury_hotel_1783508260160.png');
+    $bannerImage = ($page && $page->featured_image) ? asset($page->featured_image) : asset('images/luxury_hotel_1783508260160.jpg');
     $bannerTitle = ($page && $page->banner_title) ? $page->banner_title : $pageTitle;
     $bannerSubtitle = ($page && $page->banner_subtitle) ? $page->banner_subtitle : $metaDescription;
     $bannerBtnText = ($page && $page->banner_button_text) ? $page->banner_button_text : ('Browse ' . (isset($currentCategory) ? $currentCategory->name : 'Featured Hotels'));

@@ -3133,3 +3133,140 @@ font-size: 0.85rem;
 .search-category-pills::-webkit-scrollbar {
     display: none;
 }
+
+/* --- Homepage Refactored CSS --- */
+
+/* Event Strip */
+.ev-bottom-strip {
+    background: #fff;
+    border: 1.5px solid #e9ecef;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+    transition: background 0.3s, box-shadow 0.3s;
+}
+.ev-bottom-strip:hover {
+    background: rgba(255,255,255,0.07) !important;
+    box-shadow: 0 0 0 2px rgba(255,159,28,0.35);
+}
+.ev-bottom-strip:hover .ev-strip-img {
+    transform: scale(1.04);
+}
+.ev-strip-img {
+    transition: transform 0.4s ease;
+    object-fit: cover;
+}
+.ev-strip-badge {
+    background: #fff3cd;
+    color: #e67e00;
+    font-size: 0.68rem;
+    letter-spacing: 0.07em;
+    padding: 3px 10px;
+    border-radius: 100px;
+}
+.ev-strip-fallback {
+    background: #fff3cd;
+}
+
+/* Event Widget */
+.ev-widget-section {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f2027 100%);
+}
+.ev-widget-badge {
+    background: rgba(255,159,28,0.18);
+    color: #ff9f1c;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+}
+.ev-banner-link .ev-banner-img {
+    transition: transform 0.5s cubic-bezier(.25,.8,.25,1);
+    object-fit: cover;
+}
+.ev-banner-link:hover .ev-banner-img {
+    transform: scale(1.06);
+}
+.ev-banner-fallback {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+}
+.ev-banner-overlay {
+    background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.35) 50%, transparent 100%);
+}
+.ev-banner-cat {
+    background: #ff9f1c;
+    color: #fff;
+    font-size: 0.75rem;
+}
+.ev-side-card {
+    transition: background 0.25s, border-color 0.25s, transform 0.2s, box-shadow 0.25s;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.09);
+    min-height: 110px;
+}
+.ev-side-card:hover {
+    background: rgba(255,159,28,0.12) !important;
+    border-color: rgba(255,159,28,0.45) !important;
+    transform: translateX(4px);
+    box-shadow: 0 4px 24px rgba(255,159,28,0.15);
+}
+.ev-side-fallback {
+    background: rgba(255,159,28,0.12);
+}
+.ev-side-cat {
+    color: #ff9f1c;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+.ev-side-arrow {
+    color: rgba(255,159,28,0.5);
+}
+
+
+/* More Inline Replacements */
+.ev-strip-container {
+    background: #fff; border: 1.5px solid #e9ecef; box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+}
+.ev-strip-inner {
+    min-height: 120px;
+}
+.ev-strip-thumb-container {
+    width: 190px;
+}
+.ev-strip-category-name {
+    font-size: 0.75rem;
+}
+.ev-strip-title {
+    font-size: 1.05rem; line-height: 1.3;
+}
+.ev-strip-meta {
+    font-size: 0.8rem;
+}
+
+/* Event Widget Remaining */
+.ev-widget-banner-inner {
+    min-height: 420px;
+}
+.ev-widget-banner-title {
+    font-size: 1.6rem; line-height: 1.25;
+}
+.ev-widget-banner-meta {
+    font-size: 0.875rem;
+}
+.ev-side-card-thumb-img {
+    width: 110px; object-fit: cover;
+}
+.ev-side-card-title {
+    font-size: 0.95rem; line-height: 1.3;
+}
+.ev-side-card-meta {
+    opacity: 0.55; font-size: 0.78rem;
+}
+
+/* Hero Search */
+.hero-search-thumb {
+    width: 45px; height: 45px; object-fit: cover;
+}
+
+
+.ev-side-fallback-thumb {
+    width: 110px;
+}
+

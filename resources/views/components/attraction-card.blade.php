@@ -9,7 +9,7 @@
     <!-- Image Wrapper -->
     <div class="listing-img-wrapper position-relative h-240px overflow-hidden">
         @php
-            $imgUrl = asset('images/attraction_nature_1783508280642.png');
+            $imgUrl = asset('images/attraction_nature_1783508280642.jpg');
             if (!empty($attraction->featured_image)) {
                 $imgUrl = str_starts_with($attraction->featured_image, 'http') ? $attraction->featured_image : asset($attraction->featured_image);
             } elseif (!empty($attraction->image)) {

@@ -8,7 +8,7 @@
         : 'Get in touch with the Michigan Explorer team. We\'re here to help you plan your next great adventure!';
     $canonicalUrl = route('web.contact');
     
-    $bannerImage = ($page && $page->featured_image) ? asset($page->featured_image) : asset('images/contact_hero_banner.png');
+    $bannerImage = ($page && $page->featured_image) ? asset($page->featured_image) : asset('images/contact_hero_banner.jpg');
     $bannerTitle = ($page && $page->banner_title) ? $page->banner_title : $pageTitle;
     $bannerSubtitle = ($page && $page->banner_subtitle) ? $page->banner_subtitle : 'We\'re here to help you plan your next great adventure in Michigan.';
 @endphp
@@ -134,7 +134,7 @@
                             <i class="fa-solid fa-location-dot fs-3"></i>
                         </div>
                         <h4 class="fw-bold mb-3">Headquarters</h4>
-                        <p class="text-muted mb-0">100 Traverse City<br>Michigan, MI 49684<br>United States</p>
+                        <p class="text-muted mb-0">{!! nl2br(e($settings['contact_headquarters'] ?? "100 Traverse City\nMichigan, MI 49684\nUnited States")) !!}</p>
                     </div>
 
                     <div class="card border-0 shadow-sm rounded-4 p-4 p-lg-5 bg-white hover-shadow transition-all flex-grow-1">
@@ -143,7 +143,8 @@
                         </div>
                         <h4 class="fw-bold mb-3">Phone</h4>
                         <p class="text-muted mb-2">Mon-Fri from 8am to 5pm.</p>
-                        <a href="tel:+18001234567" class="text-dark fw-semibold text-decoration-none fs-5 hover-text-primary transition-all">+1 (800) 123-4567</a>
+                        @php $phone = $settings['contact_phone'] ?? '+1 (800) 123-4567'; @endphp
+                        <a href="tel:{{ preg_replace('/[^0-9+]/', '', $phone) }}" class="text-dark fw-semibold text-decoration-none fs-5 hover-text-primary transition-all">{{ $phone }}</a>
                     </div>
                     
                     <div class="card border-0 shadow-sm rounded-4 p-4 p-lg-5 bg-white hover-shadow transition-all flex-grow-1">
@@ -152,7 +153,8 @@
                         </div>
                         <h4 class="fw-bold mb-3">Email</h4>
                         <p class="text-muted mb-2">Our friendly team is here to help.</p>
-                        <a href="mailto:hello@michiganexplorer.com" class="text-dark fw-semibold text-decoration-none fs-5 hover-text-primary transition-all">hello@michiganexplorer.com</a>
+                        @php $email = $settings['contact_email'] ?? 'hello@michiganexplorer.com'; @endphp
+                        <a href="mailto:{{ $email }}" class="text-dark fw-semibold text-decoration-none fs-5 hover-text-primary transition-all">{{ $email }}</a>
                     </div>
                 </div>
             </div>
@@ -162,12 +164,21 @@
 </section>
 
 <!-- Map Section -->
-<section class="position-relative">
-    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d182236.42571253018!2d-85.74830113876077!3d44.75056708688463!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x881e32b2d7da29dd%3A0x47bfdc3f3f745621!2sTraverse%20City%2C%20MI!5e0!3m2!1sen!2sus!4v1716301389278!5m2!1sen!2sus" width="100%" height="450" style="border:0; display:block;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+<section class="position-relative map-wrapper">
+    @php $mapUrl = $settings['contact_map_url'] ?? 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d182236.42571253018!2d-85.74830113876077!3d44.75056708688463!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x881e32b2d7da29dd%3A0x47bfdc3f3f745621!2sTraverse%20City%2C%20MI!5e0!3m2!1sen!2sus!4v1716301389278!5m2!1sen!2sus'; @endphp
+    @if(str_starts_with(trim($mapUrl), '<iframe'))
+        {!! $mapUrl !!}
+    @else
+        <iframe src="{{ $mapUrl }}" width="100%" height="450" style="border:0; display:block;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    @endif
 </section>
 
 <!-- Additional Style for hover effects -->
 <style>
+    .map-wrapper iframe {
+        width: 100% !important;
+        display: block;
+    }
     .hover-shadow:hover {
         transform: translateY(-5px);
         box-shadow: 0 1rem 3rem rgba(0,0,0,.1) !important;

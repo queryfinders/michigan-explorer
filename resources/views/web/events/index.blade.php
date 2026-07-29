@@ -67,7 +67,7 @@
 </style>
 
 <!-- 1. Hero Banner -->
-<section class="hotel-listing-hero position-relative" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), url('{{ isset($page) && $page->featured_image && !isset($currentCategory) ? asset($page->featured_image) : asset('images/attraction_nature_1783508280642.png') }}');">
+<section class="hotel-listing-hero position-relative" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), url('{{ isset($page) && $page->featured_image && !isset($currentCategory) ? asset($page->featured_image) : asset('images/attraction_nature_1783508280642.jpg') }}');">
     <div class="content">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb" class="mb-4">

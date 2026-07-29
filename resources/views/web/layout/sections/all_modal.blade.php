@@ -11,7 +11,7 @@
         <div class="re-logo pb-3">
           <img
             class="logo-modal"
-            src="{{ asset('website/assets/images/logo.png') }}"
+            src="{{ asset('website/assets/images/logo.jpg') }}"
           />
         </div>
 
@@ -112,7 +112,7 @@
         <div class="re-logo pb-3">
           <img
             class="logo-modal"
-            src="images/ptn-logo.png"
+            src="images/ptn-logo.jpg"
           />
         </div>
 
@@ -204,7 +204,7 @@
         <div class="re-logo pb-3">
           <img
             class="logo-modal"
-            src="images/ptn-logo.png"
+            src="images/ptn-logo.jpg"
           />
         </div>
 
@@ -290,7 +290,7 @@
         <div class="re-logo pb-3">
           <img
             class="logo-modal"
-            src="images/ptn-logo.png"
+            src="images/ptn-logo.jpg"
           />
         </div>
 
@@ -380,7 +380,7 @@
         <div class="re-logo pb-3">
           <img
             class="logo-modal"
-            src="images/ptn-logo.png"
+            src="images/ptn-logo.jpg"
           />
         </div>
 
@@ -465,7 +465,7 @@
         <div class="re-logo pb-3">
           <img
             class="logo-modal"
-            src="images/ptn-logo.png"
+            src="images/ptn-logo.jpg"
           />
         </div>
 

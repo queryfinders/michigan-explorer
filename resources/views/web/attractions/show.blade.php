@@ -3,7 +3,7 @@
 @php
     $metaTitle = $attraction->meta_title ?? $attraction->name . ' - Michigan Explorer';
     $metaDescription = $attraction->meta_description ?? Str::limit(strip_tags($attraction->description), 160);
-    $heroImage = $attraction->featured_image ? asset($attraction->featured_image) : asset('images/attraction_nature_1783508280642.png');
+    $heroImage = $attraction->featured_image ? asset($attraction->featured_image) : asset('images/attraction_nature_1783508280642.jpg');
 @endphp
 
 @section('title', $metaTitle)
