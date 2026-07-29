@@ -135,6 +135,7 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::resource('/admin/events', \App\Http\Controllers\Admin\EventController::class);
 
     // Blogs Module
+    Route::post('/admin/blog-categories/quick-store', [\App\Http\Controllers\Admin\BlogCategoryController::class, 'quickStore'])->name('blog-categories.quick-store');
     Route::resource('/admin/blog-categories', \App\Http\Controllers\Admin\BlogCategoryController::class);
     Route::get('/admin/blog-categories/status/{id}/{status}', [\App\Http\Controllers\Admin\BlogCategoryController::class, 'changeStatus'])->name('blog-categories.status');
     Route::resource('/admin/blogs', \App\Http\Controllers\Admin\BlogController::class);

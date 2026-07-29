@@ -41,31 +41,31 @@
       @endif
 
       <!-- Tabs Navigation -->
-      <ul class="nav nav-tabs" id="blogFormTabs" role="tablist">
+      <ul class="nav nav-tabs mb-4" id="blogFormTabs" role="tablist">
         <li class="nav-item" role="presentation">
           <button class="nav-link active" id="basic-tab" data-bs-toggle="tab" data-bs-target="#basic-pane" type="button" role="tab">
-            <i class="ti ti-info-circle me-1"></i> Basic Info
+            Basic Info
           </button>
         </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="image-tab" data-bs-toggle="tab" data-bs-target="#image-pane" type="button" role="tab">
-            <i class="ti ti-photo me-1"></i> Featured Image
+            Featured Image
           </button>
         </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="seo-tab" data-bs-toggle="tab" data-bs-target="#seo-pane" type="button" role="tab">
-            <i class="ti ti-world me-1"></i> SEO & Schema
+            SEO & Schema
           </button>
         </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="faqs-tab" data-bs-toggle="tab" data-bs-target="#faqs-pane" type="button" role="tab">
-            <i class="ti ti-help me-1"></i> FAQs
+            FAQs
           </button>
         </li>
       </ul>
 
       <!-- Tabs Content -->
-      <div class="tab-content pt-4" id="blogFormTabsContent">
+      <div class="tab-content p-0" id="blogFormTabsContent">
 
         {{-- ============================================ --}}
         {{-- TAB 1: BASIC INFO --}}
@@ -85,7 +85,6 @@
             <div class="col-md-6">
               <label class="form-label fw-semibold" for="slug">Slug <span class="text-danger">*</span></label>
               <div class="input-group">
-                <span class="input-group-text text-muted" style="font-size:0.8rem;">/blog/</span>
                 <input type="text" class="form-control @error('slug') is-invalid @enderror"
                        id="slug" name="slug"
                        value="{{ old('slug', $blog->slug) }}"
@@ -99,7 +98,13 @@
           <div class="row g-3 mb-3">
             {{-- CATEGORY --}}
             <div class="col-md-4">
-              <label class="form-label fw-semibold" for="blog_category_id">Category</label>
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label class="form-label fw-semibold mb-0" for="blog_category_id">Category</label>
+                <button type="button" class="btn btn-sm btn-link p-0 text-primary fw-semibold"
+                        data-bs-toggle="modal" data-bs-target="#addCategoryModal" style="text-decoration: none; font-size: 0.85rem;">
+                  <i class="fas fa-plus-circle me-1"></i>Add Category
+                </button>
+              </div>
               <input type="hidden" name="blog_category_id" id="blog_category_id"
                      value="{{ old('blog_category_id', $blog->blog_category_id) }}" />
               <div class="cuisine-dropdown-wrapper" id="catDropWrapper">
@@ -132,6 +137,15 @@
                     @endforeach
                     <div class="cuisine-no-results d-none" id="catNoResults">
                       <i class="ti ti-search-off me-1"></i>No categories found
+                    </div>
+                  </div>
+                  <div class="cuisine-divider"></div>
+                  <div class="cuisine-items-list p-0">
+                    <div class="cuisine-panel-footer">
+                      <button type="button" class="btn btn-sm btn-link p-0 text-primary fw-semibold"
+                              data-bs-toggle="modal" data-bs-target="#addCategoryModal" onclick="closeCatDrop()">
+                        <i class="fas fa-plus-circle me-1"></i>Add New Category
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -418,16 +432,42 @@
       </div>{{-- /tab-content --}}
 
       <!-- Form Actions -->
-      <div class="d-flex justify-content-between align-items-center pt-4 mt-3 border-top">
-        <a href="{{ route('blogs.index') }}" class="btn btn-outline-secondary">
-          <i class="ti ti-x me-1"></i> Cancel
-        </a>
-        <button type="submit" class="btn btn-warning text-white px-5">
-          <i class="ti ti-device-floppy me-1"></i> Update Blog
-        </button>
+      <div class="mt-4 pt-3 border-top">
+        <button type="submit" class="btn btn-warning text-white me-2">Update</button>
+        <a href="{{ route('blogs.index') }}" class="btn btn-secondary">Cancel</a>
       </div>
 
     </form>
+  </div>
+</div>
+
+{{-- ===== Add Category Modal ===== --}}
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addCategoryModalLabel"><i class="ti ti-circle-plus me-1 text-primary"></i>Add New Category</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="category-modal-alert" class="d-none"></div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="new_category_name">Category Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="new_category_name" onkeyup="document.getElementById('new_category_slug').value = this.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="new_category_slug">Slug <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="new_category_slug" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="saveNewCategory()">
+          <span id="saveCategoryBtnText"><i class="ti ti-circle-plus me-1"></i>Add Category</span>
+          <span id="saveCategoryBtnSpinner" class="d-none"><span class="spinner-border spinner-border-sm me-1"></span>Saving...</span>
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -469,6 +509,7 @@
 .cuisine-item-check { color: #7367f0; display: none; }
 .cuisine-item.selected .cuisine-item-check { display: inline; }
 .cuisine-no-results { padding: 12px; text-align: center; color: #aaa; font-size: 0.88rem; }
+.cuisine-panel-footer { display: flex; align-items: center; justify-content: space-between; padding: 10px 10px; background: #f8f7ff; }
 
 /* ── Blog Tag Dropdown ── */
 .blog-tag-wrapper { position: relative; }
@@ -851,9 +892,59 @@ document.addEventListener('DOMContentLoaded', function() {
     if (el) el.remove();
   };
 
+  function saveNewCategory() {
+    const name = document.getElementById('new_category_name').value.trim();
+    const slug = document.getElementById('new_category_slug').value.trim();
+    const alertBox = document.getElementById('category-modal-alert');
+    if (!name || !slug) { alertBox.className = 'alert alert-danger'; alertBox.textContent = 'Please enter name and slug.'; return; }
+    alertBox.className = 'd-none';
+    document.getElementById('saveCategoryBtnText').classList.add('d-none');
+    document.getElementById('saveCategoryBtnSpinner').classList.remove('d-none');
+    $.ajax({
+      url: '{{ route("blog-categories.quick-store") }}', type: 'POST',
+      data: { _token: '{{ csrf_token() }}', name, slug, status: 1 },
+      success: function(response) {
+        if (response.success) {
+          const cat = response.category;
+          const list = document.getElementById('catItemsList');
+          const lbl = document.createElement('label');
+          lbl.className = 'cuisine-item';
+          lbl.id = 'cat-lbl-' + cat.id;
+          lbl.innerHTML = `
+            <input type="radio" name="_cat_radio" value="${cat.id}" id="cat_rb_${cat.id}" class="cat-rb d-none" data-name="${cat.name}" onchange="onCatChange(this)" />
+            <span class="cuisine-item-name">${cat.name}</span>
+            <span class="cuisine-item-check"><i class="ti ti-check"></i></span>
+          `;
+          list.insertBefore(lbl, list.firstChild);
+          
+          const newRb = lbl.querySelector('input[type="radio"]');
+          newRb.checked = true;
+          onCatChange(newRb);
+
+          document.getElementById('new_category_name').value = '';
+          document.getElementById('new_category_slug').value = '';
+          alertBox.className = 'alert alert-success'; alertBox.textContent = 'Category added!';
+          bootstrap.Modal.getInstance(document.getElementById('addCategoryModal')).hide();
+        } else { alertBox.className = 'alert alert-danger'; alertBox.textContent = response.message || 'Failed.'; }
+      },
+      error: function(xhr) {
+        alertBox.className = 'alert alert-danger';
+        const errors = xhr.responseJSON?.errors;
+        alertBox.textContent = errors ? Object.values(errors).flat().join(' ') : 'An error occurred.';
+      },
+      complete: function() {
+        document.getElementById('saveCategoryBtnText').classList.remove('d-none');
+        document.getElementById('saveCategoryBtnSpinner').classList.add('d-none');
+      }
+    });
+  }
+  window.saveNewCategory = saveNewCategory;
+  window.filterCat = filterCat;
+  window.onCatChange = onCatChange;
+
   /* ── Outside click closes all ── */
   document.addEventListener('click', function(e) {
-    if (!document.getElementById('catDropWrapper')?.contains(e.target))   closeCatDrop();
+    if (!document.getElementById('catDropWrapper')?.contains(e.target) && !e.target.closest('#addCategoryModal'))   closeCatDrop();
     if (!document.getElementById('statusDropWrapper')?.contains(e.target)) closeStatusDrop();
   });
 

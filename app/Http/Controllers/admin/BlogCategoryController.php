@@ -31,6 +31,18 @@ class BlogCategoryController extends Controller
         return redirect()->route('blog-categories.index')->with('success', 'Category created successfully.');
     }
 
+    public function quickStore(\Illuminate\Http\Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255|unique:blog_categories,name',
+            'slug' => 'required|string|max:255|unique:blog_categories,slug',
+            'status' => 'boolean'
+        ]);
+
+        $category = \App\Models\BlogCategory::create($request->all());
+        return response()->json(['success' => true, 'category' => $category]);
+    }
+
     public function edit(\App\Models\BlogCategory $blogCategory)
     {
         return view('new_content.admin.blog_categories.edit', compact('blogCategory'));

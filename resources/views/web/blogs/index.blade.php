@@ -55,7 +55,7 @@
             <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 w-100">
                 <div class="category-filter-wrapper d-flex align-items-center flex-nowrap gap-1 overflow-x-auto hide-scrollbar flex-grow-1" style="max-width: 100%;">
                     
-                    <a href="{{ $activeSort ? route('web.blogs.sort', $activeSort) : route('web.blogs.index') }}" class="category-pill {{ !$activeCategory ? 'active' : '' }}">
+                    <a href="{{ route('web.blogs.index') }}" class="category-pill {{ !$activeCategory ? 'active' : '' }}">
                         <span class="cat-name">All Articles</span>
                         <span class="cat-count">{{ $totalBlogs }}</span>
                     </a>
@@ -71,7 +71,7 @@
                     @endphp
 
                     @foreach($displayCategories as $cat)
-                    <a href="{{ $activeSort ? route('web.blogs.category.sort', [$cat->slug, $activeSort]) : route('web.blogs.category', $cat->slug) }}" class="category-pill {{ ($activeCategory && $activeCategory->id == $cat->id) ? 'active' : '' }}">
+                    <a href="{{ route('web.blogs.category', $cat->slug) }}" class="category-pill {{ ($activeCategory && $activeCategory->id == $cat->id) ? 'active' : '' }}">
                         <span class="cat-name">{{ $cat->name }}</span>
                         <span class="cat-count">{{ $cat->blogs_count }}</span>
                     </a>
@@ -84,7 +84,7 @@
                     @endif
 
                     @if(request('q'))
-                    <a href="{{ route('web.blogs.index', array_merge(request()->except('q'))) }}" class="category-pill active bg-danger border-danger text-white">
+                    <a href="{{ route('web.blogs.index', array_merge(request()->except('q'), ['category' => 'all'])) }}" class="category-pill active bg-danger border-danger text-white">
                         <span class="cat-name"><i class="fas fa-search me-1"></i> "{{ Str::limit(request('q'), 15) }}"</span>
                         <span class="cat-count bg-white text-danger px-2"><i class="fas fa-times"></i></span>
                     </a>
@@ -94,9 +94,9 @@
                 <div class="d-flex justify-content-lg-end align-items-center flex-shrink-0">
                     <div class="sort-tabs">
                         <span class="text-muted small fw-bold me-2 ms-2 d-none d-sm-inline">Sort:</span>
-                        <a href="{{ $activeCategory ? route('web.blogs.category.sort', [$activeCategory->slug, 'latest']) : route('web.blogs.sort', 'latest') }}" class="sort-tab {{ $activeSort == 'latest' ? 'active' : '' }}">Latest</a>
-                        <a href="{{ $activeCategory ? route('web.blogs.category.sort', [$activeCategory->slug, 'popular']) : route('web.blogs.sort', 'popular') }}" class="sort-tab {{ $activeSort == 'popular' ? 'active' : '' }}">Popular</a>
-                        <a href="{{ $activeCategory ? route('web.blogs.category.sort', [$activeCategory->slug, 'oldest']) : route('web.blogs.sort', 'oldest') }}" class="sort-tab {{ $activeSort == 'oldest' ? 'active' : '' }}">Oldest</a>
+                        <a href="?sort=latest" class="sort-tab {{ $activeSort == 'latest' ? 'active' : '' }}">Latest</a>
+                        <a href="?sort=popular" class="sort-tab {{ $activeSort == 'popular' ? 'active' : '' }}">Popular</a>
+                        <a href="?sort=oldest" class="sort-tab {{ $activeSort == 'oldest' ? 'active' : '' }}">Oldest</a>
                     </div>
                 </div>
             </div>
@@ -278,6 +278,7 @@
                     </div>
                     @endif
 
+                    @if(isset($tags) && $tags->count() > 0)
                     <div class="sidebar-widget mb-4">
                         <div class="sidebar-widget-header"><i class="fas fa-tags text-primary me-2"></i> Popular Tags</div>
                         <div class="sidebar-widget-body">
@@ -288,6 +289,7 @@
                             </div>
                         </div>
                     </div>
+                    @endif
 
                 </div>
             </div>{{-- /col-lg-4 --}}

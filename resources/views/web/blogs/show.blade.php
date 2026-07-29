@@ -128,8 +128,13 @@
         <div class="row w-100 justify-content-center">
             <div class="col-lg-10 col-xl-9 d-flex flex-column align-items-center">
                 
-
-                
+                <nav aria-label="breadcrumb" class="mb-3 fade-up-anim">
+                    <ol class="breadcrumb justify-content-center text-white opacity-75 small text-uppercase align-items-center">
+                        <li class="breadcrumb-item"><a href="{{ route('web.home') }}" class="text-white text-decoration-none">Home</a></li>
+                        <span class="mx-2 text-white-50">/</span>
+                        <li class="breadcrumb-item"><a href="{{ route('web.blogs.index') }}" class="text-white text-decoration-none">Travel Guides</a></li>
+                    </ol>
+                </nav>
                 <h1 class="display-3 fw-bold text-white mb-4 editorial-title fade-up-anim auto-style-33">{{ $blog->title }}</h1>
                 
                 <div class="d-flex flex-wrap align-items-center justify-content-center text-white opacity-90 gap-4 fade-up-anim auto-style-34">
@@ -381,18 +386,18 @@
                     @endif
 
                     <!-- Tags Sidebar Widget -->
+                    @if($blog->tags && $blog->tags->count() > 0)
                     <div class="card border-0 rounded-4 shadow-sm mt-4 bg-white border border-light p-4">
                         <h6 class="text-uppercase fw-bold letter-spacing-1 mb-3 text-primary d-flex align-items-center">
                             <i class="fas fa-tags me-2"></i> Tags
                         </h6>
                         <div class="d-flex flex-wrap gap-2">
-                            @forelse($blog->tags as $tag)
+                            @foreach($blog->tags as $tag)
                                 <a href="#" class="tag-chip">{{ $tag->name }}</a>
-                            @empty
-                                <span class="text-muted small">No tags</span>
-                            @endforelse
+                            @endforeach
                         </div>
                     </div>
+                    @endif
 
                     <!-- Sidebar Ad / Promo Placeholder -->
                     <!-- <div class="mt-4 rounded-4 overflow-hidden position-relative shadow-sm group hover-shadow-lg transition-all" style="border: 1px solid #f1f5f9;">

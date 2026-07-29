@@ -13,15 +13,29 @@ class BlogController extends Controller
     public function index(Request $request, $param1 = null, $param2 = null)
     {
         $categorySlug = null;
-        $sort = null;
 
-        if ($request->routeIs('web.blogs.sort')) {
-            $sort = $param1;
-        } elseif ($request->routeIs('web.blogs.category.sort')) {
+        // 1. Resolve active category based on route
+        if ($request->routeIs('web.blogs.category')) {
             $categorySlug = $param1;
-            $sort = $param2;
-        } else {
-            $categorySlug = $param1;
+        }
+
+        // 2. Handle sort parameter from query parameter (store in session and redirect to clean URL)
+        if ($request->has('sort')) {
+            session(['blog_sort' => $request->query('sort')]);
+            return redirect()->to($request->url(), 302);
+        }
+
+        // 3. Resolve active sort from session
+        $activeSort = session('blog_sort', 'latest');
+
+        // 4. Handle query-parameter based category filtering by redirecting to SEO-friendly route
+        if ($request->has('category')) {
+            $catVal = $request->query('category');
+            if ($catVal === 'all') {
+                return redirect()->route('web.blogs.index', $request->except(['category', 'page']), 301);
+            } else {
+                return redirect()->route('web.blogs.category', array_merge(['categorySlug' => $catVal], $request->except(['category', 'page'])), 301);
+            }
         }
 
         $query = Blog::with(['category', 'author'])
@@ -52,7 +66,6 @@ class BlogController extends Controller
         }
 
         // Sorting
-        $activeSort = $sort ?: $request->get('sort', 'latest');
         if ($activeSort == 'popular') {
             $query->orderBy('views', 'desc');
         } elseif ($activeSort == 'trending') {
