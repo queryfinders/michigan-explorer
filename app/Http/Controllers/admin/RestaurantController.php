@@ -41,7 +41,7 @@ class RestaurantController extends Controller
             'featured_image_alt'    => 'nullable|string|max:255',
             'email'                 => 'nullable|email',
             'website'               => 'nullable|url',
-            'affiliate_url'         => 'nullable|url',
+            'affiliate_link_id'     => 'nullable|exists:affiliate_links,id',
             'latitude'              => 'nullable|numeric',
             'longitude'             => 'nullable|numeric',
             'map_iframe'            => 'nullable|string',
@@ -74,7 +74,7 @@ class RestaurantController extends Controller
             }
         }
 
-        $data = $request->except('_token', '_method', 'featured_image_file', 'meta_title', 'meta_description', 'og_title', 'og_description', 'schema_markup', 'gallery_images', 'gallery_alts', 'faqs', 'cuisines', 'features', 'featured_image_alt');
+        $data = $request->except('_token', '_method', 'featured_image_file', 'meta_title', 'meta_description', 'og_title', 'og_description', 'schema_markup', 'gallery_images', 'gallery_alts', 'faqs', 'cuisines', 'features', 'featured_image_alt', 'affiliate_url');
         $data['featured_image_alt'] = $request->input('featured_image_alt');
         $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
 

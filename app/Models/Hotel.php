@@ -42,4 +42,14 @@ class Hotel extends Model
     {
         return $this->hasMany(HotelPolicyValue::class);
     }
+
+    public function affiliateLink()
+    {
+        return $this->belongsTo(AffiliateLink::class);
+    }
+
+    public function getAffiliateUrlAttribute()
+    {
+        return $this->affiliateLink?->link;
+    }
 }

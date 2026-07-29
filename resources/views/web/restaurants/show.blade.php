@@ -286,32 +286,18 @@
             <!-- Location & Map removed from here -->
 
             <!-- Nearby Attractions -->
-            <!-- Nearby Attractions -->
+            @if(isset($nearbyAttractions) && $nearbyAttractions->count() > 0)
             <div class="content-card">
                 <h3 class="mb-4">Explore Nearby</h3>
                 <div class="row g-4">
+                    @foreach($nearbyAttractions as $attraction)
                     <div class="col-md-6">
-                        <x-hotel-card :hotel="(object)[
-                            'name' => 'Sleeping Bear Dunes',
-                            'city' => '2.5 miles away',
-                            'description' => 'Experience towering sand dunes and spectacular views of Lake Michigan at this national lakeshore.',
-                            'starting_price' => 'Free',
-                            'affiliate_url' => '#',
-                            'featured_image' => asset('storage/demo/michigan_sleeping_bear_1783683642640.png')
-                        ]" />
+                        <x-attraction-card :attraction="$attraction" />
                     </div>
-                    <div class="col-md-6">
-                        <x-hotel-card :hotel="(object)[
-                            'name' => 'Grand Haven Lighthouse',
-                            'city' => '1.2 miles away',
-                            'description' => 'A historic red lighthouse located on the pier, offering a scenic walk and beautiful sunset views over the water.',
-                            'starting_price' => 'Free',
-                            'affiliate_url' => '#',
-                            'featured_image' => asset('storage/demo/michigan_lighthouse_1783683652511.png')
-                        ]" />
-                    </div>
+                    @endforeach
                 </div>
             </div>
+            @endif
 
             @if(isset($restaurant->faqs) && count($restaurant->faqs) > 0)
             <!-- FAQ Section -->
@@ -367,9 +353,15 @@
                     <p class="text-muted small mb-0">Secure your table in advance through our official reservation partner.</p>
                 </div>
 
-                <a href="{{ $restaurant->affiliate_url ?? '#' }}" class="btn-affiliate-book" target="_blank">
+                @if($restaurant->affiliate_link_id)
+                <a href="{{ route('affiliate.redirect', ['type' => 'restaurant', 'id' => $restaurant->id]) }}" class="btn-affiliate-book" target="_blank">
                     Reserve a Table <i class="fas fa-external-link-alt ms-2"></i>
                 </a>
+                @else
+                <button class="btn-affiliate-book disabled" disabled style="opacity: 0.6; cursor: not-allowed;">
+                    Currently Unavailable Online
+                </button>
+                @endif
 
                 {{-- 
                 <div class="mt-4 text-center">
@@ -415,6 +407,9 @@
     /> -->
 
 </div>
+
+{{-- Restaurant Detail Promotion Banner --}}
+<x-promo-banner :promotion="$detailPromotion ?? null" />
 
 <!-- Custom Fullscreen Gallery Lightbox -->
 <div id="customGalleryLightbox" class="custom-lightbox" style="display: none;">

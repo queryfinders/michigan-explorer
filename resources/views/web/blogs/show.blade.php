@@ -462,6 +462,9 @@
     </div>
 </section>
 
+{{-- Blog Detail Promotion Banner --}}
+<x-promo-banner :promotion="$detailPromotion ?? null" />
+
 <!-- CSS specifically for Blog Editorial Layout -->
 <style>
 /* ── Premium Editorial Custom Styles ── */

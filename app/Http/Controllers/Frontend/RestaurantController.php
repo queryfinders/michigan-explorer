@@ -65,6 +65,15 @@ class RestaurantController extends Controller
             ];
         }
 
-        return view('web.restaurants.show', compact('restaurant'));
+        // Query attractions in the same city as the restaurant dynamically
+        $nearbyAttractions = \App\Models\Attraction::where('status', 1)
+            ->where('city', $restaurant->city ?? '')
+            ->take(2)
+            ->get();
+
+        // Fetch active restaurant_detail placement promotion
+        $detailPromotion = \App\Models\AffiliatePromotion::forPlacement('restaurant_detail');
+
+        return view('web.restaurants.show', compact('restaurant', 'nearbyAttractions', 'detailPromotion'));
     }
 }

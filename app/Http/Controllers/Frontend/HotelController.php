@@ -73,6 +73,15 @@ class HotelController extends Controller
             ->take(3)
             ->get();
 
-        return view('web.hotels.show', compact('hotel', 'relatedHotels'));
+        // Query attractions in the same city as the hotel dynamically
+        $nearbyAttractions = \App\Models\Attraction::where('status', 1)
+            ->where('city', $hotel->city ?? '')
+            ->take(2)
+            ->get();
+
+        // Fetch active hotel_detail placement promotion
+        $detailPromotion = \App\Models\AffiliatePromotion::forPlacement('hotel_detail');
+
+        return view('web.hotels.show', compact('hotel', 'relatedHotels', 'nearbyAttractions', 'detailPromotion'));
     }
 }

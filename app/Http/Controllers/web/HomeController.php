@@ -70,6 +70,12 @@ class HomeController extends Controller
             return \App\Models\SearchShortcut::where('status', 1)->orderBy('sort_order', 'asc')->get();
         });
 
-        return view('web.pages.index', compact('hotels', 'restaurants', 'attractions', 'events', 'blogs', 'page', 'searchShortcuts', 'upcomingEventsWidget'));
+        // Fetch the active homepage banner promotion (not cached due to scheduling)
+        $homepagePromotion = \App\Models\AffiliatePromotion::active()
+            ->where('placement', 'homepage_banner')
+            ->orderBy('priority')
+            ->first();
+
+        return view('web.pages.index', compact('hotels', 'restaurants', 'attractions', 'events', 'blogs', 'page', 'searchShortcuts', 'upcomingEventsWidget', 'homepagePromotion'));
     }
 }

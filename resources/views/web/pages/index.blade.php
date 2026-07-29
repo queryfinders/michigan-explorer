@@ -237,8 +237,13 @@
 <!-- 5. Featured Attractions -->
 <section class="section-padding bg-light pb-0">
     <div class="container">
-        <h2 class="section-title">Must-See Attractions</h2>
-        <p class="section-subtitle">Discover the hidden gems and natural wonders of the Great Lakes state.</p>
+        <div class="d-flex justify-content-between align-items-center mb-5 flex-wrap gap-3">
+            <div>
+                <h2 class="section-title mb-0">Must-See Attractions</h2>
+                <p class="section-subtitle mb-0 mt-2">Discover the hidden gems and natural wonders of the Great Lakes state.</p>
+            </div>
+            <a href="{{ route('web.attractions.index') }}" class="btn btn-outline-primary rounded-pill">View All Attractions</a>
+        </div>
         
         <div class="row g-4">
              @if(isset($attractions) && $attractions->count() > 0)
@@ -332,18 +337,37 @@
 </section>
 
 <!-- 7. Affiliate Promotions -->
+@php
+    $promo = $homepagePromotion ?? null;
+    $promoBg = $promo
+        ? asset($promo->desktop_image)
+        : asset('images/promo_banner_1783508311655.png');
+    $promoMobileBg = $promo && $promo->mobile_image
+        ? asset($promo->mobile_image)
+        : $promoBg;
+    $promoBadge    = $promo ? $promo->badge_text : 'Special Promotion';
+    $promoTitle    = $promo ? $promo->title      : 'Save 20% on Romantic Lakefront Escapes';
+    $promoSubtitle = $promo ? $promo->subtitle   : 'Book your next getaway through our exclusive affiliate partners and enjoy premium upgrades.';
+    $promoCtaText  = $promo ? $promo->cta_text   : 'Claim Offer';
+    $promoCtaHref  = $promo
+        ? route('affiliate.redirect', ['type' => 'promotion', 'id' => $promo->id])
+        : '#';
+@endphp
 <section class="py-0">
     <div class="container-fluid px-0">
         <div class="card border-0 rounded-0 text-white position-relative promo-banner-wrapper">
-    <img src="{{ asset('images/promo_banner_1783508311655.png') }}" class="promo-bg-img" loading="lazy" alt="Promo Background">
+            {{-- Desktop image --}}
+            <img src="{{ $promoBg }}" class="promo-bg-img d-none d-md-block" loading="lazy" alt="{{ $promoTitle }}">
+            {{-- Mobile image (portrait) --}}
+            <img src="{{ $promoMobileBg }}" class="promo-bg-img d-block d-md-none" loading="lazy" alt="{{ $promoTitle }}">
             <div class="position-absolute top-0 start-0 w-100 h-100 bg-gradient-primary"></div>
             <div class="container position-relative z-index-1">
                 <div class="row">
                     <div class="col-lg-6">
-                        <span class="badge bg-secondary mb-3 fs-6 px-3 py-2 rounded-pill">Special Promotion</span>
-                        <h2 class="display-4 fw-bold mb-4 text-white font-heading">Save 20% on Romantic Lakefront Escapes</h2>
-                        <p class="fs-4 mb-5 text-light">Book your next getaway through our exclusive affiliate partners and enjoy premium upgrades.</p>
-                        <a href="#" class="btn btn-secondary btn-lg rounded-pill px-5">Claim Offer</a>
+                        <span class="badge bg-secondary mb-3 fs-6 px-3 py-2 rounded-pill">{{ $promoBadge }}</span>
+                        <h2 class="display-4 fw-bold mb-4 text-white font-heading">{{ $promoTitle }}</h2>
+                        <p class="fs-4 mb-5 text-light">{{ $promoSubtitle }}</p>
+                        <a href="{{ $promoCtaHref }}" class="btn btn-secondary btn-lg rounded-pill px-5" @if($promo) target="_blank" @endif>{{ $promoCtaText }}</a>
                     </div>
                 </div>
             </div>
@@ -354,8 +378,13 @@
 <!-- 8. Latest Travel Guides (Blogs) -->
 <section class="section-padding bg-light">
     <div class="container">
-        <h2 class="section-title">Latest Travel Guides</h2>
-        <p class="section-subtitle">Tips, itineraries, and stories from local experts.</p>
+        <div class="d-flex justify-content-between align-items-center mb-5 flex-wrap gap-3">
+            <div>
+                <h2 class="section-title mb-0">Latest Travel Guides</h2>
+                <p class="section-subtitle mb-0 mt-2">Tips, itineraries, and stories from local experts.</p>
+            </div>
+            <a href="{{ route('web.blogs.index') }}" class="btn btn-outline-primary rounded-pill">View All Guides</a>
+        </div>
         
         <div class="row g-4">
             @if(isset($blogs) && $blogs->count() > 0)
@@ -552,9 +581,11 @@
                 <p class="mb-0 text-white fs-5">Get the best travel secrets and exclusive deals delivered to your inbox.</p>
             </div>
             <div class="col-lg-5">
-                <form action="#">
+                <form id="explorerClubForm" method="POST" action="{{ route('newsletter.subscribe') }}">
+                    @csrf
+                    <input type="hidden" name="source" value="explorer_club">
                     <div class="input-group input-group-lg shadow-lg rounded-pill overflow-hidden bg-white p-1">
-                        <input type="email" class="form-control border-0 shadow-none px-4" placeholder="Enter your email address" required>
+                        <input type="email" name="email" class="form-control border-0 shadow-none px-4" placeholder="Enter your email address" required>
                         <button class="btn btn-primary rounded-pill px-4" type="submit">Subscribe</button>
                     </div>
                 </form>

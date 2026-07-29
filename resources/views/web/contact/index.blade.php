@@ -72,41 +72,50 @@
                             </div>
                         @endif
                         
-                        <form action="{{ route('web.contact.submit') }}" method="POST">
+                        <form id="contactUsForm" action="{{ route('web.contact.submit') }}" method="POST" novalidate>
                             @csrf
                             <div class="row g-4">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="name" class="form-label fw-semibold text-dark">Full Name <span class="text-danger">*</span></label>
-                                        <input type="text" name="name" class="form-control form-control-lg bg-light border-0 px-4 py-3" id="name" placeholder="John Doe" required>
+                                        <label for="full_name" class="form-label fw-semibold text-dark">Full Name <span class="text-danger">*</span></label>
+                                        <input type="text" name="full_name" class="form-control form-control-lg bg-light border-0 px-4 py-3" id="full_name" placeholder="John Doe">
+                                        <div class="error-feedback text-danger small mt-1" id="err-full_name"></div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="email" class="form-label fw-semibold text-dark">Email Address <span class="text-danger">*</span></label>
-                                        <input type="email" name="email" class="form-control form-control-lg bg-light border-0 px-4 py-3" id="email" placeholder="name@example.com" required>
+                                        <input type="email" name="email" class="form-control form-control-lg bg-light border-0 px-4 py-3" id="email" placeholder="name@example.com">
+                                        <div class="error-feedback text-danger small mt-1" id="err-email"></div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="phone" class="form-label fw-semibold text-dark">Phone Number</label>
                                         <input type="text" name="phone" class="form-control form-control-lg bg-light border-0 px-4 py-3" id="phone" placeholder="(123) 456-7890">
+                                        <div class="error-feedback text-danger small mt-1" id="err-phone"></div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="subject" class="form-label fw-semibold text-dark">Subject</label>
                                         <input type="text" name="subject" class="form-control form-control-lg bg-light border-0 px-4 py-3" id="subject" placeholder="How can we help?">
+                                        <div class="error-feedback text-danger small mt-1" id="err-subject"></div>
                                     </div>
                                 </div>
                                 <div class="col-12">
                                     <div class="form-group">
                                         <label for="message" class="form-label fw-semibold text-dark">Your Message <span class="text-danger">*</span></label>
-                                        <textarea name="message" class="form-control form-control-lg bg-light border-0 px-4 py-3" id="message" style="height: 150px; resize: none;" placeholder="Tell us more about your inquiry..." required></textarea>
+                                        <textarea name="message" class="form-control form-control-lg bg-light border-0 px-4 py-3" id="message" style="height: 150px; resize: none;" placeholder="Tell us more about your inquiry..."></textarea>
+                                        <div class="error-feedback text-danger small mt-1" id="err-message"></div>
                                     </div>
                                 </div>
-                                <div class="col-12 mt-4">
-                                    <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center transition-all w-100">
+                                <div class="col-12 mb-3">
+                                    <div class="g-recaptcha" data-sitekey="{{ env('RECAPTCHA_SITE_KEY') }}" data-callback="onCaptchaVerified"></div>
+                                    <div class="error-feedback text-danger small mt-1" id="err-g-recaptcha-response"></div>
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <button type="submit" id="contactSubmitBtn" class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center transition-all w-100">
                                         <span>Send Message</span>
                                         <i class="fa-solid fa-paper-plane ms-2 text-white"></i>
                                     </button>
@@ -169,9 +178,12 @@
     .transition-all {
         transition: all 0.3s ease;
     }
+    .form-control {
+        border: 1px solid #ced4da !important;
+    }
     .form-control:focus {
         background-color: #fff !important;
-        border-color: var(--bs-primary);
+        border-color: var(--bs-primary) !important;
         box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
     }
     .icon-box i {
@@ -184,4 +196,125 @@
         background-color: rgba(25, 135, 84, 0.1) !important;
     }
 </style>
+@endsection
+
+@section('webLayoutScript')
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<script>
+// Global callback function invoked by Google when captcha is solved
+function onCaptchaVerified() {
+    const errEl = document.getElementById('err-g-recaptcha-response');
+    if (errEl) {
+        errEl.textContent = '';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const contactForm = document.getElementById('contactUsForm');
+    if (!contactForm) return;
+
+    // Automatically hide validation error messages when user types or updates data
+    contactForm.querySelectorAll('input, textarea').forEach(input => {
+        input.addEventListener('input', function() {
+            const fieldName = this.getAttribute('name');
+            if (fieldName) {
+                let errEl = document.getElementById('err-' + fieldName);
+                if (!errEl) {
+                    errEl = document.getElementById('err-' + fieldName.replace(/_/g, '-'));
+                }
+                if (errEl) {
+                    errEl.textContent = '';
+                }
+            }
+        });
+    });
+
+    contactForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        
+        const form = this;
+        const submitBtn = document.getElementById('contactSubmitBtn');
+        const formData = new FormData(form);
+        const csrfToken = form.querySelector('input[name="_token"]').value;
+
+        // Clear all previous errors
+        document.querySelectorAll('.error-feedback').forEach(el => el.textContent = '');
+
+
+
+        // Disable submit button
+        const originalBtnHtml = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Sending...';
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: formData
+        })
+        .then(response => {
+            if (response.status === 429) {
+                throw new Error('Too many requests. Maximum 5 contact submissions per hour.');
+            }
+            return response.json().then(data => {
+                if (!response.ok) {
+                    return Promise.reject({ status: response.status, data: data });
+                }
+                return data;
+            });
+        })
+        .then(data => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnHtml;
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Thank You!',
+                html: 'Your message has been received successfully.<br>Our team will contact you within 24 hours.',
+                confirmButtonColor: '#7367f0'
+            });
+            form.reset();
+            if (typeof grecaptcha !== 'undefined') {
+                grecaptcha.reset();
+            }
+        })
+        .catch(err => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnHtml;
+            if (typeof grecaptcha !== 'undefined') {
+                grecaptcha.reset();
+            }
+            
+            if (err.status === 422 && err.data && err.data.errors) {
+                console.log("Validation Errors Received:", err.data.errors);
+                // Populate specific validation errors below each input field
+                for (const [field, messages] of Object.entries(err.data.errors)) {
+                    let errEl = document.getElementById('err-' + field);
+                    if (!errEl) {
+                        // Support keys with dashes converted to underscores by Laravel
+                        errEl = document.getElementById('err-' + field.replace(/_/g, '-'));
+                    }
+                    if (errEl) {
+                        console.log("Setting error for field: " + field + " to: " + messages[0]);
+                        errEl.textContent = messages[0];
+                    } else {
+                        console.warn("No error element found for field: " + field);
+                    }
+                }
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: err.message || (err.data ? err.data.message : 'An error occurred. Please try again.'),
+                    confirmButtonColor: '#7367f0'
+                });
+            }
+        });
+    });
+});
+</script>
 @endsection

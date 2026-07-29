@@ -83,13 +83,22 @@
                     View Details
                 </a>
                 
-                <a href="{{ $hotel->affiliate_url ?? '#' }}" 
+                @if(isset($hotel->affiliate_link_id) && $hotel->affiliate_link_id)
+                <a href="{{ route('affiliate.redirect', ['type' => 'hotel', 'id' => $hotel->id]) }}" 
                    class="btn btn-secondary hotel-book-btn rounded-pill w-50 fw-bold shadow-sm d-flex align-items-center justify-content-center text-white px-1 py-2"
                    style="font-size: 0.8rem;"
                    onclick="event.stopPropagation();" 
                    target="_blank">
                     Book Now
                 </a>
+                @else
+                <button class="btn btn-secondary rounded-pill w-50 fw-bold shadow-sm d-flex align-items-center justify-content-center text-white px-1 py-2 disabled"
+                   style="font-size: 0.8rem; opacity: 0.55; cursor: not-allowed;"
+                   onclick="event.stopPropagation();" 
+                   disabled>
+                    Unavailable
+                </button>
+                @endif
             </div>
         </div>
     </div>
