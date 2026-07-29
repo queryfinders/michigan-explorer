@@ -65,29 +65,49 @@
 <meta property="article:author" content="{{ $blog->author->name }}">
 @endif
 <meta name="twitter:card" content="summary_large_image">
+@endsection
 
+@section('custom_schema')
+@if(!isset($blog->seo) || !$blog->seo->schema_markup)
 <!-- JSON-LD Schema -->
 <script type="application/ld+json">
 {
   "@@context": "https://schema.org",
-  "@@type": "Article",
-  "headline": "{{ $blog->title }}",
-  "image": "{{ $heroImage }}",
+  "@@type": "BlogPosting",
+  "@@id": "{{ $canonicalUrl }}#blogposting",
+  "mainEntityOfPage": {
+    "@@type": "WebPage",
+    "@@id": "{{ $canonicalUrl }}"
+  },
+  "headline": {!! json_encode($blog->title) !!},
+  "alternativeHeadline": {!! json_encode($blog->meta_title ?? $blog->title) !!},
+  "description": {!! json_encode($blog->excerpt ?? Str::limit(strip_tags($blog->content), 160)) !!},
   "author": {
     "@@type": "Person",
-    "name": "{{ $blog->author ? $blog->author->name : 'Michigan Explorer' }}"
+    "name": "{{ $blog->author ? $blog->author->name : 'Michigan Explorer' }}",
+    "url": "{{ $blog->author && $blog->author->facebook ? (Str::startsWith($blog->author->facebook, ['http://', 'https://']) ? $blog->author->facebook : 'https://' . $blog->author->facebook) : route('web.home') }}"
   },
   "publisher": {
     "@@type": "Organization",
     "name": "Michigan Explorer",
+    "url": "{{ route('web.home') }}",
     "logo": {
       "@@type": "ImageObject",
-      "url": "{{ asset('images/logo.png') }}"
+      "url": "{{ asset('images/logo.png') }}",
+      "width": 512,
+      "height": 512
     }
   },
-  "datePublished": "{{ $blog->published_at ?? $blog->created_at }}"
+  "datePublished": "{{ \Carbon\Carbon::parse($blog->published_at ?? $blog->created_at)->toIso8601String() }}",
+  "dateModified": "{{ \Carbon\Carbon::parse($blog->updated_at ?? $blog->created_at)->toIso8601String() }}",
+  "url": "{{ $canonicalUrl }}",
+  "articleSection": "{{ $blog->category ? $blog->category->name : 'Travel' }}",
+  "isAccessibleForFree": true,
+  "genre": "Blog"
 }
 </script>
+@endif
+
 <script type="application/ld+json">
 {
   "@@context": "https://schema.org",
@@ -110,6 +130,26 @@
   }]
 }
 </script>
+@if($blog->faqs && $blog->faqs->count() > 0)
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "FAQPage",
+  "mainEntity": [
+    @foreach($blog->faqs as $faq)
+    {
+      "@@type": "Question",
+      "name": {!! json_encode($faq->question) !!},
+      "acceptedAnswer": {
+        "@@type": "Answer",
+        "text": {!! json_encode(strip_tags($faq->answer)) !!}
+      }
+    }{{ !$loop->last ? ',' : '' }}
+    @endforeach
+  ]
+}
+</script>
+@endif
 @endsection
 
 @section('webLayoutContent')
@@ -133,8 +173,18 @@
                         <li class="breadcrumb-item"><a href="{{ route('web.home') }}" class="text-white text-decoration-none">Home</a></li>
                         <span class="mx-2 text-white-50">/</span>
                         <li class="breadcrumb-item"><a href="{{ route('web.blogs.index') }}" class="text-white text-decoration-none">Travel Guides</a></li>
+                        <span class="mx-2 text-white-50">/</span>
+                        <li class="breadcrumb-item active text-white" aria-current="page">{{ $blog->title }}</li>
                     </ol>
                 </nav>
+
+                @if($blog->category)
+                <div class="mb-3 fade-up-anim">
+                    <a href="{{ route('web.blogs.index') }}?category={{ $blog->category->slug }}" class="badge bg-primary text-white text-uppercase px-3 py-2 rounded-pill fw-bold text-decoration-none shadow-sm" style="font-size: 0.8rem; letter-spacing: 0.5px;">
+                        {{ $blog->category->name }}
+                    </a>
+                </div>
+                @endif
                 <h1 class="display-3 fw-bold text-white mb-4 editorial-title fade-up-anim auto-style-33">{{ $blog->title }}</h1>
                 
                 <div class="d-flex flex-wrap align-items-center justify-content-center text-white opacity-90 gap-4 fade-up-anim auto-style-34">

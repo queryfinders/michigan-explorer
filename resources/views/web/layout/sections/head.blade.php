@@ -21,6 +21,7 @@
         @yield('structured_data')
     @endif
 </script>
+@yield('custom_schema')
 @hasSection('seo_description')
     @yield('seo_description')
 @else

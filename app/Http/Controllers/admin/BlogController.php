@@ -70,6 +70,58 @@ class BlogController extends Controller
         $blog = Blog::create($data);
 
         $seoData = $request->only(['meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup']);
+        if (empty($seoData['schema_markup'])) {
+            $blogUrl = route('web.blogs.show', $blog->slug);
+            $heroImage = $blog->featured_image 
+                ? (Str::startsWith($blog->featured_image, ['http://', 'https://']) ? $blog->featured_image : asset($blog->featured_image))
+                : 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1600';
+
+            $schema = [
+                "@context" => "https://schema.org",
+                "@type" => "BlogPosting",
+                "@id" => $blogUrl . "#blogposting",
+                "mainEntityOfPage" => [
+                    "@type" => "WebPage",
+                    "@id" => $blogUrl
+                ],
+                "headline" => $blog->title,
+                "alternativeHeadline" => $request->input('meta_title') ?: $blog->title,
+                "description" => $request->input('meta_description') ?: Str::limit(strip_tags($blog->content), 160),
+                "image" => [
+                    "@type" => "ImageObject",
+                    "url" => $heroImage,
+                    "width" => 1200,
+                    "height" => 630
+                ],
+                "author" => [
+                    "@type" => "Person",
+                    "name" => $blog->author ? $blog->author->name : 'Michigan Explorer',
+                    "url" => $blog->author && $blog->author->facebook ? (Str::startsWith($blog->author->facebook, ['http://', 'https://']) ? $blog->author->facebook : 'https://' . $blog->author->facebook) : route('web.home')
+                ],
+                "publisher" => [
+                    "@type" => "Organization",
+                    "name" => "Michigan Explorer",
+                    "url" => route('web.home'),
+                    "logo" => [
+                        "@type" => "ImageObject",
+                        "url" => asset('images/logo.png'),
+                        "width" => 512,
+                        "height" => 512
+                    ]
+                ],
+                "datePublished" => \Carbon\Carbon::parse($blog->published_at ?? $blog->created_at)->toIso8601String(),
+                "dateModified" => \Carbon\Carbon::parse($blog->updated_at ?? $blog->created_at)->toIso8601String(),
+                "url" => $blogUrl,
+                "articleSection" => $blog->category ? $blog->category->name : 'Travel',
+                "keywords" => $blog->tags ? $blog->tags->pluck('name')->toArray() : [],
+                "wordCount" => str_word_count(strip_tags($blog->content)),
+                "inLanguage" => "en",
+                "isAccessibleForFree" => true,
+                "genre" => "Blog",
+                "articleBody" => strip_tags($blog->content)
+            ];
+            $seoData['schema_markup'] = json_encode($schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        }
         $blog->seo()->create($seoData);
 
         if ($request->has('tags')) {
@@ -164,6 +216,58 @@ class BlogController extends Controller
         $blog->update($data);
 
         $seoData = $request->only(['meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'schema_markup']);
+        if (empty($seoData['schema_markup'])) {
+            $blogUrl = route('web.blogs.show', $blog->slug);
+            $heroImage = $blog->featured_image 
+                ? (Str::startsWith($blog->featured_image, ['http://', 'https://']) ? $blog->featured_image : asset($blog->featured_image))
+                : 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1600';
+
+            $schema = [
+                "@context" => "https://schema.org",
+                "@type" => "BlogPosting",
+                "@id" => $blogUrl . "#blogposting",
+                "mainEntityOfPage" => [
+                    "@type" => "WebPage",
+                    "@id" => $blogUrl
+                ],
+                "headline" => $blog->title,
+                "alternativeHeadline" => $request->input('meta_title') ?: $blog->title,
+                "description" => $request->input('meta_description') ?: Str::limit(strip_tags($blog->content), 160),
+                "image" => [
+                    "@type" => "ImageObject",
+                    "url" => $heroImage,
+                    "width" => 1200,
+                    "height" => 630
+                ],
+                "author" => [
+                    "@type" => "Person",
+                    "name" => $blog->author ? $blog->author->name : 'Michigan Explorer',
+                    "url" => $blog->author && $blog->author->facebook ? (Str::startsWith($blog->author->facebook, ['http://', 'https://']) ? $blog->author->facebook : 'https://' . $blog->author->facebook) : route('web.home')
+                ],
+                "publisher" => [
+                    "@type" => "Organization",
+                    "name" => "Michigan Explorer",
+                    "url" => route('web.home'),
+                    "logo" => [
+                        "@type" => "ImageObject",
+                        "url" => asset('images/logo.png'),
+                        "width" => 512,
+                        "height" => 512
+                    ]
+                ],
+                "datePublished" => \Carbon\Carbon::parse($blog->published_at ?? $blog->created_at)->toIso8601String(),
+                "dateModified" => \Carbon\Carbon::parse($blog->updated_at ?? $blog->created_at)->toIso8601String(),
+                "url" => $blogUrl,
+                "articleSection" => $blog->category ? $blog->category->name : 'Travel',
+                "keywords" => $blog->tags ? $blog->tags->pluck('name')->toArray() : [],
+                "wordCount" => str_word_count(strip_tags($blog->content)),
+                "inLanguage" => "en",
+                "isAccessibleForFree" => true,
+                "genre" => "Blog",
+                "articleBody" => strip_tags($blog->content)
+            ];
+            $seoData['schema_markup'] = json_encode($schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        }
         if ($blog->seo) {
             $blog->seo->update($seoData);
         } else {

@@ -446,7 +446,7 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="addCategoryModalLabel"><i class="ti ti-circle-plus me-1 text-primary"></i>Add New Category</h5>
+        <h5 class="modal-title" id="addCategoryModalLabel"><i class="fas fa-plus-circle me-1 text-primary"></i>Add New Category</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -463,7 +463,7 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         <button type="button" class="btn btn-primary" onclick="saveNewCategory()">
-          <span id="saveCategoryBtnText"><i class="ti ti-circle-plus me-1"></i>Add Category</span>
+          <span id="saveCategoryBtnText"><i class="fas fa-plus-circle me-1"></i>Add Category</span>
           <span id="saveCategoryBtnSpinner" class="d-none"><span class="spinner-border spinner-border-sm me-1"></span>Saving...</span>
         </button>
       </div>
