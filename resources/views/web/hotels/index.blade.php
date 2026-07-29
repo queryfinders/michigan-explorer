@@ -62,7 +62,7 @@
 <section class="category-filter-bar-sticky py-4 border-bottom bg-white shadow-sm position-relative z-index-1">
     <div class="container">
         <div class="category-bar-inner d-flex flex-column align-items-start gap-2">
-            <h6 class="text-uppercase text-muted fw-bold small mb-0 tracking-wider text-nowrap">Browse by Category</h6>
+            <h6 class="text-uppercase text-muted fw-bold small mb-0 tracking-wider text-nowrap mt-2">Browse by Category</h6>
             <div class="category-filter-wrapper d-flex align-items-center flex-wrap gap-2">
                 
                 <a href="{{ route('web.hotels.index', ['scroll' => 1]) }}" class="category-pill {{ !isset($currentCategory) ? 'active' : '' }}">

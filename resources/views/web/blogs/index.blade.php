@@ -51,7 +51,7 @@
 <section class="category-filter-bar-sticky py-3 border-bottom bg-white shadow-sm transition-all" id="stickyFilterBar" style="z-index:1000; top: 78px;">
     <div class="container">
         <div class="category-bar-inner d-flex flex-column gap-2">
-            <h6 class="text-uppercase text-muted fw-bold small mb-0 tracking-wider text-nowrap mt-3 mb-1">Browse by Category</h6>
+            <h6 class="text-uppercase text-muted fw-bold small mb-0 tracking-wider text-nowrap mt-2">Browse by Category</h6>
             <div class="d-flex flex-column flex-xl-row align-items-xl-center justify-content-between gap-3 w-100" style="min-width: 0;">
                 <div class="category-filter-wrapper d-flex align-items-center flex-nowrap gap-1 overflow-x-auto hide-scrollbar flex-grow-1" style="max-width: 100%; min-width: 0;">
                     
@@ -91,7 +91,7 @@
                     @endif
 
                 </div>
-                <div class="d-flex justify-content-xl-end align-items-center flex-shrink-0 mb-1">
+                <div class="d-flex justify-content-xl-end align-items-center flex-shrink-0">
                     <div class="sort-tabs mt-3">
                         <span class="text-muted small fw-bold me-2 ms-2 d-none d-sm-inline">Sort:</span>
                         <a href="?sort=latest" class="sort-tab {{ $activeSort == 'latest' ? 'active' : '' }}">Latest</a>
