@@ -67,7 +67,7 @@
 </style>
 
 <!-- 1. Hero Banner -->
-<section class="hotel-listing-hero position-relative" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), url('{{ asset('images/attraction_nature_1783508280642.png') }}');">
+<section class="hotel-listing-hero position-relative" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), url('{{ isset($page) && $page->featured_image && !isset($currentCategory) ? asset($page->featured_image) : asset('images/attraction_nature_1783508280642.png') }}');">
     <div class="content">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb" class="mb-4">
@@ -81,10 +81,10 @@
         </nav>
 
         <h1 class="display-3 fw-bold text-white mb-3 auto-style-7">
-            {{ isset($currentCategory) ? $currentCategory->name . ' Events' : 'Upcoming Events' }}
+            {{ isset($currentCategory) ? $currentCategory->name . ' Events' : (isset($page) && $page->banner_title ? $page->banner_title : 'Upcoming Events') }}
         </h1>
         <p class="lead text-white opacity-75 mb-4">
-            {{ isset($currentCategory) ? 'Discover the best ' . strtolower($currentCategory->name) . ' happening near you.' : 'Discover concerts, festivals, workshops, and more happening across Michigan.' }}
+            {{ isset($currentCategory) ? 'Discover the best ' . strtolower($currentCategory->name) . ' happening near you.' : (isset($page) && $page->banner_subtitle ? $page->banner_subtitle : 'Discover concerts, festivals, workshops, and more happening across Michigan.') }}
         </p>
     </div>
 </section>

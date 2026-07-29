@@ -40,11 +40,11 @@
         <div class="tab-pane fade show active" id="content-pane" role="tabpanel" aria-labelledby="content-tab">
           <div class="mb-3">
             <label class="form-label" for="title">Title</label>
-            <input type="text" class="form-control" id="title" name="title" value="{{ $page->title }}" required />
+            <input type="text" class="form-control" id="title" name="title" value="{{ $page->title }}" placeholder="Enter page title" required />
           </div>
           <div class="mb-3">
             <label class="form-label" for="slug">Slug</label>
-            <input type="text" class="form-control" id="slug" name="slug" value="{{ $page->slug }}" required />
+            <input type="text" class="form-control" id="slug" name="slug" value="{{ $page->slug }}" placeholder="Enter page slug (e.g. about-us)" required />
           </div>
           {{-- 
           <div class="mb-3">
@@ -52,28 +52,21 @@
             <textarea class="form-control tinymce" id="content" name="content" rows="15">{{ $page->content }}</textarea>
           </div>
           --}}
-          <div class="mb-3">
-            <label class="form-label" for="status">Status</label>
-            <select class="form-select" id="status" name="status">
-              <option value="1" {{ $page->status == 1 ? 'selected' : '' }}>Active</option>
-              <option value="0" {{ $page->status == 0 ? 'selected' : '' }}>Inactive</option>
-            </select>
-          </div>
         </div>
 
         <!-- Tab 2: Hero Banner -->
         <div class="tab-pane fade" id="banner-pane" role="tabpanel" aria-labelledby="banner-tab">
           <div class="mb-3">
             <label class="form-label" for="banner_title">Banner Title</label>
-            <input type="text" class="form-control" id="banner_title" name="banner_title" value="{{ $page->banner_title }}" />
+            <input type="text" class="form-control" id="banner_title" name="banner_title" value="{{ $page->banner_title }}" placeholder="Enter banner title" />
           </div>
           <div class="mb-3">
             <label class="form-label" for="banner_subtitle">Banner Subtitle</label>
-            <textarea class="form-control" id="banner_subtitle" name="banner_subtitle" rows="3">{{ $page->banner_subtitle }}</textarea>
+            <textarea class="form-control" id="banner_subtitle" name="banner_subtitle" rows="3" placeholder="Enter banner subtitle">{{ $page->banner_subtitle }}</textarea>
           </div>
           <div class="mb-3">
             <label class="form-label" for="banner_button_text">Button Text</label>
-            <input type="text" class="form-control" id="banner_button_text" name="banner_button_text" value="{{ $page->banner_button_text }}" />
+            <input type="text" class="form-control" id="banner_button_text" name="banner_button_text" value="{{ $page->banner_button_text }}" placeholder="Enter button text (e.g. Explore Now)" />
           </div>
           <div class="mb-3">
             <label class="form-label" for="banner_button_link">Button Link</label>
@@ -98,23 +91,19 @@
         <div class="tab-pane fade" id="seo-pane" role="tabpanel" aria-labelledby="seo-tab">
           <div class="mb-3">
             <label class="form-label" for="meta_title">Meta Title</label>
-            <input type="text" class="form-control" id="meta_title" name="meta_title" value="{{ $page->seo->meta_title ?? '' }}" />
+            <input type="text" class="form-control" id="meta_title" name="meta_title" value="{{ $page->seo->meta_title ?? '' }}" placeholder="Enter meta title" />
           </div>
           <div class="mb-3">
-            <label class="form-label" for="meta_description">Meta Description</label>
-            <textarea class="form-control" id="meta_description" name="meta_description" rows="2">{{ $page->seo->meta_description ?? '' }}</textarea>
-          </div>
-          <div class="mb-3">
-            <label class="form-label" for="canonical_url">Canonical URL</label>
-            <input type="url" class="form-control" id="canonical_url" name="canonical_url" value="{{ $page->seo->canonical_url ?? '' }}" />
+            <label class="form-label" for="meta_description">Meta Description <span class="text-muted small ms-2 fw-normal" id="meta_desc_count">(0 / 160)</span></label>
+            <textarea class="form-control" id="meta_description" name="meta_description" rows="2" maxlength="160" placeholder="Enter meta description (max 160 characters)">{{ $page->seo->meta_description ?? '' }}</textarea>
           </div>
           <div class="mb-3">
             <label class="form-label" for="og_title">OG Title</label>
-            <input type="text" class="form-control" id="og_title" name="og_title" value="{{ $page->seo->og_title ?? '' }}" />
+            <input type="text" class="form-control" id="og_title" name="og_title" value="{{ $page->seo->og_title ?? '' }}" placeholder="Enter OG title" />
           </div>
           <div class="mb-3">
-            <label class="form-label" for="og_description">OG Description</label>
-            <textarea class="form-control" id="og_description" name="og_description" rows="2">{{ $page->seo->og_description ?? '' }}</textarea>
+            <label class="form-label" for="og_description">OG Description <span class="text-muted small ms-2 fw-normal" id="og_desc_count">(0 / 160)</span></label>
+            <textarea class="form-control" id="og_description" name="og_description" rows="2" maxlength="160" placeholder="Enter OG description (max 160 characters)">{{ $page->seo->og_description ?? '' }}</textarea>
           </div>
           <div class="mb-3">
             <label class="form-label" for="schema_markup">Schema Markup (JSON-LD) - <span class="text-info">Auto-generated</span></label>
@@ -148,6 +137,20 @@
         });
       }
     });
+
+    function updateCount(inputId, countId) {
+        const input = document.getElementById(inputId);
+        const count = document.getElementById(countId);
+        if (input && count) {
+            const update = () => {
+                count.textContent = `(${input.value.length} / 160)`;
+            };
+            input.addEventListener('input', update);
+            update(); // Init on load
+        }
+    }
+    updateCount('meta_description', 'meta_desc_count');
+    updateCount('og_description', 'og_desc_count');
   });
 </script>
 @endsection

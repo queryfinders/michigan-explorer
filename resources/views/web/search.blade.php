@@ -9,12 +9,12 @@
 
 @section('webLayoutContent')
 <!-- 1. PREMIUM HERO SECTION -->
-<section class="hero-premium position-relative" style="min-height: 70vh; padding-top: 100px; z-index: 10; overflow: visible !important;">
-    <div class="hero-bg-parallax position-absolute top-0 start-0 w-100 h-100 overflow-hidden" style="z-index: -1;">
+<section class="hero-premium position-relative" style="min-height: 70vh; padding-top: 100px; overflow: visible !important;">
+    <div class="hero-bg-parallax position-absolute start-0 w-100 overflow-hidden" style="top: 0; height: 100%;">
         <div class="hero-bg-zoom" role="img" aria-label="Michigan Explorer Search" style="background-image: url('{{ asset('images/hero_banner_1783508250640.png') }}');"></div>
     </div>
 
-    <div class="container position-relative z-index-1 text-white py-5">
+    <div class="container position-relative text-white py-5">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb" class="mb-3">
             <ol class="breadcrumb justify-content-center text-white opacity-75">
@@ -24,7 +24,8 @@
         </nav>
 
         <!-- Typography -->
-        <div class="text-center mb-4">
+        <div id="ajax-search-hero">
+            <div class="text-center mb-4">
             <h1 class="display-4 fw-bold mb-3 text-white font-heading text-shadow-md">Search Results</h1>
             @if($q)
                 <p class="lead fs-5 mx-auto text-shadow-sm">Showing results for: <span class="fw-bold text-warning">"{{ $q }}"</span></p>
@@ -82,6 +83,7 @@
                     </div>
                 </template>
             </div>
+        </div>
         </div>
     </div>
 </section>
@@ -476,9 +478,13 @@
                 const doc = parser.parseFromString(text, 'text/html');
                 
                 // Replace elements
+                const newHero = doc.getElementById('ajax-search-hero');
                 const newHeader = doc.getElementById('ajax-search-header');
                 const newResults = doc.getElementById('ajax-search-results');
                 
+                if (newHero && document.getElementById('ajax-search-hero')) {
+                    document.getElementById('ajax-search-hero').innerHTML = newHero.innerHTML;
+                }
                 if (newHeader && document.getElementById('ajax-search-header')) {
                     document.getElementById('ajax-search-header').innerHTML = newHeader.innerHTML;
                 }

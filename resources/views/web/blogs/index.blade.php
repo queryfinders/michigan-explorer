@@ -15,7 +15,7 @@
 
 @section('webLayoutContent')
 {{-- 1. HERO --}}
-<section class="blog-hero position-relative overflow-hidden" style="height:520px;padding-top:80px;background-image:linear-gradient(to bottom,rgba(0,0,0,0.25),rgba(0,0,0,0.82)),url('{{ asset('images/attraction_nature_1783508280642.png') }}');background-size:cover;background-position:center;background-attachment:fixed;">
+<section class="blog-hero position-relative overflow-hidden" style="height:520px;padding-top:80px;background-image:linear-gradient(to bottom,rgba(0,0,0,0.25),rgba(0,0,0,0.82)),url('{{ isset($page) && $page->featured_image ? asset($page->featured_image) : asset('images/attraction_nature_1783508280642.png') }}');background-size:cover;background-position:center;background-attachment:fixed;">
     <div class="container h-100 d-flex flex-column justify-content-center align-items-center text-center">
         <nav aria-label="breadcrumb" class="mb-3 slide-up-anim">
             <ol class="breadcrumb justify-content-center text-white opacity-75 small text-uppercase">
@@ -24,10 +24,10 @@
             </ol>
         </nav>
         <h1 class="display-3 fw-bold text-white mb-3 slide-up-anim">
-            Travel Guides &amp; Stories
+            {{ isset($page) && $page->banner_title ? $page->banner_title : 'Travel Guides & Stories' }}
         </h1>
         <p class="lead text-white mb-4 slide-up-anim" style="max-width:540px;opacity:0.9;">
-            Expert guides, hidden gems &amp; seasonal adventures across Michigan.
+            {{ isset($page) && $page->banner_subtitle ? $page->banner_subtitle : 'Expert guides, hidden gems & seasonal adventures across Michigan.' }}
         </p>
         <!-- <div class="hero-search-bar w-100 slide-up-anim" style="max-width:580px;">
             <form action="{{ route('web.blogs.index') }}" method="GET" role="search" class="d-flex w-100 align-items-center m-0">

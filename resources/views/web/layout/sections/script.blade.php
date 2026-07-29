@@ -100,8 +100,8 @@
                 if (this.activeIndex >= 0) {
                     e.preventDefault();
                     this.selectCurrent();
-                } else if (this.keyword.trim() === '') {
-                    // Prevent submission if search input is empty
+                } else if (this.keyword.trim() === '' && window.location.pathname !== '/search') {
+                    // Prevent submission if search input is empty, unless we are already on the search page
                     e.preventDefault();
                 }
             },
