@@ -100,6 +100,9 @@
                 if (this.activeIndex >= 0) {
                     e.preventDefault();
                     this.selectCurrent();
+                } else if (this.keyword.trim() === '') {
+                    // Prevent submission if search input is empty
+                    e.preventDefault();
                 }
             },
             

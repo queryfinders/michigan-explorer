@@ -27,6 +27,10 @@ class AffiliatePromotionController extends Controller
             $query->where('placement', $request->input('placement'));
         }
 
+        if ($request->has('status') && $request->input('status') !== '') {
+            $query->where('is_active', $request->input('status'));
+        }
+
         $promotions = $query->orderBy('priority', 'asc')
             ->orderBy('created_at', 'desc')
             ->paginate(10);

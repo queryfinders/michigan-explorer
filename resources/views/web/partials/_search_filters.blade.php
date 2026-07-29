@@ -175,15 +175,7 @@
             @php $first_filter = false; @endphp
             @endif
 
-            <!-- Featured Only -->
-            @if($tab != 'travel_guides')
-            <div class="mb-3">
-                <div class="form-check form-switch mt-2">
-                    <input class="form-check-input filter-checkbox" type="checkbox" name="featured" value="1" id="filter_featured" {{ request('featured') == '1' ? 'checked' : '' }}>
-                    <label class="form-check-label fw-bold text-muted" for="filter_featured">Featured Only</label>
-                </div>
-            </div>
-            @endif
+
             
             </div>
         </form>
@@ -200,32 +192,4 @@
     }
 </style>
 
-<script>
-    // Auto-submit form when checkboxes are clicked for instant filtering
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('searchFiltersForm');
-        
-        // Checkboxes & Radios auto-submit instantly
-        const checkboxes = document.querySelectorAll('.filter-checkbox');
-        checkboxes.forEach(function(checkbox) {
-            checkbox.addEventListener('change', function() {
-                form.submit();
-            });
-        });
 
-        // Price inputs auto-submit on blur (when user clicks away after typing)
-        const inputs = document.querySelectorAll('.filter-input');
-        inputs.forEach(function(input) {
-            input.addEventListener('change', function() {
-                form.submit();
-            });
-            // Also submit on Enter key press
-            input.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    form.submit();
-                }
-            });
-        });
-    });
-</script>

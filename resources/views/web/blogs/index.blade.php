@@ -110,53 +110,20 @@
         <div class="row g-5">
             <div class="col-lg-8">
 
-                @if($featuredBlog && !request()->has('category') && !request()->has('q') && request('page', 1) == 1 && request('sort', 'latest') == 'latest')
-                <div class="blog-featured-card mb-5">
-                    <div class="row g-0">
-                        <div class="col-md-6 overflow-hidden position-relative">
-                            <a href="{{ route('web.blogs.show', $featuredBlog->slug) }}" class="d-block h-100">
-                                <img src="{{ $featuredBlog->featured_image ? asset($featuredBlog->featured_image) : 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800' }}" loading="lazy" class="img-fluid h-100 w-100 object-fit-cover blog-img-zoom" alt="{{ $featuredBlog->title }}">
-                                <div class="featured-img-overlay"></div>
-                            </a>
-                            <div class="reading-time-badge"><i class="far fa-clock me-1"></i>{{ $featuredBlog->reading_time ?? ceil(str_word_count(strip_tags($featuredBlog->content)) / 200) }} min read</div>
-                        </div>
-                        <div class="col-md-6 p-4 p-lg-5 d-flex flex-column justify-content-center bg-white position-relative">
-                            <div class="position-absolute top-0 end-0 p-3"><div class="featured-star-badge" data-bs-toggle="tooltip" title="Featured Story"><i class="fas fa-star"></i></div></div>
-                            @if($featuredBlog->category)
-                            <a href="{{ route('web.blogs.category', $featuredBlog->category->slug) }}" class="blog-cat-badge mb-3 align-self-start">
-                                @if($featuredBlog->category->icon)<i class="{{ $featuredBlog->category->icon }} me-1"></i>@endif{{ $featuredBlog->category->name }}
-                            </a>
-                            @endif
-                            <h2 class="h3 fw-bold mb-3"><a href="{{ route('web.blogs.show', $featuredBlog->slug) }}" class="text-dark text-decoration-none hover-text-primary transition-all">{{ $featuredBlog->title }}</a></h2>
-                            <p class="text-muted mb-4 lh-lg">{{ $featuredBlog->excerpt ?? Str::limit(strip_tags($featuredBlog->content), 120) }}</p>
-                            <div class="d-flex align-items-center gap-3 text-muted small fw-bold mb-4">
-                                <span><i class="far fa-eye me-1 text-primary"></i>{{ number_format($featuredBlog->views ?? 0) }} views</span>
-                            </div>
-                            <div class="mt-auto d-flex align-items-center justify-content-between border-top pt-4">
-                                <div class="d-flex align-items-center gap-3">
-                                    <img src="{{ $featuredBlog->author && $featuredBlog->author->avatar ? asset($featuredBlog->author->avatar) : 'https://placehold.co/100' }}" class="rounded-circle shadow-sm border border-2 border-white object-fit-cover" style="width:42px;height:42px;" alt="Author">
-                                    <div>
-                                        <div class="fw-bold text-dark small">{{ $featuredBlog->author ? $featuredBlog->author->name : 'Admin' }}</div>
-                                        <div class="text-muted" style="font-size:.75rem;">{{ $featuredBlog->published_at ? \Carbon\Carbon::parse($featuredBlog->published_at)->format('M d, Y') : $featuredBlog->created_at->format('M d, Y') }}</div>
-                                    </div>
-                                </div>
-                                <a href="{{ route('web.blogs.show', $featuredBlog->slug) }}" class="btn-read-more" aria-label="Read article"><i class="fas fa-arrow-right"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @endif
 
                 <div class="row g-4">
                     @forelse($blogs as $blog)
-                        @if($featuredBlog && $blog->id == $featuredBlog->id && !request()->has('category') && !request()->has('q') && request('page', 1) == 1 && request('sort', 'latest') == 'latest')
-                            @continue
-                        @endif
                         <div class="col-md-6 fade-up-card">
                             <div class="blog-card h-100">
                                 <div class="blog-card-img-wrap position-relative overflow-hidden">
                                     <a href="{{ route('web.blogs.show', $blog->slug) }}">
-                                        <img src="{{ $blog->featured_image ? asset($blog->featured_image) : 'https://placehold.co/600x400/e9ecef/495057?text=No+Image' }}" loading="lazy" class="blog-card-img blog-img-zoom" alt="{{ $blog->title }}">
+                                        @if($blog->featured_image)
+                                            <img src="{{ asset($blog->featured_image) }}" loading="lazy" class="blog-card-img blog-img-zoom" alt="{{ $blog->title }}">
+                                        @else
+                                            <div class="blog-card-img blog-img-zoom d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #7367f0 0%, #ce93d8 100%);">
+                                                <i class="fas fa-compass text-white opacity-50" style="font-size: 3.5rem;"></i>
+                                            </div>
+                                        @endif
                                     </a>
                                 
                                     <div class="reading-time-badge"><i class="far fa-clock me-1"></i>{{ $blog->reading_time ?? ceil(str_word_count(strip_tags($blog->content)) / 200) }} min</div>
@@ -250,7 +217,13 @@
                             @foreach($mostViewedBlogs as $mvb)
                             <a href="{{ route('web.blogs.show', $mvb->slug) }}" class="sidebar-article-item">
                                 <div class="sidebar-rank">{{ $loop->index + 1 }}</div>
-                                <img src="{{ $mvb->featured_image ? asset($mvb->featured_image) : 'https://placehold.co/100' }}" loading="lazy" class="sidebar-article-img" alt="{{ $mvb->title }}">
+                                @if($mvb->featured_image)
+                                    <img src="{{ asset($mvb->featured_image) }}" loading="lazy" class="sidebar-article-img" alt="{{ $mvb->title }}">
+                                @else
+                                    <div class="sidebar-article-img d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #7367f0 0%, #ce93d8 100%);">
+                                        <i class="fas fa-compass text-white opacity-50" style="font-size: 1.2rem;"></i>
+                                    </div>
+                                @endif
                                 <div class="sidebar-article-info">
                                     <div class="sidebar-article-title">{{ Str::limit($mvb->title, 45) }}</div>
                                     <div class="sidebar-article-meta"><i class="far fa-eye me-1 text-primary"></i>{{ number_format($mvb->views ?? 0) }} Views</div>
@@ -267,7 +240,13 @@
                         <div class="sidebar-widget-body">
                             @foreach($recentBlogs as $rb)
                             <a href="{{ route('web.blogs.show', $rb->slug) }}" class="sidebar-article-item">
-                                <img src="{{ $rb->featured_image ? asset($rb->featured_image) : 'https://placehold.co/100' }}" loading="lazy" class="sidebar-article-img" alt="{{ $rb->title }}">
+                                @if($rb->featured_image)
+                                    <img src="{{ asset($rb->featured_image) }}" loading="lazy" class="sidebar-article-img" alt="{{ $rb->title }}">
+                                @else
+                                    <div class="sidebar-article-img d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #7367f0 0%, #ce93d8 100%);">
+                                        <i class="fas fa-compass text-white opacity-50" style="font-size: 1.2rem;"></i>
+                                    </div>
+                                @endif
                                 <div class="sidebar-article-info">
                                     <div class="sidebar-article-title">{{ Str::limit($rb->title, 45) }}</div>
                                     <div class="sidebar-article-meta"><i class="far fa-calendar-alt me-1 text-primary"></i>{{ $rb->published_at ? \Carbon\Carbon::parse($rb->published_at)->format('M d, Y') : $rb->created_at->format('M d, Y') }}</div>

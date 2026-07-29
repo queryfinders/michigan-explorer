@@ -71,22 +71,24 @@
 @if(isset($recommendations) && $recommendations->isNotEmpty())
     <div class="mt-5">
         <h4 class="fw-bold mb-4 border-bottom pb-2">Recommended {{ ucfirst($tabName) }}</h4>
-        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4">
+        <div class="recommendations-scroll-container" style="max-height: 900px; overflow-y: auto; overflow-x: hidden; padding-right: 10px;">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             @foreach($recommendations as $item)
                 <div class="col">
                     @if($tab == 'hotels')
-                        @include('web.partials.cards._hotel_card', ['hotel' => $item])
+                        <x-hotel-card :hotel="$item" :featured="false" />
                     @elseif($tab == 'restaurants')
-                        @include('web.partials.cards._restaurant_card', ['restaurant' => $item])
+                        <x-restaurant-card :restaurant="$item" :featured="false" />
                     @elseif($tab == 'attractions')
-                        @include('web.partials.cards._attraction_card', ['attraction' => $item])
+                        <x-attraction-card :attraction="$item" :featured="false" />
                     @elseif($tab == 'events')
-                        @include('web.partials.cards._event_card', ['event' => $item])
+                        <x-event-card :event="$item" />
                     @elseif($tab == 'travel_guides')
-                        @include('web.partials.cards._blog_card', ['blog' => $item])
+                        <x-blog-card :blog="$item" />
                     @endif
                 </div>
             @endforeach
+            </div>
         </div>
     </div>
 @endif

@@ -164,12 +164,16 @@ class SearchController extends Controller
             return redirect()->route('web.search');
         }
 
-        // Retrieve search parameters from session
         $searchParams = session('last_search_params', []);
         $request->merge($searchParams);
 
         $q   = $request->input('keyword') ?? $request->input('q');
         $tab = $request->input('tab', 'all');
+
+        // Normalize keyword into 'q' so all sub-queries catch it properly
+        if ($q) {
+            $request->merge(['q' => $q]);
+        }
 
         // Log the search keyword for analytics; increment if it already exists
         if ($q) {
@@ -461,23 +465,23 @@ class SearchController extends Controller
     {
         switch ($tab) {
             case 'hotels':
-                $recs = Hotel::with(['category'])->where('status', 1)->where('is_featured', 1)->inRandomOrder()->take(4)->get();
-                return $recs->isEmpty() ? Hotel::with(['category'])->where('status', 1)->latest()->take(4)->get() : $recs;
+                $recs = Hotel::with(['category'])->where('status', 1)->where('is_featured', 1)->inRandomOrder()->take(12)->get();
+                return $recs->isEmpty() ? Hotel::with(['category'])->where('status', 1)->latest()->take(12)->get() : $recs;
 
             case 'restaurants':
-                $recs = Restaurant::with(['category'])->where('status', 1)->where('is_featured', 1)->inRandomOrder()->take(4)->get();
-                return $recs->isEmpty() ? Restaurant::with(['category'])->where('status', 1)->latest()->take(4)->get() : $recs;
+                $recs = Restaurant::with(['category'])->where('status', 1)->where('is_featured', 1)->inRandomOrder()->take(12)->get();
+                return $recs->isEmpty() ? Restaurant::with(['category'])->where('status', 1)->latest()->take(12)->get() : $recs;
 
             case 'attractions':
-                $recs = Attraction::with(['category'])->where('status', 1)->where('is_featured', 1)->inRandomOrder()->take(4)->get();
-                return $recs->isEmpty() ? Attraction::with(['category'])->where('status', 1)->latest()->take(4)->get() : $recs;
+                $recs = Attraction::with(['category'])->where('status', 1)->where('is_featured', 1)->inRandomOrder()->take(12)->get();
+                return $recs->isEmpty() ? Attraction::with(['category'])->where('status', 1)->latest()->take(12)->get() : $recs;
 
             case 'events':
-                $recs = Event::with(['category'])->where('status', 1)->where('start_date', '>=', now())->orderBy('start_date', 'asc')->take(4)->get();
-                return $recs->isEmpty() ? Event::with(['category'])->where('status', 1)->latest()->take(4)->get() : $recs;
+                $recs = Event::with(['category'])->where('status', 1)->where('start_date', '>=', now())->orderBy('start_date', 'asc')->take(12)->get();
+                return $recs->isEmpty() ? Event::with(['category'])->where('status', 1)->latest()->take(12)->get() : $recs;
 
             case 'travel_guides':
-                return Blog::with(['category'])->where('status', 'published')->latest()->take(4)->get();
+                return Blog::with(['category'])->where('status', 'published')->latest('published_at')->take(12)->get();
 
             default:
                 return collect();

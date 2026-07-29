@@ -98,7 +98,7 @@
       <div class="col-lg-3 col-md-12 col-12">
         <label class="form-label d-none d-lg-block">&nbsp;</label>
         <div class="d-flex gap-2">
-          <button type="submit" class="btn btn-primary flex-grow-1" style="height: 38px;">Filter</button>
+          <button type="submit" class="btn btn-warning text-white flex-grow-1" style="height: 38px;">Filter</button>
           <a href="{{ route('subscribers.index') }}" class="btn btn-label-secondary d-flex align-items-center justify-content-center" style="height: 38px; min-width: 80px;">Reset</a>
         </div>
       </div>

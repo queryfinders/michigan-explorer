@@ -628,18 +628,21 @@
 }
 
 .toc-nav a {
+    display: block;
     font-size: 0.88rem;
     color: #64748b;
     text-decoration: none;
     transition: all 0.2s ease;
     border-left: 2px solid #e2e8f0;
     padding-left: 12px;
+    margin-bottom: 8px;
 }
 .toc-nav a:hover, .toc-nav a.active {
     color: var(--primary-color) !important;
     border-left-color: var(--primary-color);
-    font-weight: 600;
     padding-left: 16px;
+    background: rgba(115,103,240,0.05);
+    border-radius: 0 4px 4px 0;
 }
 
 /* FAQ Accordion Premium styling */

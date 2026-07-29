@@ -3081,3 +3081,44 @@ font-size: 0.85rem;
     margin-top: 0 !important;
 }
 
+/* Search Results Header Layout */
+.search-results-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+@media (min-width: 1200px) {
+    .search-results-header {
+        flex-direction: row;
+        align-items: center;
+    }
+}
+.search-results-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+@media (min-width: 1200px) {
+    .search-results-actions {
+        width: auto;
+        margin-top: 0;
+        justify-content: flex-end;
+    }
+}
+.search-category-pills {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    margin-bottom: 0;
+    padding-bottom: 0.25rem;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.search-category-pills::-webkit-scrollbar {
+    display: none;
+}

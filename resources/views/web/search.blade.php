@@ -87,65 +87,67 @@
 </section>
 
 <!-- 2. GLOBAL SEARCH SUMMARY & TABS -->
-<section class="py-4 border-bottom bg-white shadow-sm position-sticky z-index-1" style="top: 70px; z-index: 1020;">
+<section class="py-2 border-bottom bg-white shadow-sm position-sticky z-index-1" style="top: 70px; z-index: 1020;" id="ajax-search-header-container">
     <div class="container">
-        
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3">
-            <div>
+        <div class="search-results-header" id="ajax-search-header">
+            <div class="search-results-title">
                 <h4 class="fw-bold mb-1">{{ $counts['all'] }} Results Found</h4>
                 @if($tab != 'all')
                     @php $tabDisplayName = ucfirst(str_replace('_', ' ', $tab)); @endphp
-                    <p class="text-muted small mb-0">Showing {{ $results->firstItem() ?? 0 }}–{{ $results->lastItem() ?? 0 }} of {{ $results->total() ?? 0 }} {{ $tabDisplayName }}</p>
+                    <p class="text-muted small mb-0 lh-1 mt-1">Showing {{ $results->firstItem() ?? 0 }}–{{ $results->lastItem() ?? 0 }} of {{ $results->total() ?? 0 }} {{ $tabDisplayName }}</p>
                 @endif
             </div>
-            @if($tab != 'all')
-            <!-- Mobile Filter Toggle -->
-            <button class="btn btn-outline-primary d-lg-none mt-3 mt-md-0 rounded-pill px-4" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileFiltersOffcanvas">
-                <i class="fas fa-filter me-2"></i> Filters
-            </button>
-            @endif
-        </div>
+            
+            <div class="search-results-actions">
+                <!-- Tabs -->
+                <ul class="nav nav-pills custom-pills search-category-pills hide-scrollbar pb-2 pb-xl-0">
+                    <li class="nav-item me-2">
+                        <a class="nav-link rounded-pill px-4 {{ $tab == 'all' ? 'active shadow-sm' : 'bg-light text-dark' }}" href="{{ request()->fullUrlWithQuery(['tab' => 'all', 'page' => null]) }}">
+                            All <span class="badge bg-{{ $tab == 'all' ? 'white text-primary' : 'secondary text-white' }} ms-1 rounded-pill">{{ $counts['all'] }}</span>
+                        </a>
+                    </li>
+                    <li class="nav-item me-2">
+                        <a class="nav-link rounded-pill px-4 {{ $tab == 'hotels' ? 'active shadow-sm' : 'bg-light text-dark' }}" href="{{ request()->fullUrlWithQuery(['tab' => 'hotels', 'page' => null]) }}">
+                            Hotels <span class="badge bg-{{ $tab == 'hotels' ? 'white text-primary' : 'secondary text-white' }} ms-1 rounded-pill">{{ $counts['hotels'] }}</span>
+                        </a>
+                    </li>
+                    <li class="nav-item me-2">
+                        <a class="nav-link rounded-pill px-4 {{ $tab == 'restaurants' ? 'active shadow-sm' : 'bg-light text-dark' }}" href="{{ request()->fullUrlWithQuery(['tab' => 'restaurants', 'page' => null]) }}">
+                            Restaurants <span class="badge bg-{{ $tab == 'restaurants' ? 'white text-primary' : 'secondary text-white' }} ms-1 rounded-pill">{{ $counts['restaurants'] }}</span>
+                        </a>
+                    </li>
+                    <li class="nav-item me-2">
+                        <a class="nav-link rounded-pill px-4 {{ $tab == 'attractions' ? 'active shadow-sm' : 'bg-light text-dark' }}" href="{{ request()->fullUrlWithQuery(['tab' => 'attractions', 'page' => null]) }}">
+                            Attractions <span class="badge bg-{{ $tab == 'attractions' ? 'white text-primary' : 'secondary text-white' }} ms-1 rounded-pill">{{ $counts['attractions'] }}</span>
+                        </a>
+                    </li>
+                    <li class="nav-item me-2">
+                        <a class="nav-link rounded-pill px-4 {{ $tab == 'events' ? 'active shadow-sm' : 'bg-light text-dark' }}" href="{{ request()->fullUrlWithQuery(['tab' => 'events', 'page' => null]) }}">
+                            Events <span class="badge bg-{{ $tab == 'events' ? 'white text-primary' : 'secondary text-white' }} ms-1 rounded-pill">{{ $counts['events'] }}</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link rounded-pill px-4 {{ $tab == 'travel_guides' ? 'active shadow-sm' : 'bg-light text-dark' }}" href="{{ request()->fullUrlWithQuery(['tab' => 'travel_guides', 'page' => null]) }}">
+                            Travel Guides <span class="badge bg-{{ $tab == 'travel_guides' ? 'white text-primary' : 'secondary text-white' }} ms-1 rounded-pill">{{ $counts['blogs'] }}</span>
+                        </a>
+                    </li>
+                </ul>
 
-        <!-- Tabs -->
-        <ul class="nav nav-pills custom-pills flex-nowrap overflow-auto hide-scrollbar pb-2" style="white-space: nowrap;">
-            <li class="nav-item me-2">
-                <a class="nav-link rounded-pill px-4 {{ $tab == 'all' ? 'active shadow-sm' : 'bg-light text-dark' }}" href="{{ request()->fullUrlWithQuery(['tab' => 'all', 'page' => null]) }}">
-                    All <span class="badge bg-{{ $tab == 'all' ? 'white text-primary' : 'secondary text-white' }} ms-1 rounded-pill">{{ $counts['all'] }}</span>
-                </a>
-            </li>
-            <li class="nav-item me-2">
-                <a class="nav-link rounded-pill px-4 {{ $tab == 'hotels' ? 'active shadow-sm' : 'bg-light text-dark' }}" href="{{ request()->fullUrlWithQuery(['tab' => 'hotels', 'page' => null]) }}">
-                    Hotels <span class="badge bg-{{ $tab == 'hotels' ? 'white text-primary' : 'secondary text-white' }} ms-1 rounded-pill">{{ $counts['hotels'] }}</span>
-                </a>
-            </li>
-            <li class="nav-item me-2">
-                <a class="nav-link rounded-pill px-4 {{ $tab == 'restaurants' ? 'active shadow-sm' : 'bg-light text-dark' }}" href="{{ request()->fullUrlWithQuery(['tab' => 'restaurants', 'page' => null]) }}">
-                    Restaurants <span class="badge bg-{{ $tab == 'restaurants' ? 'white text-primary' : 'secondary text-white' }} ms-1 rounded-pill">{{ $counts['restaurants'] }}</span>
-                </a>
-            </li>
-            <li class="nav-item me-2">
-                <a class="nav-link rounded-pill px-4 {{ $tab == 'attractions' ? 'active shadow-sm' : 'bg-light text-dark' }}" href="{{ request()->fullUrlWithQuery(['tab' => 'attractions', 'page' => null]) }}">
-                    Attractions <span class="badge bg-{{ $tab == 'attractions' ? 'white text-primary' : 'secondary text-white' }} ms-1 rounded-pill">{{ $counts['attractions'] }}</span>
-                </a>
-            </li>
-            <li class="nav-item me-2">
-                <a class="nav-link rounded-pill px-4 {{ $tab == 'events' ? 'active shadow-sm' : 'bg-light text-dark' }}" href="{{ request()->fullUrlWithQuery(['tab' => 'events', 'page' => null]) }}">
-                    Events <span class="badge bg-{{ $tab == 'events' ? 'white text-primary' : 'secondary text-white' }} ms-1 rounded-pill">{{ $counts['events'] }}</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link rounded-pill px-4 {{ $tab == 'travel_guides' ? 'active shadow-sm' : 'bg-light text-dark' }}" href="{{ request()->fullUrlWithQuery(['tab' => 'travel_guides', 'page' => null]) }}">
-                    Travel Guides <span class="badge bg-{{ $tab == 'travel_guides' ? 'white text-primary' : 'secondary text-white' }} ms-1 rounded-pill">{{ $counts['blogs'] }}</span>
-                </a>
-            </li>
-        </ul>
+                @if($tab != 'all')
+                <!-- Mobile Filter Toggle -->
+                <button class="btn btn-outline-primary d-lg-none rounded-pill px-3 py-1 ms-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileFiltersOffcanvas">
+                    <i class="fas fa-filter"></i>
+                </button>
+                @endif
+            </div>
+        </div>
     </div>
 </section>
 
 <!-- 3. MAIN CONTENT -->
 <section class="py-5 bg-light-gray min-vh-50">
-    <div class="container">
-        <div class="row">
+    <div class="container" id="ajax-search-results-container">
+        <div class="row" id="ajax-search-results">
             
             <!-- LEFT SIDEBAR FILTERS (Only show if not "all") -->
             @if($tab != 'all')
@@ -376,10 +378,142 @@
                         </div>
                     @endif
                 @endif
-                
-            </div>
-        </div>
-    </div>
+            </div> <!-- End col-lg -->
+        </div> <!-- End row #ajax-search-results -->
+    </div> <!-- End container #ajax-search-results-container -->
 </section>
 
+@endsection
+
+@section('webLayoutScript')
+<script>
+    // AJAX Search Filtering (Vanilla JS)
+    document.addEventListener('DOMContentLoaded', function() {
+        const attachAjaxHandlers = () => {
+            // Handle form submission (checkboxes, inputs)
+            const form = document.getElementById('searchFiltersForm');
+            if (form) {
+                // Remove any existing event listeners by cloning
+                const newForm = form.cloneNode(true);
+                form.parentNode.replaceChild(newForm, form);
+                
+                // Add submit event listener
+                newForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // Filter out empty values for a cleaner URL
+                    const formData = new FormData(newForm);
+                    const params = new URLSearchParams();
+                    for (const [key, value] of formData.entries()) {
+                        if (value !== '' && value !== null) {
+                            params.append(key, value);
+                        }
+                    }
+                    
+                    fetchAndUpdate(new URL(newForm.action + '?' + params.toString()));
+                });
+
+                // Checkboxes auto-submit
+                const checkboxes = newForm.querySelectorAll('.filter-checkbox');
+                checkboxes.forEach(function(checkbox) {
+                    checkbox.addEventListener('change', function() {
+                        newForm.dispatchEvent(new Event('submit', { cancelable: true }));
+                    });
+                });
+
+                // Price inputs auto-submit
+                const inputs = newForm.querySelectorAll('.filter-input');
+                inputs.forEach(function(input) {
+                    input.addEventListener('change', function() {
+                        newForm.dispatchEvent(new Event('submit', { cancelable: true }));
+                    });
+                    input.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            newForm.dispatchEvent(new Event('submit', { cancelable: true }));
+                        }
+                    });
+                });
+            }
+
+            // Handle Tab clicks, Pagination links, Clear Filter links
+            const ajaxLinks = document.querySelectorAll('#ajax-search-header a, #ajax-search-results a.page-link, #ajax-search-results a.text-muted, #ajax-search-results a.text-danger');
+            ajaxLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Make sure it's a relative/internal link for search
+                    if (this.href && this.href.includes('/search')) {
+                        e.preventDefault();
+                        fetchAndUpdate(new URL(this.href));
+                    }
+                });
+            });
+        };
+
+        const fetchAndUpdate = async (url) => {
+            // Show loading state
+            const resultsContainer = document.getElementById('ajax-search-results');
+            if (resultsContainer) {
+                resultsContainer.style.opacity = '0.5';
+                resultsContainer.style.pointerEvents = 'none';
+            }
+
+            try {
+                // Keep URL clean, only show the path (e.g., /search)
+                window.history.pushState({}, '', window.location.pathname);
+
+                // Fetch new page
+                const response = await fetch(url, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Network response was not ok');
+                const text = await response.text();
+                
+                // Parse the HTML
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(text, 'text/html');
+                
+                // Replace elements
+                const newHeader = doc.getElementById('ajax-search-header');
+                const newResults = doc.getElementById('ajax-search-results');
+                
+                if (newHeader && document.getElementById('ajax-search-header')) {
+                    document.getElementById('ajax-search-header').innerHTML = newHeader.innerHTML;
+                }
+                if (newResults && resultsContainer) {
+                    resultsContainer.innerHTML = newResults.innerHTML;
+                    resultsContainer.style.opacity = '1';
+                    resultsContainer.style.pointerEvents = 'auto';
+                }
+
+                // Re-attach handlers to newly loaded DOM elements
+                attachAjaxHandlers();
+
+                // Re-initialize any bootstrap components (dropdowns, tooltips) if needed
+                // Optionally scroll to top of results
+                window.scrollTo({
+                    top: document.getElementById('ajax-search-header-container').offsetTop - 20,
+                    behavior: 'smooth'
+                });
+                
+            } catch (error) {
+                console.error('Error fetching search results:', error);
+                // Fallback to normal page load on error
+                window.location.href = url;
+            }
+        };
+
+        // Handle browser back/forward buttons
+        window.addEventListener('popstate', function() {
+            // Since we aren't tracking URL state anymore to keep it clean, 
+            // a back navigation should probably just reload the page to be safe
+            window.location.reload();
+        });
+
+        // Initial setup
+        attachAjaxHandlers();
+    });
+</script>
 @endsection
