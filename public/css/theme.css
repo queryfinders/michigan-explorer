@@ -1747,6 +1747,9 @@ padding-bottom: 80px;
     scrollbar-width: none; /* Firefox */
     flex-wrap: nowrap !important;
 }
+.category-filter-wrapper {
+    padding: 6px 15px 6px 0;
+}
 .category-filter-wrapper::-webkit-scrollbar {
     display: none; /* Chrome/Safari */
 }
@@ -2878,6 +2881,8 @@ font-size: 0.85rem;
     align-items: flex-start;
     gap: 0.5rem;
     transition: all 0.25s ease;
+    width: 100%;
+    min-width: 0;
 }
 
 .category-filter-bar-sticky.is-sticky,
@@ -2887,11 +2892,15 @@ font-size: 0.85rem;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.10) !important;
 }
 
-.category-filter-bar-sticky.is-sticky .category-bar-inner,
-.category-filter-bar-sticky.pills-collapsed .category-bar-inner {
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 1rem !important;
+@media (min-width: 1200px) {
+    .category-filter-bar-sticky.is-sticky .category-bar-inner,
+    .category-filter-bar-sticky.pills-collapsed .category-bar-inner {
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 1rem !important;
+        width: 100% !important;
+        min-width: 0 !important;
+    }
 }
 
 /* Smooth hide/show of pills during collapse */
