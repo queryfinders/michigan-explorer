@@ -335,7 +335,7 @@
 .filter-pill-clear { background:#fff3f3;color:#ea5455;border-color:#f5c6c6; }
 .filter-pill-clear:hover { background:#ea5455;color:#fff;border-color:#ea5455; }
 .filter-count { display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.35);width:18px;height:18px;border-radius:50%;font-size:.7rem;font-weight:700;margin-left:4px; }
-.sort-tabs { display:inline-flex;align-items:center;background:#f0f0f5;border-radius:50px;padding:6px;border:1px solid #e5e5ef; max-width: 100%; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; -ms-overflow-style: none; scrollbar-width: none; }
+.sort-tabs { display:inline-flex;align-items:center;background:#f0f0f5;border-radius:50px;padding:5px;border:1px solid #e5e5ef; max-width: 100%; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; -ms-overflow-style: none; scrollbar-width: none; }
 .sort-tabs::-webkit-scrollbar { display: none; }
 .sort-tab { padding:5px 16px;border-radius:50px;font-size:.82rem;font-weight:600;color:#888;text-decoration:none;transition:all .2s; flex-shrink: 0; }
 .sort-tab:hover { color:#0d6efd; }
