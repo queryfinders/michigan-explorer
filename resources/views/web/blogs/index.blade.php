@@ -52,8 +52,8 @@
     <div class="container">
         <div class="category-bar-inner d-flex flex-column gap-2">
             <h6 class="text-uppercase text-muted fw-bold small mb-0 tracking-wider text-nowrap">Browse by Category</h6>
-            <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 w-100">
-                <div class="category-filter-wrapper d-flex align-items-center flex-nowrap gap-1 overflow-x-auto hide-scrollbar flex-grow-1" style="max-width: 100%;">
+            <div class="d-flex flex-column flex-xl-row align-items-xl-center justify-content-between gap-3 w-100" style="min-width: 0;">
+                <div class="category-filter-wrapper d-flex align-items-center flex-nowrap gap-1 overflow-x-auto hide-scrollbar flex-grow-1" style="max-width: 100%; min-width: 0;">
                     
                     <a href="{{ route('web.blogs.index') }}" class="category-pill {{ !$activeCategory ? 'active' : '' }}">
                         <span class="cat-name">All Articles</span>
@@ -91,8 +91,8 @@
                     @endif
 
                 </div>
-                <div class="d-flex justify-content-lg-end align-items-center flex-shrink-0">
-                    <div class="sort-tabs">
+                <div class="d-flex justify-content-xl-end align-items-center flex-shrink-0">
+                    <div class="sort-tabs mt-2">
                         <span class="text-muted small fw-bold me-2 ms-2 d-none d-sm-inline">Sort:</span>
                         <a href="?sort=latest" class="sort-tab {{ $activeSort == 'latest' ? 'active' : '' }}">Latest</a>
                         <a href="?sort=popular" class="sort-tab {{ $activeSort == 'popular' ? 'active' : '' }}">Popular</a>
@@ -335,10 +335,14 @@
 .filter-pill-clear { background:#fff3f3;color:#ea5455;border-color:#f5c6c6; }
 .filter-pill-clear:hover { background:#ea5455;color:#fff;border-color:#ea5455; }
 .filter-count { display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.35);width:18px;height:18px;border-radius:50%;font-size:.7rem;font-weight:700;margin-left:4px; }
-.sort-tabs { display:inline-flex;align-items:center;background:#f0f0f5;border-radius:50px;padding:4px;border:1px solid #e5e5ef; }
-.sort-tab { padding:5px 16px;border-radius:50px;font-size:.82rem;font-weight:600;color:#888;text-decoration:none;transition:all .2s; }
+.sort-tabs { display:inline-flex;align-items:center;background:#f0f0f5;border-radius:50px;padding:4px;border:1px solid #e5e5ef; max-width: 100%; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; -ms-overflow-style: none; scrollbar-width: none; }
+.sort-tabs::-webkit-scrollbar { display: none; }
+.sort-tab { padding:5px 16px;border-radius:50px;font-size:.82rem;font-weight:600;color:#888;text-decoration:none;transition:all .2s; flex-shrink: 0; }
 .sort-tab:hover { color:#0d6efd; }
 .sort-tab.active { background:#fff;color:#0d6efd;box-shadow:0 2px 8px rgba(13,110,253,.18); }
+@media (max-width: 576px) {
+    .sort-tab { padding: 5px 12px; font-size: 0.78rem; }
+}
 .blog-img-zoom { transition:transform .55s cubic-bezier(.4,0,.2,1); }
 .blog-featured-card:hover .blog-img-zoom,.blog-card:hover .blog-img-zoom { transform:scale(1.06); }
 .reading-time-badge { position:absolute;bottom:12px;left:12px;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);color:#fff;font-size:.75rem;font-weight:600;padding:4px 12px;border-radius:50px;display:flex;align-items:center; }
