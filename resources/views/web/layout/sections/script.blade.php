@@ -236,15 +236,24 @@ function shareCurrentPage(title) {
         const rect = categoryBar.getBoundingClientRect();
         const isStuck = rect.top <= 80 && window.scrollY > 50;
         const w = window.innerWidth;
+        const wrapper = categoryBar.querySelector('.category-filter-wrapper');
 
-        // Calculate max visible regular pills so More... button NEVER overflows on any screen size
-        let maxPills = 7;
+        // First reset all to default visible state to calculate correct client/scroll dimensions
+        regularPills.forEach(function(pill) {
+            pill.style.display = '';
+        });
+        if (morePill) {
+            morePill.style.display = 'none';
+        }
+
+        // Calculate initial max visible regular pills based on screen size
+        let maxPills = regularPills.length;
         if (w < 576) {
             maxPills = 2;
         } else if (w < 768) {
             maxPills = 3;
         } else if (w < 992) {
-            maxPills = 6;
+            maxPills = 5;
         } else if (w < 1200) {
             maxPills = 6;
         }
@@ -253,9 +262,29 @@ function shareCurrentPage(title) {
             maxPills = isEventsPage ? 6 : Math.min(maxPills, 6);
         }
 
+        // Apply initial hidden state
+        let hasHiddenPills = false;
         regularPills.forEach(function(pill, i) {
-            pill.style.display = (i >= maxPills) ? 'none' : '';
+            if (i >= maxPills) {
+                pill.style.display = 'none';
+                hasHiddenPills = true;
+            }
         });
+
+        // Dynamically collapse pills if they still overflow the wrapper container (e.g. on laptop screens)
+        if (wrapper && morePill) {
+            if (hasHiddenPills || regularPills.length > 4) {
+                morePill.style.display = '';
+            }
+
+            // Keep hiding pills one by one from the end until there is no horizontal overflow
+            while (wrapper.scrollWidth > wrapper.clientWidth && maxPills > 2) {
+                maxPills--;
+                hasHiddenPills = true;
+                regularPills[maxPills].style.display = 'none';
+                morePill.style.display = '';
+            }
+        }
 
         if (isStuck) {
             categoryBar.classList.add('is-sticky', 'pills-collapsed');

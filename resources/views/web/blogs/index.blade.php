@@ -77,11 +77,9 @@
                     </a>
                     @endforeach
 
-                    @if($categories->count() > 4)
                     <a href="#" class="category-pill bg-light more-pill" data-bs-toggle="modal" data-bs-target="#categoriesModal">
                         <span class="cat-name">More...</span>
                     </a>
-                    @endif
 
                     @if(request('q'))
                     <a href="{{ route('web.blogs.index', array_merge(request()->except('q'), ['category' => 'all'])) }}" class="category-pill active bg-danger border-danger text-white">
@@ -89,7 +87,6 @@
                         <span class="cat-count bg-white text-danger px-2"><i class="fas fa-times"></i></span>
                     </a>
                     @endif
-
                 </div>
                 <div class="d-flex justify-content-xl-end align-items-center flex-shrink-0">
                     <div class="sort-tabs mt-2">
