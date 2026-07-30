@@ -5,12 +5,20 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\RestaurantFeature;
+use App\Traits\Sortable;
 
 class FeatureController extends Controller
 {
-    public function index()
+    use Sortable;
+    public function index(Request $request)
     {
-        $features = RestaurantFeature::orderBy('sort_order')->orderBy('created_at', 'desc')->paginate(10);
+        $query = RestaurantFeature::query();
+        $query = $this->applySorting($query, ['id', 'name', 'slug', 'sort_order', 'status', 'created_at'], 'sort_order', 'asc');
+        $features = $query->paginate(10);
+        
+        if ($request->ajax()) {
+            return view('new_content.admin.features._table', compact('features'))->render();
+        }
         return view('new_content.admin.features.index', compact('features'));
     }
 
@@ -91,7 +99,7 @@ class FeatureController extends Controller
     public function changeStatus($id, $status)
     {
         $feature = RestaurantFeature::findOrFail($id);
-        $feature->status = $status == 1 ? 0 : 1;
+        $feature->status = $status;
         $feature->save();
         return redirect()->route('features.index')->with('success', 'Status updated successfully.');
     }

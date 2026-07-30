@@ -99,6 +99,32 @@
               $(this).toggle(text.indexOf(query) > -1);
           });
       });
+      // AJAX Sorting and Pagination
+      $(document).on('click', '.ajax-sortable, .pagination a', function(e) {
+          e.preventDefault();
+          var url = $(this).attr('href') || $(this).data('url');
+          if (!url || url === '#' || url === 'javascript:void(0)') return;
+
+          var $container = $('#ajax-table-container');
+          if (!$container.length) return; // Only if there is a container
+
+          // Add a simple loading state
+          $container.css('opacity', '0.5');
+
+          $.ajax({
+              url: url,
+              type: 'GET',
+              headers: { 'X-Requested-With': 'XMLHttpRequest' },
+              success: function(response) {
+                  $container.html(response);
+                  $container.css('opacity', '1');
+              },
+              error: function() {
+                  $container.css('opacity', '1');
+                  console.error('Failed to load table data.');
+              }
+          });
+      });
   });
 </script>
 

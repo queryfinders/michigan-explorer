@@ -4,12 +4,21 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Traits\Sortable;
 
 class RestaurantCategoryController extends Controller
 {
-    public function index()
+    use Sortable;
+    public function index(Request $request)
     {
-        $categories = \App\Models\RestaurantCategory::orderBy('created_at', 'desc')->paginate(10);
+        $query = \App\Models\RestaurantCategory::query();
+        $query = $this->applySorting($query, ['id', 'name', 'slug', 'status', 'created_at'], 'created_at', 'desc');
+        $categories = $query->paginate(10);
+        
+        if ($request->ajax()) {
+            return view('new_content.admin.restaurant_categories._table', compact('categories'))->render();
+        }
+        
         return view('new_content.admin.restaurant_categories.index', compact('categories'));
     }
 
@@ -63,5 +72,13 @@ class RestaurantCategoryController extends Controller
     {
         $restaurantCategory->delete();
         return redirect()->route('restaurant-categories.index')->with('success', 'Category deleted successfully.');
+    }
+
+    public function changeStatus($id, $status)
+    {
+        $category = \App\Models\RestaurantCategory::findOrFail($id);
+        $category->status = $status;
+        $category->save();
+        return response()->json(['success' => true, 'status' => $category->status]);
     }
 }

@@ -1,19 +1,14 @@
 <!-- 7. Affiliate Promotions -->
+@if(isset($homepagePromotion) && $homepagePromotion)
 @php
-    $promo = $homepagePromotion ?? null;
-    $promoBg = $promo
-        ? asset($promo->desktop_image)
-        : asset('images/promo_banner_1783508311655.jpg');
-    $promoMobileBg = $promo && $promo->mobile_image
-        ? asset($promo->mobile_image)
-        : $promoBg;
-    $promoBadge    = $promo ? $promo->badge_text : 'Special Promotion';
-    $promoTitle    = $promo ? $promo->title      : 'Save 20% on Romantic Lakefront Escapes';
-    $promoSubtitle = $promo ? $promo->subtitle   : 'Book your next getaway through our exclusive affiliate partners and enjoy premium upgrades.';
-    $promoCtaText  = $promo ? $promo->cta_text   : 'Claim Offer';
-    $promoCtaHref  = $promo
-        ? route('affiliate.redirect', ['type' => 'promotion', 'id' => $promo->id])
-        : '#';
+    $promo = $homepagePromotion;
+    $promoBg = asset($promo->desktop_image);
+    $promoMobileBg = $promo->mobile_image ? asset($promo->mobile_image) : $promoBg;
+    $promoBadge    = $promo->badge_text;
+    $promoTitle    = $promo->title;
+    $promoSubtitle = $promo->subtitle;
+    $promoCtaText  = $promo->cta_text;
+    $promoCtaHref  = route('affiliate.redirect', ['type' => 'promotion', 'id' => $promo->id]);
 @endphp
 <section class="py-0">
     <div class="container-fluid px-0">
@@ -36,3 +31,4 @@
         </div>
     </div>
 </section>
+@endif

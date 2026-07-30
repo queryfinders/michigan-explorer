@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\ContactMessage;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Traits\Sortable;
 
 class ContactMessageController extends Controller
 {
+    use Sortable;
     /**
      * Display a listing of contact messages.
      */
@@ -34,7 +36,12 @@ class ContactMessageController extends Controller
             }
         }
 
-        $messages = $query->orderByDesc('created_at')->paginate(15);
+        $query = $this->applySorting($query, ['id', 'full_name', 'email', 'phone', 'subject', 'created_at'], 'created_at', 'desc');
+        $messages = $query->paginate(15);
+
+        if ($request->ajax()) {
+            return view('new_content.admin.contact_messages._table', compact('messages'))->render();
+        }
 
         return view('new_content.admin.contact_messages.index', compact('messages'));
     }

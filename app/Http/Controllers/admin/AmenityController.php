@@ -6,12 +6,19 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Amenity;
 use Illuminate\Support\Str;
+use App\Traits\Sortable;
 
 class AmenityController extends Controller
 {
-    public function index()
+    use Sortable;
+    public function index(Request $request)
     {
-        $amenities = Amenity::orderBy('name')->get();
+        $query = Amenity::query();
+        $query = $this->applySorting($query, ['id', 'name', 'slug', 'status'], 'name', 'asc');
+        $amenities = $query->paginate(10);
+        if ($request->ajax()) {
+            return view('new_content.admin.amenities._table', compact('amenities'))->render();
+        }
         return view('new_content.admin.amenities.index', compact('amenities'));
     }
 

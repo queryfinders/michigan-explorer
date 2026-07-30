@@ -13,6 +13,7 @@ use App\Http\Requests\Admin\StoreSearchShortcutRequest;
 use App\Http\Requests\Admin\UpdateSearchShortcutRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use App\Traits\Sortable;
 
 /**
  * Class SearchShortcutController
@@ -22,14 +23,20 @@ use Illuminate\Support\Facades\Cache;
  */
 class SearchShortcutController extends Controller
 {
+    use Sortable;
     /**
      * Display a listing of the search shortcuts.
      *
      * @return \Illuminate\Contracts\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
-        $searchShortcuts = SearchShortcut::orderBy('sort_order', 'asc')->get();
+        $query = SearchShortcut::query();
+        $query = $this->applySorting($query, ['id', 'title', 'action_type', 'target_url', 'click_count', 'status', 'sort_order'], 'sort_order', 'asc');
+        $searchShortcuts = $query->get();
+        if ($request->ajax()) {
+            return view('new_content.admin.search_shortcuts._table', compact('searchShortcuts'))->render();
+        }
         return view('new_content.admin.search_shortcuts.index', compact('searchShortcuts'));
     }
 

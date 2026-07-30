@@ -8,9 +8,11 @@ use App\Models\AffiliateLink;
 use App\Http\Requests\Admin\PromotionRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Traits\Sortable;
 
 class AffiliatePromotionController extends Controller
 {
+    use Sortable;
     public function index(Request $request)
     {
         $query = AffiliatePromotion::with('affiliateLink');
@@ -31,9 +33,8 @@ class AffiliatePromotionController extends Controller
             $query->where('is_active', $request->input('status'));
         }
 
-        $promotions = $query->orderBy('priority', 'asc')
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        $query = $this->applySorting($query, ['id', 'title', 'badge_text', 'placement', 'priority', 'is_active', 'starts_at', 'ends_at', 'created_at'], 'priority', 'asc');
+        $promotions = $query->paginate(10);
 
         // Fetch click analytics dynamically for listing page
         foreach ($promotions as $promo) {
@@ -49,6 +50,10 @@ class AffiliatePromotionController extends Controller
             $promo->last_click_at = $lastClick ? $lastClick->clicked_at : null;
         }
 
+        if ($request->ajax()) {
+            return view('new_content.admin.affiliate_promotions._table', compact('promotions'))->render();
+        }
+        
         return view('new_content.admin.affiliate_promotions.index', compact('promotions'));
     }
 
@@ -61,7 +66,7 @@ class AffiliatePromotionController extends Controller
     public function store(PromotionRequest $request)
     {
         $data = $request->except('_token', '_method', 'desktop_image', 'mobile_image');
-        $data['is_active'] = $request->has('is_active') ? 1 : 0;
+        $data['is_active'] = 1; // Default to active on creation
 
         if ($request->hasFile('desktop_image')) {
             $path = $request->file('desktop_image')->store('promotions', 'public');
@@ -88,8 +93,7 @@ class AffiliatePromotionController extends Controller
     public function update(PromotionRequest $request, $id)
     {
         $promotion = AffiliatePromotion::findOrFail($id);
-        $data = $request->except('_token', '_method', 'desktop_image', 'mobile_image');
-        $data['is_active'] = $request->has('is_active') ? 1 : 0;
+        $data = $request->except('_token', '_method', 'desktop_image', 'mobile_image', 'is_active');
 
         if ($request->hasFile('desktop_image')) {
             // Delete old desktop image
@@ -138,7 +142,7 @@ class AffiliatePromotionController extends Controller
     public function changeStatus($id, $status)
     {
         $promotion = AffiliatePromotion::findOrFail($id);
-        $promotion->is_active = $status == 1 ? 0 : 1;
+        $promotion->is_active = $status;
         $promotion->save();
 
         return response()->json([

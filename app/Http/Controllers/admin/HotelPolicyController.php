@@ -5,12 +5,20 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\HotelPolicy;
+use App\Traits\Sortable;
 
 class HotelPolicyController extends Controller
 {
-    public function index()
+    use Sortable;
+    public function index(Request $request)
     {
-        $policies = HotelPolicy::orderBy('sort_order')->paginate(20);
+        $query = HotelPolicy::query();
+        $query = $this->applySorting($query, ['id', 'name', 'input_type', 'sort_order', 'is_active'], 'sort_order', 'asc');
+        $policies = $query->paginate(20);
+        
+        if ($request->ajax()) {
+            return view('new_content.admin.hotel_policies._table', compact('policies'))->render();
+        }
         return view('new_content.admin.hotel_policies.index', compact('policies'));
     }
 

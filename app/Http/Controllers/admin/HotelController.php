@@ -4,12 +4,21 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Traits\Sortable;
 
 class HotelController extends Controller
 {
-    public function index()
+    use Sortable;
+    public function index(Request $request)
     {
-        $hotels = \App\Models\Hotel::with('category')->orderBy('created_at', 'desc')->paginate(10);
+        $query = \App\Models\Hotel::with('category');
+        $query = $this->applySorting($query, ['id', 'name', 'hotel_category_id', 'is_featured', 'status', 'created_at'], 'created_at', 'desc');
+        $hotels = $query->paginate(10);
+        
+        if ($request->ajax()) {
+            return view('new_content.admin.hotels._table', compact('hotels'))->render();
+        }
+        
         return view('new_content.admin.hotels.index', compact('hotels'));
     }
 
@@ -339,7 +348,7 @@ class HotelController extends Controller
     public function changeStatus($id, $status)
     {
         $hotel = \App\Models\Hotel::findOrFail($id);
-        $hotel->status = $status == 1 ? 0 : 1;
+        $hotel->status = $status;
         $hotel->save();
 
         return response()->json(['success' => true, 'message' => 'Status updated successfully.', 'status' => $hotel->status]);

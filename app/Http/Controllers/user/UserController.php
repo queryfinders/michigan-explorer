@@ -10,15 +10,39 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
+use App\Traits\Sortable;
+
 class UserController extends Controller
 {
+    use Sortable;
 
     public function user(Request $request){
-        return view('new_content.user.user_list');
+        if (!\App\Helpers\AccessRights::accessRights('users.list')) {
+            $users = collect([]);
+            $users = new \Illuminate\Pagination\LengthAwarePaginator($users, 0, 10);
+            if ($request->ajax()) {
+                return view('new_content.user._table', compact('users'))->render();
+            }
+            return view('new_content.user.user_list', compact('users'));
+        }
+
+        $query = AdminUser::leftJoin('role','admin_user.role_id','=','role.id')
+            ->select(['admin_user.id', 'admin_user.name', 'admin_user.email_id', 'admin_user.contact_no', 'admin_user.job_title', 'admin_user.role_id', 'admin_user.is_active', 'admin_user.profile_url', 'role.role']);
+            
+        $query = $this->applySorting($query, ['admin_user.id', 'name', 'email_id', 'contact_no', 'job_title', 'role', 'is_active'], 'admin_user.id', 'desc');
+        
+        $users = $query->paginate(10);
+
+        if ($request->ajax()) {
+            return view('new_content.user._table', compact('users'))->render();
+        }
+
+        return view('new_content.user.user_list', compact('users'));
     }
 
     public function index_user(Request $request)
     {
+        // deprecated, kept for legacy if any JS directly calls it.
         $user= AdminUser::leftJoin('role','admin_user.role_id','=','role.id')->select(['admin_user.id', 'admin_user.name', 'admin_user.email_id', 'admin_user.contact_no', 'admin_user.job_title', 'admin_user.role_id', 'admin_user.is_active', 'admin_user.profile_url', 'role.role'])->orderBy('admin_user.id', 'desc')->get();
         return response()->json(['user' => $user]);
     }

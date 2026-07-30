@@ -76,9 +76,7 @@ class BlogController extends Controller
             // Default latest (Show newly added blogs first)
             $query->orderBy('created_at', 'desc');
         }
-
-        $blogs = $query->paginate(12);
-        
+        $blogs = $query->paginate(10);        
         $featuredBlog = Blog::with(['category', 'author'])
             ->where('status', 'published')
             ->where('is_featured', 1)

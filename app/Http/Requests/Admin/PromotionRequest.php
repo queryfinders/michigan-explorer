@@ -26,7 +26,6 @@ class PromotionRequest extends FormRequest
             'priority'           => 'required|integer|min:1',
             'starts_at'          => 'nullable|date',
             'ends_at'            => 'nullable|date|after_or_equal:starts_at',
-            'is_active'          => 'nullable|boolean',
         ];
     }
 

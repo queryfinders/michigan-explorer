@@ -4,12 +4,21 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Traits\Sortable;
 
 class AttractionCategoryController extends Controller
 {
-    public function index()
+    use Sortable;
+    public function index(Request $request)
     {
-        $categories = \App\Models\AttractionCategory::orderBy('created_at', 'desc')->paginate(10);
+        $query = \App\Models\AttractionCategory::query();
+        $query = $this->applySorting($query, ['id', 'name', 'status', 'created_at'], 'created_at', 'desc');
+        $categories = $query->paginate(10);
+        
+        if ($request->ajax()) {
+            return view('new_content.admin.attraction_categories._table', compact('categories'))->render();
+        }
+        
         return view('new_content.admin.attraction_categories.index', compact('categories'));
     }
 

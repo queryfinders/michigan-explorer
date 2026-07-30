@@ -158,30 +158,86 @@
           @error('subtitle')<div class="invalid-feedback">{{ $message }}</div>@else<div class="invalid-feedback">The subtitle field is required.</div>@enderror
         </div>
 
-        <!-- Affiliate Link Selection -->
         <div class="col-12">
           <label class="form-label fw-semibold">Destination Affiliate Link</label>
-          <select name="affiliate_link_id" class="form-select @error('affiliate_link_id') is-invalid @enderror">
-            <option value="">Select Platform Link...</option>
-            @foreach($affiliateLinks as $link)
-              <option value="{{ $link->id }}" {{ old('affiliate_link_id', $promotion->affiliate_link_id) == $link->id ? 'selected' : '' }}>{{ $link->name }} ({{ $link->provider }})</option>
-            @endforeach
-          </select>
-          @error('affiliate_link_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+          
+          @php
+              $selectedLink = old('affiliate_link_id', $promotion->affiliate_link_id ?? null);
+              $selectedLinkName = 'Select Platform Link...';
+              if ($selectedLink) {
+                  $foundLink = $affiliateLinks->firstWhere('id', $selectedLink);
+                  if ($foundLink) {
+                      $selectedLinkName = $foundLink->name . ' (' . $foundLink->provider . ')';
+                  }
+              }
+          @endphp
+
+          <input type="hidden" name="affiliate_link_id" id="affiliate_link_id_value" value="{{ $selectedLink }}">
+          
+          <div class="cuisine-dropdown-wrapper" id="linkDropdownWrapper">
+            <div class="cuisine-dropdown-trigger {{ $errors->has('affiliate_link_id') ? 'border-danger' : '' }}" id="linkTrigger" onclick="toggleLinkDropdown()">
+              <div class="cuisine-tags-area" id="linkTagsArea">
+                <span class="category-selected-text" id="linkPlaceholder">{{ $selectedLinkName }}</span>
+              </div>
+              <i class="fas fa-chevron-down cuisine-dropdown-arrow" id="linkArrow"></i>
+            </div>
+            <div class="cuisine-dropdown-panel" id="linkDropdownPanel" style="display:none;">
+              <div class="cuisine-search-wrap">
+                <i class="fas fa-search cuisine-search-icon"></i>
+                <input type="text" class="cuisine-search-input" id="linkSearchInput"
+                       placeholder="Search links..." oninput="filterLinks(this.value)" autocomplete="off" />
+              </div>
+              <div class="cuisine-divider"></div>
+              <div class="cuisine-items-list" id="linkItemsList">
+                <label class="cuisine-item {{ !$selectedLink ? 'selected' : '' }}" id="link-label-empty">
+                  <input type="radio" name="_link_radio" value=""
+                         id="link_rb_empty"
+                         class="cat-rb d-none"
+                         data-name="Select Platform Link..."
+                         data-id=""
+                         {{ !$selectedLink ? 'checked' : '' }}
+                         onchange="onLinkChange(this)" />
+                  <span class="cuisine-item-name text-muted">Select Platform Link...</span>
+                  <span class="cuisine-item-check"><i class="fas fa-check"></i></span>
+                </label>
+                @foreach($affiliateLinks as $link)
+                @php $linkName = $link->name . ' (' . $link->provider . ')'; @endphp
+                <label class="cuisine-item {{ $selectedLink == $link->id ? 'selected' : '' }}" id="link-label-{{ $link->id }}">
+                  <input type="radio" name="_link_radio" value="{{ $link->id }}"
+                         id="link_rb_{{ $link->id }}"
+                         class="cat-rb d-none"
+                         data-name="{{ $linkName }}"
+                         data-id="{{ $link->id }}"
+                         {{ $selectedLink == $link->id ? 'checked' : '' }}
+                         onchange="onLinkChange(this)" />
+                  <span class="cuisine-item-name">{{ $linkName }}</span>
+                  <span class="cuisine-item-check"><i class="fas fa-check"></i></span>
+                </label>
+                @endforeach
+                <div class="cuisine-no-results d-none" id="linkNoResults">
+                  <i class="fas fa-search-minus me-2"></i>No links found
+                </div>
+              </div>
+            </div>
+          </div>
+          @error('affiliate_link_id')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
         </div>
 
         <!-- Desktop Banner Image -->
-        <div class="col-md-6">
+        <div class="col-12">
           <label class="form-label fw-semibold">Desktop Banner Image</label>
-          @if($promotion->desktop_image)
-            <div class="mb-2">
-              <img src="{{ asset($promotion->desktop_image) }}" class="rounded img-fluid" style="max-height: 100px; border: 1px solid #dbdade;" alt="Current Desktop Banner">
-              <small class="d-block text-muted mt-1">Current desktop banner. Upload below to replace it.</small>
+          <div class="d-flex align-items-center gap-3">
+            <div class="flex-grow-1">
+              <input type="file" name="desktop_image" id="desktop_image" class="form-control @error('desktop_image') is-invalid @enderror">
+              <small class="text-muted d-block mt-1">Leave empty to keep current image (max 2MB).</small>
+              @error('desktop_image')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
             </div>
-          @endif
-          <input type="file" name="desktop_image" id="desktop_image" class="form-control @error('desktop_image') is-invalid @enderror">
-          <small class="text-muted">Leave empty to keep current image (max 2MB).</small>
-          @error('desktop_image')<div class="invalid-feedback">{{ $message }}</div>@enderror
+            @if($promotion->desktop_image)
+            <div class="flex-shrink-0">
+              <img src="{{ asset($promotion->desktop_image) }}" class="rounded" style="height: 60px; object-fit: cover; border: 1px solid #dbdade;" alt="Current Desktop Banner">
+            </div>
+            @endif
+          </div>
         </div>
 
         <!-- Mobile Banner Image -->
@@ -217,14 +273,7 @@
           @error('ends_at')<div class="invalid-feedback">{{ $message }}</div>@enderror
         </div>
 
-        <!-- Active Status Toggle 
-        <div class="col-12 my-3">
-          <div class="form-check form-switch form-check-md">
-            <input class="form-check-input" type="checkbox" name="is_active" id="is_active" value="1" {{ old('is_active', $promotion->is_active) ? 'checked' : '' }}>
-            <label class="form-check-label fw-semibold ms-2" for="is_active">Promotion Active</label>
-          </div>
-        </div>
-        -->
+
 
         <!-- Buttons -->
         <div class="col-12 pt-3 border-top d-flex gap-2">
@@ -298,11 +347,16 @@
 
   // Custom Placement Dropdown Logic
   function togglePlacementDropdown() {
-    const panel  = document.getElementById('placementDropdownPanel');
-    const arrow  = document.getElementById('placementArrow');
+    const panel = document.getElementById('placementDropdownPanel');
+    const arrow = document.getElementById('placementArrow');
     const trigger = document.getElementById('placementTrigger');
-    const isOpen = panel.style.display !== 'none';
+    const isOpen = panel.style.display === 'block';
     
+    // close link dropdown if open
+    document.getElementById('linkDropdownPanel').style.display = 'none';
+    document.getElementById('linkArrow').style.transform = 'rotate(0deg)';
+    document.getElementById('linkTrigger').classList.remove('open');
+
     if (isOpen) {
         panel.style.display = 'none';
         arrow.style.transform = 'rotate(0deg)';
@@ -312,6 +366,29 @@
         arrow.style.transform = 'rotate(180deg)';
         trigger.classList.add('open');
         document.getElementById('placementSearchInput').focus();
+    }
+  }
+
+  function toggleLinkDropdown() {
+    const panel = document.getElementById('linkDropdownPanel');
+    const arrow = document.getElementById('linkArrow');
+    const trigger = document.getElementById('linkTrigger');
+    const isOpen = panel.style.display === 'block';
+    
+    // close placement dropdown if open
+    document.getElementById('placementDropdownPanel').style.display = 'none';
+    document.getElementById('placementArrow').style.transform = 'rotate(0deg)';
+    document.getElementById('placementTrigger').classList.remove('open');
+
+    if (isOpen) {
+        panel.style.display = 'none';
+        arrow.style.transform = 'rotate(0deg)';
+        trigger.classList.remove('open');
+    } else {
+        panel.style.display = 'block';
+        arrow.style.transform = 'rotate(180deg)';
+        trigger.classList.add('open');
+        document.getElementById('linkSearchInput').focus();
     }
   }
 
@@ -326,6 +403,19 @@
       if (show) found++;
     });
     document.getElementById('placementNoResults').classList.toggle('d-none', found > 0);
+  }
+
+  function filterLinks(val) {
+    const term  = val.toLowerCase();
+    const items = document.querySelectorAll('#linkItemsList .cuisine-item');
+    let   found = 0;
+    items.forEach(item => {
+      const name = item.querySelector('.cuisine-item-name').textContent.toLowerCase();
+      const show = name.includes(term);
+      item.style.display = show ? '' : 'none';
+      if (show) found++;
+    });
+    document.getElementById('linkNoResults').classList.toggle('d-none', found > 0);
   }
 
   function onPlacementChange(rb) {
@@ -351,15 +441,47 @@
     document.getElementById('placementTrigger').classList.remove('border-danger');
   }
 
+  function onLinkChange(rb) {
+    const id    = rb.dataset.id;
+    const name  = rb.dataset.name;
+    const hidden= document.getElementById('affiliate_link_id_value');
+    const ph    = document.getElementById('linkPlaceholder');
+
+    hidden.value = id;
+    document.querySelectorAll('#linkItemsList .cuisine-item').forEach(l => l.classList.remove('selected'));
+    
+    const label = document.getElementById(id ? 'link-label-' + id : 'link-label-empty');
+    if(label) label.classList.add('selected');
+
+    ph.textContent = name;
+    
+    // Auto-close dropdown
+    document.getElementById('linkDropdownPanel').style.display = 'none';
+    document.getElementById('linkArrow').style.transform = 'rotate(0deg)';
+    document.getElementById('linkTrigger').classList.remove('open');
+    document.getElementById('linkTrigger').classList.remove('border-danger');
+  }
+
   // Close dropdown on outside click
   document.addEventListener('click', function(e) {
     const wrapper = document.getElementById('placementDropdownWrapper');
+    const linkWrapper = document.getElementById('linkDropdownWrapper');
+    
     if (wrapper && !wrapper.contains(e.target)) {
       const panel = document.getElementById('placementDropdownPanel');
       if(panel && panel.style.display !== 'none') {
         panel.style.display = 'none';
         document.getElementById('placementArrow').style.transform = 'rotate(0deg)';
         document.getElementById('placementTrigger').classList.remove('open');
+      }
+    }
+
+    if (linkWrapper && !linkWrapper.contains(e.target)) {
+      const panel = document.getElementById('linkDropdownPanel');
+      if(panel && panel.style.display !== 'none') {
+        panel.style.display = 'none';
+        document.getElementById('linkArrow').style.transform = 'rotate(0deg)';
+        document.getElementById('linkTrigger').classList.remove('open');
       }
     }
   });
