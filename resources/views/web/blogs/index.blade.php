@@ -111,7 +111,7 @@
             <div class="col-lg-8">
 
 
-                <div class="row g-4">
+                <div class="row g-4" id="infinite-scroll-grid">
                     @forelse($blogs as $blog)
                         <div class="col-md-6 fade-up-card">
                             <div class="blog-card h-100">
@@ -159,34 +159,11 @@
                     @endforelse
                 </div>
 
-                @if($blogs->hasPages())
-                <div class="d-flex justify-content-center mt-5 pt-4">
-                    <nav aria-label="Blog pagination">
-                        <ul class="pagination pagination-lg premium-pagination mb-0 gap-2">
-                            @if ($blogs->onFirstPage())
-                                <li class="page-item disabled"><span class="page-link rounded-circle border-0 d-flex align-items-center justify-content-center bg-light text-muted" style="width:44px;height:44px;"><i class="fas fa-chevron-left"></i></span></li>
-                            @else
-                                <li class="page-item"><a class="page-link rounded-circle border-0 shadow-sm d-flex align-items-center justify-content-center hover-bg-primary hover-text-white transition-all" style="width:44px;height:44px;" href="{{ $blogs->previousPageUrl() }}" rel="prev"><i class="fas fa-chevron-left"></i></a></li>
-                            @endif
-                            @foreach ($blogs->links()->elements as $element)
-                                @if (is_string($element))<li class="page-item disabled"><span class="page-link border-0 bg-transparent">{{ $element }}</span></li>@endif
-                                @if (is_array($element))
-                                    @foreach ($element as $page => $url)
-                                        @if ($page == $blogs->currentPage())
-                                            <li class="page-item active" aria-current="page"><span class="page-link rounded-circle border-0 shadow-sm bg-primary d-flex align-items-center justify-content-center" style="width:44px;height:44px;">{{ $page }}</span></li>
-                                        @else
-                                            <li class="page-item"><a class="page-link rounded-circle border-0 shadow-sm d-flex align-items-center justify-content-center hover-bg-primary hover-text-white transition-all text-dark bg-white" style="width:44px;height:44px;" href="{{ $url }}">{{ $page }}</a></li>
-                                        @endif
-                                    @endforeach
-                                @endif
-                            @endforeach
-                            @if ($blogs->hasMorePages())
-                                <li class="page-item"><a class="page-link rounded-circle border-0 shadow-sm d-flex align-items-center justify-content-center hover-bg-primary hover-text-white transition-all" style="width:44px;height:44px;" href="{{ $blogs->nextPageUrl() }}" rel="next"><i class="fas fa-chevron-right"></i></a></li>
-                            @else
-                                <li class="page-item disabled"><span class="page-link rounded-circle border-0 d-flex align-items-center justify-content-center bg-light text-muted" style="width:44px;height:44px;"><i class="fas fa-chevron-right"></i></span></li>
-                            @endif
-                        </ul>
-                    </nav>
+                @if ($blogs->hasMorePages())
+                <div id="infinite-scroll-trigger" data-next-url="{{ $blogs->nextPageUrl() }}" class="d-flex justify-content-center mt-5 pt-4">
+                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem; opacity: 0.5;">
+                        <span class="visually-hidden">Loading more...</span>
+                    </div>
                 </div>
                 @endif
 
@@ -396,6 +373,53 @@
 
 @section('webLayoutScript')
 <script>
+window.initInfiniteScroll = function() {
+    var trigger = document.getElementById('infinite-scroll-trigger');
+    var grid = document.getElementById('infinite-scroll-grid');
+    
+    if(window.scrollObserver) {
+        window.scrollObserver.disconnect();
+    }
+
+    if (trigger && grid && 'IntersectionObserver' in window) {
+        var isLoading = false;
+        window.scrollObserver = new IntersectionObserver(function(entries) {
+            if (entries[0].isIntersecting && !isLoading) {
+                var nextUrl = trigger.getAttribute('data-next-url');
+                if (!nextUrl) return;
+
+                isLoading = true;
+                fetch(nextUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(function(res) { return res.text(); })
+                    .then(function(html) {
+                        var parser = new DOMParser();
+                        var doc = parser.parseFromString(html, 'text/html');
+                        
+                        var newCards = doc.querySelectorAll('#infinite-scroll-grid > .col-md-6');
+                        newCards.forEach(function(card) {
+                            grid.appendChild(card);
+                        });
+
+                        var newTrigger = doc.getElementById('infinite-scroll-trigger');
+                        if (newTrigger) {
+                            trigger.setAttribute('data-next-url', newTrigger.getAttribute('data-next-url'));
+                        } else {
+                            trigger.remove();
+                            window.scrollObserver.disconnect();
+                        }
+                        isLoading = false;
+                    })
+                    .catch(function(err) {
+                        console.error('Infinite scroll failed:', err);
+                        isLoading = false;
+                    });
+            }
+        }, { rootMargin: '400px' });
+
+        window.scrollObserver.observe(trigger);
+    }
+};
+
 window.handleSortAJAX = function(e, element) {
     e.preventDefault();
     e.stopPropagation();
@@ -426,6 +450,8 @@ window.handleSortAJAX = function(e, element) {
                 var offset = filterBar ? filterBar.offsetHeight + 20 : 100;
                 var targetPos = document.getElementById('all-blogs').getBoundingClientRect().top + window.scrollY - offset;
                 window.scrollTo({top: targetPos, behavior: 'smooth'});
+                
+                window.initInfiniteScroll();
             }
         })
         .catch(function(err) {
@@ -439,6 +465,8 @@ window.handleSortAJAX = function(e, element) {
 };
 
 document.addEventListener('DOMContentLoaded', function() {
+    window.initInfiniteScroll();
+    
     try {
         if(typeof bootstrap !== 'undefined') {
             document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el){ new bootstrap.Tooltip(el); });
