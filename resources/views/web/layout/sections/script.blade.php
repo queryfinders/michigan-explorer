@@ -244,13 +244,13 @@ function shareCurrentPage(title) {
         } else if (w < 768) {
             maxPills = 3;
         } else if (w < 992) {
-            maxPills = 4;
+            maxPills = 6;
         } else if (w < 1200) {
-            maxPills = 5;
+            maxPills = 6;
         }
 
         if (isStuck) {
-            maxPills = isEventsPage ? 5 : Math.min(maxPills, 4);
+            maxPills = isEventsPage ? 6 : Math.min(maxPills, 6);
         }
 
         regularPills.forEach(function(pill, i) {

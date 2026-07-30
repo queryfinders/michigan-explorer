@@ -92,7 +92,7 @@
 
                 </div>
                 <div class="d-flex justify-content-xl-end align-items-center flex-shrink-0">
-                    <div class="sort-tabs mt-3">
+                    <div class="sort-tabs mt-2">
                         <span class="text-muted small fw-bold me-2 ms-2 d-none d-sm-inline">Sort:</span>
                         <a href="?sort=latest" class="sort-tab {{ $activeSort == 'latest' ? 'active' : '' }}">Latest</a>
                         <a href="?sort=popular" class="sort-tab {{ $activeSort == 'popular' ? 'active' : '' }}">Popular</a>
