@@ -168,13 +168,11 @@
         <div class="row w-100 justify-content-center">
             <div class="col-lg-10 col-xl-9 d-flex flex-column align-items-center">
                 
-                <nav aria-label="breadcrumb" class="mb-3 fade-up-anim">
-                    <ol class="breadcrumb justify-content-center text-white opacity-75 small text-uppercase align-items-center">
+                <nav aria-label="breadcrumb" class="mb-4 fade-up-anim">
+                    <ol class="breadcrumb justify-content-center text-white opacity-75">
                         <li class="breadcrumb-item"><a href="{{ route('web.home') }}" class="text-white text-decoration-none">Home</a></li>
-                        <span class="mx-2 text-white-50">/</span>
                         <li class="breadcrumb-item"><a href="{{ route('web.blogs.index') }}" class="text-white text-decoration-none">Travel Guides</a></li>
-                        <span class="mx-2 text-white-50">/</span>
-                        <li class="breadcrumb-item active text-white" aria-current="page">{{ $blog->title }}</li>
+                        <li class="breadcrumb-item active text-white fw-bold" aria-current="page">{{ $blog->title }}</li>
                     </ol>
                 </nav>
 
