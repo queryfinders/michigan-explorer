@@ -5,12 +5,20 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\BookingFeature;
+use App\Traits\Sortable;
 
 class BookingFeatureController extends Controller
 {
-    public function index()
+    use Sortable;
+    public function index(Request $request)
     {
-        $features = BookingFeature::orderBy('sort_order')->paginate(20);
+        $query = BookingFeature::query();
+        $query = $this->applySorting($query, ['id', 'name', 'icon', 'sort_order', 'is_active'], 'sort_order', 'asc');
+        $features = $query->paginate(20);
+        
+        if ($request->ajax()) {
+            return view('new_content.admin.booking_features._table', compact('features'))->render();
+        }
         return view('new_content.admin.booking_features.index', compact('features'));
     }
 

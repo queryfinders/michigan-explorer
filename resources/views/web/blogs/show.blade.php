@@ -168,13 +168,11 @@
         <div class="row w-100 justify-content-center">
             <div class="col-lg-10 col-xl-9 d-flex flex-column align-items-center">
                 
-                <nav aria-label="breadcrumb" class="mb-3 fade-up-anim">
-                    <ol class="breadcrumb justify-content-center text-white opacity-75 small text-uppercase align-items-center">
+                <nav aria-label="breadcrumb" class="mb-4 fade-up-anim">
+                    <ol class="breadcrumb justify-content-center text-white opacity-75">
                         <li class="breadcrumb-item"><a href="{{ route('web.home') }}" class="text-white text-decoration-none">Home</a></li>
-                        <span class="mx-2 text-white-50">/</span>
                         <li class="breadcrumb-item"><a href="{{ route('web.blogs.index') }}" class="text-white text-decoration-none">Travel Guides</a></li>
-                        <span class="mx-2 text-white-50">/</span>
-                        <li class="breadcrumb-item active text-white" aria-current="page">{{ $blog->title }}</li>
+                        <li class="breadcrumb-item active text-white fw-bold" aria-current="page">{{ $blog->title }}</li>
                     </ol>
                 </nav>
 
@@ -421,7 +419,13 @@
                             @foreach($relatedBlogs->take(3) as $related)
                             <div class="d-flex align-items-center gap-3 pb-2 border-bottom border-light">
                                 <a href="{{ route('web.blogs.show', $related->slug) }}" class="flex-shrink-0" style="width: 70px; height: 70px;">
-                                    <img src="{{ $related->featured_image ? (Str::startsWith($related->featured_image, ['http://', 'https://']) ? $related->featured_image : asset($related->featured_image)) : 'https://placehold.co/100' }}" class="rounded-3 w-100 h-100 object-fit-cover shadow-sm" alt="{{ $related->title }}">
+                                    @if($related->featured_image)
+                                        <img src="{{ Str::startsWith($related->featured_image, ['http://', 'https://']) ? $related->featured_image : asset($related->featured_image) }}" class="rounded-3 w-100 h-100 object-fit-cover shadow-sm" alt="{{ $related->title }}">
+                                    @else
+                                        <div class="rounded-3 w-100 h-100 d-flex align-items-center justify-content-center shadow-sm" style="background: linear-gradient(135deg, #7367f0 0%, #ce93d8 100%);">
+                                            <i class="fas fa-compass text-white opacity-50" style="font-size: 1.5rem;"></i>
+                                        </div>
+                                    @endif
                                 </a>
                                 <div>
                                     <h6 class="mb-1 fw-bold" style="font-size: 0.9rem; line-height: 1.3;">
@@ -475,7 +479,13 @@
                     <div class="card h-100 border-0 rounded-4 shadow-sm hover-shadow-lg transition-all blog-card-premium overflow-hidden">
                         <div class="position-relative overflow-hidden auto-style-47">
                             <a href="{{ route('web.blogs.show', $related->slug) }}" class="d-block w-100 h-100">
-                                <img src="{{ $related->featured_image ? (Str::startsWith($related->featured_image, ['http://', 'https://']) ? $related->featured_image : asset($related->featured_image)) : 'https://placehold.co/600x400' }}" class="w-100 h-100 object-fit-cover hover-zoom" alt="{{ $related->title }}">
+                                @if($related->featured_image)
+                                    <img src="{{ Str::startsWith($related->featured_image, ['http://', 'https://']) ? $related->featured_image : asset($related->featured_image) }}" class="w-100 h-100 object-fit-cover hover-zoom" alt="{{ $related->title }}">
+                                @else
+                                    <div class="w-100 h-100 d-flex align-items-center justify-content-center hover-zoom" style="background: linear-gradient(135deg, #7367f0 0%, #ce93d8 100%);">
+                                        <i class="fas fa-compass text-white opacity-50" style="font-size: 3.5rem;"></i>
+                                    </div>
+                                @endif
                             </a>
                             @if($related->category)
                             <div class="position-absolute top-0 start-0 m-3">

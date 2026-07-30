@@ -64,3 +64,29 @@
   </div>
 </div>
 @endsection
+
+@section('page-script')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+<script>
+  $(document).ready(function() {
+      // jQuery Validation
+      $('form').validate({
+          rules: {
+              name: { required: true },
+              input_type: { required: true },
+              sort_order: { required: true, number: true }
+          },
+          messages: {
+              name: { required: "Please enter policy name" },
+              input_type: { required: "Please select an input type" },
+              sort_order: { required: "Please enter a sort order", number: "Must be a number" }
+          },
+          errorElement: 'div',
+          errorClass: 'text-danger mt-1 small',
+          errorPlacement: function(error, element) {
+              error.insertAfter(element);
+          }
+      });
+  });
+</script>
+@endsection

@@ -48,6 +48,7 @@
 
 @section('page-script')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js" referrerpolicy="origin"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
 <script>
   $(document).ready(function() {
     tinymce.init({
@@ -71,6 +72,23 @@
                      .replace(/\s+/g, '-')
                      .replace(/-+/g, '-');
       $('#slug').val(slug);
+    });
+
+    // jQuery Validation
+    $('form').validate({
+      rules: {
+        name: { required: true },
+        slug: { required: true }
+      },
+      messages: {
+        name: { required: "Please enter category name" },
+        slug: { required: "Please enter slug" }
+      },
+      errorElement: 'div',
+      errorClass: 'text-danger mt-1 small',
+      errorPlacement: function(error, element) {
+        error.insertAfter(element);
+      }
     });
   });
 </script>

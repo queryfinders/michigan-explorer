@@ -37,7 +37,8 @@
             <div class="card-body pt-4">
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Title <span class="text-danger">*</span></label>
-                    <input type="text" name="title" id="preview_title_input" class="form-control form-control-lg" value="{{ old('title', $searchShortcut->title ?? '') }}" placeholder="e.g. Indiana Dunes" required>
+                    <input type="text" name="title" id="preview_title_input" class="form-control form-control-lg @error('title') is-invalid @enderror" value="{{ old('title', $searchShortcut->title ?? '') }}" placeholder="e.g. Indiana Dunes">
+                    @error('title') <div class="invalid-feedback">{{ $message }}</div> @else <div class="invalid-feedback">The title field is required.</div> @enderror
                     <small class="text-muted d-block mt-1">The main text displayed on the Search Shortcut chip.</small>
                 </div>
             </div>
@@ -74,14 +75,7 @@
 
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Icon Color</label>
-                        <select name="icon_color" id="icon_color_input" class="form-select">
-                            <option value="">Default</option>
-                            @foreach($colors as $class => $color)
-                                <option value="{{ $class }}" data-hex="{{ $color['hex'] }}" {{ old('icon_color', $searchShortcut->icon_color ?? '') == $class ? 'selected' : '' }}>
-                                    {{ $color['name'] }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <input type="color" name="icon_color" id="icon_color_input" class="form-control form-control-color w-100" value="{{ old('icon_color', $searchShortcut->icon_color ?? '#0d6efd') }}" title="Choose your color">
                         <small class="text-muted d-block mt-1">Choose a color that matches the Michigan Explorer design system.</small>
                     </div>
                 </div>
@@ -96,7 +90,7 @@
             <div class="card-body pt-4">
                 <div class="mb-4">
                     <label class="form-label fw-semibold">Action Type <span class="text-danger">*</span></label>
-                    <select name="action_type" id="action_type" class="form-select" required>
+                    <select name="action_type" id="action_type" class="form-select @error('action_type') is-invalid @enderror">
                         <option value="">Select Action Type</option>
                         @foreach($actionTypes as $type)
                             <option value="{{ $type->value }}" data-type="{{ $type->value }}" {{ old('action_type', isset($searchShortcut) ? $searchShortcut->action_type->value : '') == $type->value ? 'selected' : '' }}>
@@ -104,6 +98,7 @@
                             </option>
                         @endforeach
                     </select>
+                    @error('action_type') <div class="invalid-feedback">{{ $message }}</div> @else <div class="invalid-feedback">The action type field is required.</div> @enderror
                     <small class="text-muted d-block mt-1">Choose what this shortcut should open.</small>
                 </div>
 
@@ -112,6 +107,7 @@
                     <div id="input_wrapper">
                         <!-- Dynamically populated by JS -->
                     </div>
+                    <div class="invalid-feedback d-none" id="action_value_error">The action value field is required.</div>
                     <input type="hidden" name="action_value" id="action_value_hidden" value="{{ old('action_value', $searchShortcut->action_value ?? '') }}">
                 </div>
             </div>
@@ -147,11 +143,7 @@
                     <small class="text-muted fw-semibold">Final URL</small>
                 </div>
                 <div class="input-group input-group-merge">
-                    <span class="input-group-text"><i class="bx bx-link"></i></span>
-                    <input type="text" id="url_preview_input" class="form-control" readonly value="Waiting for configuration..." style="background-color: #f8f9fa;">
-                    <button class="btn btn-outline-primary" type="button" id="copyUrlBtn" title="Copy URL">
-                        <i class="bx bx-copy"></i>
-                    </button>
+                    <input type="text" id="url_preview_input" class="form-control rounded" readonly value="Waiting for configuration..." style="background-color: #f8f9fa;">
                 </div>
             </div>
         </div>
@@ -240,7 +232,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const urlPreviewInput = document.getElementById('url_preview_input');
     const urlValidIndicator = document.getElementById('url_valid_indicator');
-    const copyUrlBtn = document.getElementById('copyUrlBtn');
 
     // Icon Picker Elements
     const iconSearch = document.getElementById('iconSearch');
@@ -262,12 +253,13 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateLivePreview() {
         const title = titleInput.value || 'Title...';
         const iconClass = iconInput.value || '';
-        const colorClass = iconColorInput.value || '';
+        const colorHex = iconColorInput.value || '';
         
         livePreviewTitle.textContent = title;
         
         if (iconClass) {
-            livePreviewIcon.className = `${iconClass} ${colorClass}`;
+            livePreviewIcon.className = `${iconClass}`;
+            livePreviewIcon.style.color = colorHex;
             livePreviewIcon.style.display = 'inline-block';
         } else {
             livePreviewIcon.style.display = 'none';
@@ -297,7 +289,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Fallback for Icon Color Change
-    iconColorInput.addEventListener('change', updateLivePreview);
+    iconColorInput.addEventListener('input', updateLivePreview);
 
     // --- URL and Action Logic ---
     function generateSelectHTML(options, selectedValue, placeholder) {
@@ -426,17 +418,68 @@ document.addEventListener('DOMContentLoaded', function() {
             handleTypeChange();
         });
     }
-    
-    // Copy URL
-    copyUrlBtn.addEventListener('click', function() {
-        if(urlPreviewInput.value) {
-            navigator.clipboard.writeText(urlPreviewInput.value);
-            this.innerHTML = '<i class="bx bx-check text-success"></i>';
-            setTimeout(() => {
-                this.innerHTML = '<i class="bx bx-copy"></i>';
-            }, 2000);
-        }
-    });
+
+    // Custom Validation
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(event) {
+            let isValid = true;
+            
+            if (!titleInput.value.trim()) {
+                isValid = false;
+                titleInput.classList.add('is-invalid');
+            } else {
+                titleInput.classList.remove('is-invalid');
+            }
+
+            if (!actionTypeSelect.value) {
+                isValid = false;
+                actionTypeSelect.classList.add('is-invalid');
+            } else {
+                actionTypeSelect.classList.remove('is-invalid');
+                
+                const noValueTypes = ['hotels', 'restaurants', 'attractions', 'events', 'travel_guides'];
+                if (!noValueTypes.includes(actionTypeSelect.value)) {
+                    const actionValueError = document.getElementById('action_value_error');
+                    const dynamicInput = inputWrapper.querySelector('select, input');
+                    if (!hiddenValue.value) {
+                        isValid = false;
+                        if (actionValueError) actionValueError.classList.remove('d-none');
+                        if (dynamicInput) dynamicInput.classList.add('is-invalid');
+                        // For select2
+                        if (window.jQuery && $(dynamicInput).hasClass('select2-hidden-accessible')) {
+                            $(dynamicInput).next('.select2-container').find('.select2-selection').css('border-color', '#dc3545');
+                        }
+                    } else {
+                        if (actionValueError) actionValueError.classList.add('d-none');
+                        if (dynamicInput) dynamicInput.classList.remove('is-invalid');
+                        if (window.jQuery && $(dynamicInput).hasClass('select2-hidden-accessible')) {
+                            $(dynamicInput).next('.select2-container').find('.select2-selection').css('border-color', '');
+                        }
+                    }
+                }
+            }
+
+            if (!isValid) {
+                event.preventDefault();
+                setTimeout(() => {
+                    if (!titleInput.value.trim()) {
+                        titleInput.focus();
+                        titleInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    } else if (!actionTypeSelect.value) {
+                        actionTypeSelect.focus();
+                        actionTypeSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    } else {
+                        const dynamicInput = inputWrapper.querySelector('select, input');
+                        if (dynamicInput) {
+                            dynamicInput.focus();
+                            dynamicInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }
+                }, 100);
+            }
+        });
+    }
 
     // Initial triggers
     updateLivePreview();

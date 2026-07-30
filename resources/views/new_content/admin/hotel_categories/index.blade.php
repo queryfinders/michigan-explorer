@@ -22,53 +22,11 @@
     </div>
 </div>
 
-
 @include('layouts.messages')
 
 <div class="card">
-  <div class="table-responsive pt-0">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>SR NO</th>
-          <th>Name</th>
-          <th>Slug</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        @foreach($categories as $category)
-        <tr>
-          <td>{{ $loop->iteration }}</td>
-          <td><strong>{{ $category->name }}</strong></td>
-          <td>{{ $category->slug }}</td>
-          <td>
-            <label class="switch">
-              <input type="checkbox" class="switch-input category-status-switch" data-id="{{ $category->id }}" data-status="{{ $category->status }}" {{ $category->status == 1 ? 'checked' : '' }}>
-              <span class="switch-toggle-slider"></span>
-            </label>
-          </td>
-          <td>
-            <a href="{{ route('hotel-categories.edit', $category->id) }}" class="btn btn-sm btn-primary"><i class="fa fa-edit"></i></a>
-            <form action="{{ route('hotel-categories.destroy', $category->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure?');">
-              @csrf
-              @method('DELETE')
-              <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
-            </form>
-          </td>
-        </tr>
-        @endforeach
-      </tbody>
-    </table>
-    <div class="d-flex justify-content-between align-items-center mt-4 px-3 mb-3">
-        <div class="text-muted" style="font-size: 0.85rem;">
-            Showing {{ $categories->firstItem() ?? 0 }} to {{ $categories->lastItem() ?? 0 }} out of {{ $categories->total() }} records
-        </div>
-        <div>
-            {{ $categories->links() }}
-        </div>
-    </div>
+  <div id="ajax-table-container">
+    @include('new_content.admin.hotel_categories._table')
   </div>
 </div>
 @endsection
@@ -79,7 +37,7 @@
       $(document).on('change', '.category-status-switch', function (e) {
           e.preventDefault();
           var id = $(this).data('id');
-          var status = $(this).data('status');
+          var status = $(this).prop('checked') ? 1 : 0;
           var $switch = $(this);
 
           $.ajax({
@@ -98,5 +56,3 @@
   });
 </script>
 @endsection
-
-

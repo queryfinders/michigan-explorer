@@ -11,9 +11,11 @@ use App\Models\Restaurant;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
+use App\Traits\Sortable;
 
 class AffiliateLinkController extends Controller
 {
+    use Sortable;
     public function index(Request $request)
     {
         $query = AffiliateLink::query();
@@ -27,7 +29,13 @@ class AffiliateLinkController extends Controller
             });
         }
 
-        $affiliateLinks = $query->orderBy('created_at', 'desc')->paginate(10);
+        $query = $this->applySorting($query, ['id', 'name', 'provider', 'link', 'is_active', 'created_at'], 'created_at', 'desc');
+        $affiliateLinks = $query->paginate(15);
+        
+        if ($request->ajax()) {
+            return view('new_content.admin.affiliate_links._table', compact('affiliateLinks'))->render();
+        }
+        
         return view('new_content.admin.affiliate_links.index', compact('affiliateLinks'));
     }
 
@@ -500,7 +508,7 @@ class AffiliateLinkController extends Controller
     public function changeStatus($id, $status)
     {
         $affiliateLink = AffiliateLink::findOrFail($id);
-        $affiliateLink->is_active = $status == 1 ? 0 : 1;
+        $affiliateLink->is_active = $status;
         $affiliateLink->save();
 
         return response()->json([

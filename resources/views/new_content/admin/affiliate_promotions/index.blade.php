@@ -124,7 +124,6 @@
             $placements = [
                 '' => 'All Placements',
                 'homepage_banner' => 'Homepage Banner',
-                'homepage_sidebar' => 'Homepage Sidebar',
                 'hotel_detail' => 'Hotel Detail',
                 'restaurant_detail' => 'Restaurant Detail',
                 'attraction_detail' => 'Attraction Detail',
@@ -138,7 +137,7 @@
         <input type="hidden" name="placement" id="placement_value" value="{{ $selectedPlacement }}">
         
         <div class="cuisine-dropdown-wrapper" id="placementDropdownWrapper">
-          <div class="cuisine-dropdown-trigger" id="placementTrigger" onclick="togglePlacementDropdown()">
+          <div class="cuisine-dropdown-trigger" id="placementTrigger" onclick="toggleCuisineDropdown('placement')">
             <div class="cuisine-tags-area" id="placementTagsArea">
               <span class="category-selected-text" id="placementPlaceholder">{{ $selectedPlacementName }}</span>
             </div>
@@ -148,19 +147,19 @@
             <div class="cuisine-search-wrap">
               <i class="fas fa-search cuisine-search-icon"></i>
               <input type="text" class="cuisine-search-input" id="placementSearchInput"
-                     placeholder="Search placements..." oninput="filterPlacements(this.value)" autocomplete="off" />
+                     placeholder="Search placements..." oninput="filterCuisineDropdown(this.value, 'placement')" autocomplete="off" />
             </div>
             <div class="cuisine-divider"></div>
             <div class="cuisine-items-list" id="placementItemsList">
               @foreach($placements as $val => $name)
-              <label class="cuisine-item {{ $selectedPlacement === $val ? 'selected' : '' }}" id="place-label-{{ empty($val) ? 'all' : $val }}">
+              <label class="cuisine-item {{ $selectedPlacement === $val ? 'selected' : '' }}" id="placement-label-{{ empty($val) ? 'all' : $val }}">
                 <input type="radio" name="_place_radio" value="{{ $val }}"
                        id="place_rb_{{ empty($val) ? 'all' : $val }}"
                        class="cat-rb d-none"
                        data-name="{{ $name }}"
                        data-id="{{ $val }}"
                        {{ $selectedPlacement === $val ? 'checked' : '' }}
-                       onchange="onPlacementChange(this)" />
+                       onchange="onCuisineDropdownChange(this, 'placement')" />
                 <span class="cuisine-item-name">{{ $name }}</span>
                 <span class="cuisine-item-check"><i class="fas fa-check"></i></span>
               </label>
@@ -174,11 +173,41 @@
       </div>
       <div class="col-lg-2 col-md-6 col-12">
         <label class="form-label fw-semibold">Active Status</label>
-        <select name="status" class="form-select select2" data-allow-clear="true">
-          <option value="">All</option>
-          <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Active</option>
-          <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Inactive</option>
-        </select>
+        @php
+            $statuses = [
+                '' => 'All',
+                '1' => 'Active',
+                '0' => 'Inactive'
+            ];
+            $selectedStatus = request('status', '');
+            $selectedStatusName = $statuses[$selectedStatus] ?? 'All';
+        @endphp
+        <input type="hidden" name="status" id="status_value" value="{{ $selectedStatus }}">
+        <div class="cuisine-dropdown-wrapper" id="statusDropdownWrapper">
+          <div class="cuisine-dropdown-trigger" id="statusTrigger" onclick="toggleCuisineDropdown('status')">
+            <div class="cuisine-tags-area">
+              <span class="category-selected-text" id="statusPlaceholder">{{ $selectedStatusName }}</span>
+            </div>
+            <i class="fas fa-chevron-down cuisine-dropdown-arrow" id="statusArrow"></i>
+          </div>
+          <div class="cuisine-dropdown-panel" id="statusDropdownPanel" style="display:none;">
+            <div class="cuisine-items-list" id="statusItemsList" style="padding-top: 6px;">
+              @foreach($statuses as $val => $name)
+              <label class="cuisine-item {{ $selectedStatus === (string)$val ? 'selected' : '' }}" id="status-label-{{ $val === '' ? 'all' : $val }}">
+                <input type="radio" name="_status_radio" value="{{ $val }}"
+                       id="status_rb_{{ $val === '' ? 'all' : $val }}"
+                       class="cat-rb d-none"
+                       data-name="{{ $name }}"
+                       data-id="{{ $val }}"
+                       {{ $selectedStatus === (string)$val ? 'checked' : '' }}
+                       onchange="onCuisineDropdownChange(this, 'status')" />
+                <span class="cuisine-item-name">{{ $name }}</span>
+                <span class="cuisine-item-check"><i class="fas fa-check"></i></span>
+              </label>
+              @endforeach
+            </div>
+          </div>
+        </div>
       </div>
       <div class="col-lg-4 col-md-6 col-12">
         <label class="form-label d-none d-lg-block">&nbsp;</label>
@@ -193,98 +222,8 @@
 
 <!-- Promotions Table -->
 <div class="card border-0 shadow-sm">
-  <div class="table-responsive pt-0">
-    <table class="table table-hover align-middle">
-      <thead>
-        <tr>
-          <th>SR No</th>
-          <th>Image</th>
-          <th>Badge & Title</th>
-          <th>Placement</th>
-          <th>Affiliate Link</th>
-          <th>Priority</th>
-          <th>Status</th>
-          <th>Schedule</th>
-          <th>Analytics</th>
-          <th width="100" class="text-center">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        @foreach($promotions as $promo)
-        <tr>
-          <td>{{ $loop->iteration + ($promotions->currentPage() - 1) * $promotions->perPage() }}</td>
-          <td>
-            @if($promo->desktop_image)
-              <img src="{{ asset($promo->desktop_image) }}" alt="Thumbnail" class="rounded" style="width: 65px; height: 40px; object-fit: cover; border: 1px solid #dbdade;">
-            @else
-              <span class="text-muted">No Image</span>
-            @endif
-          </td>
-          <td>
-            <span class="badge bg-light-primary text-primary mb-1">{{ $promo->badge_text }}</span>
-            <div class="fw-bold text-dark text-truncate" style="max-width: 200px;" title="{{ $promo->title }}">{{ $promo->title }}</div>
-          </td>
-          <td>
-            <span class="badge bg-label-secondary text-capitalize">{{ str_replace('_', ' ', $promo->placement) }}</span>
-          </td>
-          <td>
-            @if($promo->affiliateLink)
-              <span class="fw-semibold text-dark">{{ $promo->affiliateLink->name }}</span>
-              <small class="text-muted d-block">{{ $promo->affiliateLink->provider }}</small>
-            @else
-              <span class="text-muted">None</span>
-            @endif
-          </td>
-          <td>
-             <span class="badge bg-label-info">Priority {{ $promo->priority }}</span>
-          </td>
-          <td>
-            <label class="switch">
-              <input type="checkbox" class="switch-input status-toggle-switch" data-id="{{ $promo->id }}" data-status="{{ $promo->is_active ? 1 : 0 }}" {{ $promo->is_active ? 'checked' : '' }}>
-              <span class="switch-toggle-slider"></span>
-            </label>
-          </td>
-          <td>
-            @if($promo->starts_at || $promo->ends_at)
-              <small class="d-block text-muted"><strong>Start:</strong> {{ $promo->starts_at ? $promo->starts_at->format('M d, Y h:i A') : 'Immediately' }}</small>
-              <small class="d-block text-muted"><strong>End:</strong> {{ $promo->ends_at ? $promo->ends_at->format('M d, Y h:i A') : 'No Expiry' }}</small>
-            @else
-              <span class="badge bg-label-success">Always Active</span>
-            @endif
-          </td>
-          <td>
-             <span class="badge bg-label-success d-block mb-1">{{ number_format($promo->clicks_count) }} Clicks</span>
-             @if($promo->last_click_at)
-                <small class="text-muted d-block" style="font-size: 0.75rem;"><strong>Last:</strong> {{ $promo->last_click_at->format('M d, Y') }}</small>
-             @endif
-          </td>
-          <td class="text-center">
-            <a href="{{ route('affiliate-promotions.edit', $promo->id) }}" class="btn btn-sm btn-primary" title="Edit"><i class="fa fa-edit"></i></a>
-            <form action="{{ route('affiliate-promotions.destroy', $promo->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this promotion?');">
-              @csrf
-              @method('DELETE')
-              <button type="submit" class="btn btn-sm btn-danger" title="Delete"><i class="fa fa-trash"></i></button>
-            </form>
-          </td>
-        </tr>
-        @endforeach
-
-        @if($promotions->isEmpty())
-        <tr>
-          <td colspan="10" class="text-center py-4 text-muted">No promotions found.</td>
-        </tr>
-        @endif
-      </tbody>
-    </table>
-
-    <div class="d-flex justify-content-between align-items-center mt-4 px-3 mb-3">
-        <div class="text-muted" style="font-size: 0.85rem;">
-            Showing {{ $promotions->firstItem() ?? 0 }} to {{ $promotions->lastItem() ?? 0 }} out of {{ $promotions->total() }} records
-        </div>
-        <div>
-            {{ $promotions->appends(request()->input())->links() }}
-        </div>
-    </div>
+  <div id="ajax-table-container">
+    @include('new_content.admin.affiliate_promotions._table')
   </div>
 </div>
 @endsection
@@ -309,7 +248,7 @@
       $(document).on('change', '.status-toggle-switch', function (e) {
           e.preventDefault();
           var id = $(this).data('id');
-          var status = $(this).data('status');
+          var status = $(this).prop('checked') ? 1 : 0;
           var $switch = $(this);
 
           $.ajax({
@@ -327,12 +266,17 @@
       });
   });
 
-  // Custom Placement Dropdown Logic
-  function togglePlacementDropdown() {
-    const panel  = document.getElementById('placementDropdownPanel');
-    const arrow  = document.getElementById('placementArrow');
-    const trigger = document.getElementById('placementTrigger');
+  // Custom Generalized Dropdown Logic
+  function toggleCuisineDropdown(type) {
+    const panel  = document.getElementById(type + 'DropdownPanel');
+    const arrow  = document.getElementById(type + 'Arrow');
+    const trigger = document.getElementById(type + 'Trigger');
     const isOpen = panel.style.display !== 'none';
+    
+    // Close all dropdowns first
+    document.querySelectorAll('.cuisine-dropdown-panel').forEach(p => p.style.display = 'none');
+    document.querySelectorAll('.cuisine-dropdown-arrow').forEach(a => a.style.transform = 'rotate(0deg)');
+    document.querySelectorAll('.cuisine-dropdown-trigger').forEach(t => t.classList.remove('open'));
     
     if (isOpen) {
         panel.style.display = 'none';
@@ -342,13 +286,14 @@
         panel.style.display = 'block';
         arrow.style.transform = 'rotate(180deg)';
         trigger.classList.add('open');
-        document.getElementById('placementSearchInput').focus();
+        const input = document.getElementById(type + 'SearchInput');
+        if(input) input.focus();
     }
   }
 
-  function filterPlacements(val) {
+  function filterCuisineDropdown(val, type) {
     const term  = val.toLowerCase();
-    const items = document.querySelectorAll('#placementItemsList .cuisine-item');
+    const items = document.querySelectorAll('#' + type + 'ItemsList .cuisine-item');
     let   found = 0;
     items.forEach(item => {
       const name = item.querySelector('.cuisine-item-name').textContent.toLowerCase();
@@ -356,40 +301,39 @@
       item.style.display = show ? '' : 'none';
       if (show) found++;
     });
-    document.getElementById('placementNoResults').classList.toggle('d-none', found > 0);
+    const noRes = document.getElementById(type + 'NoResults');
+    if(noRes) noRes.classList.toggle('d-none', found > 0);
   }
 
-  function onPlacementChange(rb) {
+  function onCuisineDropdownChange(rb, type) {
     const id    = rb.dataset.id;
     const name  = rb.dataset.name;
-    const hidden= document.getElementById('placement_value');
-    const ph    = document.getElementById('placementPlaceholder');
+    const hidden= document.getElementById(type + '_value');
+    const ph    = document.getElementById(type + 'Placeholder');
 
     hidden.value = id;
-    document.querySelectorAll('#placementItemsList .cuisine-item').forEach(l => l.classList.remove('selected'));
+    document.querySelectorAll('#' + type + 'ItemsList .cuisine-item').forEach(l => l.classList.remove('selected'));
     
-    const labelId = id === '' ? 'place-label-all' : 'place-label-' + id;
+    const labelId = type + '-label-' + (id === '' ? 'all' : id);
     const label = document.getElementById(labelId);
     if(label) label.classList.add('selected');
 
-    ph.textContent = name;
+    if(ph) ph.textContent = name;
     
     // Auto-close dropdown
-    document.getElementById('placementDropdownPanel').style.display = 'none';
-    document.getElementById('placementArrow').style.transform = 'rotate(0deg)';
-    document.getElementById('placementTrigger').classList.remove('open');
+    document.getElementById(type + 'DropdownPanel').style.display = 'none';
+    const arrow = document.getElementById(type + 'Arrow');
+    if(arrow) arrow.style.transform = 'rotate(0deg)';
+    const trigger = document.getElementById(type + 'Trigger');
+    if(trigger) trigger.classList.remove('open');
   }
 
   // Close dropdown on outside click
   document.addEventListener('click', function(e) {
-    const wrapper = document.getElementById('placementDropdownWrapper');
-    if (wrapper && !wrapper.contains(e.target)) {
-      const panel = document.getElementById('placementDropdownPanel');
-      if(panel && panel.style.display !== 'none') {
-        panel.style.display = 'none';
-        document.getElementById('placementArrow').style.transform = 'rotate(0deg)';
-        document.getElementById('placementTrigger').classList.remove('open');
-      }
+    if (!e.target.closest('.cuisine-dropdown-wrapper')) {
+      document.querySelectorAll('.cuisine-dropdown-panel').forEach(p => p.style.display = 'none');
+      document.querySelectorAll('.cuisine-dropdown-arrow').forEach(a => a.style.transform = 'rotate(0deg)');
+      document.querySelectorAll('.cuisine-dropdown-trigger').forEach(t => t.classList.remove('open'));
     }
   });
 

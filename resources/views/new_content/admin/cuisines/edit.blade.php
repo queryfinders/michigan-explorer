@@ -45,6 +45,7 @@
 @endsection
 
 @section('page-script')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
 <script>
   document.getElementById('name').addEventListener('input', function() {
     let nameVal = this.value;
@@ -52,6 +53,31 @@
     if (slugInput) {
       slugInput.value = nameVal.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
     }
+  });
+
+  $(document).ready(function() {
+      // jQuery Validation
+      $('form').validate({
+          rules: {
+              name: { required: true },
+              slug: { required: true }
+          },
+          messages: {
+              name: { required: "Please enter cuisine name" },
+              slug: { required: "Please enter cuisine slug" }
+          },
+          errorElement: 'div',
+          errorClass: 'invalid-feedback d-block',
+          highlight: function(element) {
+              $(element).addClass('is-invalid');
+          },
+          unhighlight: function(element) {
+              $(element).removeClass('is-invalid');
+          },
+          errorPlacement: function(error, element) {
+              error.insertAfter(element);
+          }
+      });
   });
 </script>
 @endsection

@@ -8,9 +8,13 @@
 @section('content')
 
 <div class="container-xxl flex-grow-1 container-p-y">
-    <h4 class="fw-bold py-3 mb-4">
-        <span class="text-muted fw-light">Dashboard / Settings / Search Shortcuts /</span> Edit Shortcut
-    </h4>
+    <nav aria-label="breadcrumb" class="mb-4">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('search-shortcuts.index') }}">Search Shortcuts</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Edit Search Shortcut</li>
+      </ol>
+    </nav>
 
     <form action="{{ route('search-shortcuts.update', $searchShortcut->id) }}" method="POST">
         @csrf

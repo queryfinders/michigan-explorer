@@ -24,43 +24,44 @@
 @include('layouts.messages')
 
 <style>
-  /* Align select2 dropdown height with standard bootstrap inputs */
-  .select2-container--default .select2-selection--single {
-    height: 38px !important;
-    border: 1px solid #dbdade !important;
-    border-radius: 0.375rem !important;
+  /* Custom Dropdown Styles (from Affiliate Promotions/Attraction page) */
+  .cuisine-dropdown-wrapper { position: relative; width: 100%; }
+  .cuisine-dropdown-trigger {
+    display: flex; align-items: center; justify-content: space-between;
+    min-height: 38px; padding: 6px 12px; border: 1px solid #dbdade;
+    border-radius: 0.375rem; background: #fff; cursor: pointer;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out; gap: 10px; user-select: none;
+    width: 100%;
   }
-  .select2-container--default .select2-selection--single .select2-selection__rendered {
-    line-height: 36px !important;
-    padding-left: 12px !important;
-    color: #5d596c !important;
+  .cuisine-dropdown-trigger:hover { border-color: #7367f0; }
+  .cuisine-dropdown-trigger.open { border-color: #7367f0; box-shadow: 0 0 0 3px rgba(115,103,240,.15); }
+  .cuisine-tags-area { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; align-items: center; min-height: 24px; }
+  .cuisine-placeholder { color: #5d596c; font-size: .9rem; display: flex; align-items: center; }
+  .category-selected-text { color: #5d596c; font-size: .9rem; }
+  .cuisine-dropdown-arrow { font-size: .8rem; color: #9ea5b1; transition: transform .25s; flex-shrink: 0; }
+  .cuisine-dropdown-arrow.rotated { transform: rotate(180deg); }
+  .cuisine-dropdown-panel {
+    position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+    background: #fff; border: 1.5px solid #d5d9e0; border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0,0,0,.12); z-index: 1055; overflow: hidden;
+    animation: dropdownFade .18s ease;
   }
-  .select2-container--default .select2-selection--single .select2-selection__arrow {
-    height: 36px !important;
+  @keyframes dropdownFade { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+  .cuisine-items-list { max-height: 240px; overflow-y: auto; padding: 6px 0; }
+  .cuisine-items-list::-webkit-scrollbar { width: 4px; }
+  .cuisine-items-list::-webkit-scrollbar-thumb { background: #d5d9e0; border-radius: 4px; }
+  .cuisine-item {
+    display: flex; align-items: center; gap: 10px; padding: 9px 16px;
+    cursor: pointer; margin: 0; font-weight: 400; transition: background .13s;
   }
-  .select2-dropdown {
-    border: 1px solid #dbdade !important;
-    border-radius: 0.375rem !important;
-    box-shadow: 0 0.25rem 1rem rgba(168, 170, 174, 0.25) !important;
-  }
-  .select2-container--default.select2-container--open .select2-selection--single {
-    border-color: #7367f0 !important;
-  }
-  .select2-results__option {
-    padding: 8px 12px !important;
-    font-size: 0.9rem !important;
-    border-radius: 0.25rem !important;
-    margin: 2px 4px !important;
-  }
-  .select2-container--default .select2-results__option--highlighted[aria-selected] {
-    background-color: #7367f0 !important;
-    color: #fff !important;
-  }
-  .select2-container--default .select2-results__option[aria-selected=true] {
-    background-color: rgba(115, 103, 240, 0.08) !important;
-    color: #7367f0 !important;
-    font-weight: 600;
-  }
+  .cuisine-item:hover { background: #f4f2ff; }
+  .cuisine-item.selected { background: #ede9ff; }
+  .cuisine-item.selected:hover { background: #e4dfff; }
+  .cuisine-item input[type="radio"] { display: none; }
+  .cuisine-item-name { flex: 1; font-size: .9rem; color: #3a3a3a; }
+  .cuisine-item.selected .cuisine-item-name { color: #5a50d6; font-weight: 600; }
+  .cuisine-item-check { font-size: .8rem; color: #7367f0; display: none; }
+  .cuisine-item.selected .cuisine-item-check { display: block; }
 </style>
 
 <!-- Filters Section -->
@@ -73,27 +74,90 @@
       </div>
       <div class="col-lg-2 col-md-6 col-12">
         <label class="form-label fw-semibold">Verified Status</label>
-        <select name="verified" class="form-select select2" data-allow-clear="true">
-          <option value="">All Statuses</option>
-          <option value="1" {{ request('verified') === '1' ? 'selected' : '' }}>Verified</option>
-          <option value="0" {{ request('verified') === '0' ? 'selected' : '' }}>Unverified</option>
-        </select>
+        @php
+            $verStatuses = ['' => 'All Statuses', '1' => 'Verified', '0' => 'Unverified'];
+            $vStatus = request('verified', '');
+        @endphp
+        <input type="hidden" name="verified" id="verified_value" value="{{ $vStatus }}">
+        <div class="cuisine-dropdown-wrapper" id="verifiedDropdownWrapper">
+          <div class="cuisine-dropdown-trigger" id="verifiedTrigger" onclick="toggleCuisineDropdown('verified')">
+            <div class="cuisine-tags-area">
+              <span class="category-selected-text" id="verifiedPlaceholder">{{ $verStatuses[$vStatus] ?? 'All Statuses' }}</span>
+            </div>
+            <i class="fas fa-chevron-down cuisine-dropdown-arrow" id="verifiedArrow"></i>
+          </div>
+          <div class="cuisine-dropdown-panel" id="verifiedDropdownPanel" style="display:none;">
+            <div class="cuisine-items-list" id="verifiedItemsList" style="padding-top: 6px;">
+              @foreach($verStatuses as $val => $name)
+              <label class="cuisine-item {{ $vStatus === (string)$val ? 'selected' : '' }}" id="verified-label-{{ $val === '' ? 'all' : $val }}">
+                <input type="radio" name="_verified_radio" value="{{ $val }}"
+                       class="cat-rb d-none" data-name="{{ $name }}" data-id="{{ $val }}"
+                       {{ $vStatus === (string)$val ? 'checked' : '' }} onchange="onCuisineDropdownChange(this, 'verified')" />
+                <span class="cuisine-item-name">{{ $name }}</span>
+                <span class="cuisine-item-check"><i class="fas fa-check"></i></span>
+              </label>
+              @endforeach
+            </div>
+          </div>
+        </div>
       </div>
       <div class="col-lg-2 col-md-6 col-12">
         <label class="form-label fw-semibold">Active Status</label>
-        <select name="active" class="form-select select2" data-allow-clear="true">
-          <option value="">All</option>
-          <option value="1" {{ request('active') === '1' ? 'selected' : '' }}>Active</option>
-          <option value="0" {{ request('active') === '0' ? 'selected' : '' }}>Inactive</option>
-        </select>
+        @php
+            $actStatuses = ['' => 'All', '1' => 'Active', '0' => 'Inactive'];
+            $aStatus = request('active', '');
+        @endphp
+        <input type="hidden" name="active" id="active_value" value="{{ $aStatus }}">
+        <div class="cuisine-dropdown-wrapper" id="activeDropdownWrapper">
+          <div class="cuisine-dropdown-trigger" id="activeTrigger" onclick="toggleCuisineDropdown('active')">
+            <div class="cuisine-tags-area">
+              <span class="category-selected-text" id="activePlaceholder">{{ $actStatuses[$aStatus] ?? 'All' }}</span>
+            </div>
+            <i class="fas fa-chevron-down cuisine-dropdown-arrow" id="activeArrow"></i>
+          </div>
+          <div class="cuisine-dropdown-panel" id="activeDropdownPanel" style="display:none;">
+            <div class="cuisine-items-list" id="activeItemsList" style="padding-top: 6px;">
+              @foreach($actStatuses as $val => $name)
+              <label class="cuisine-item {{ $aStatus === (string)$val ? 'selected' : '' }}" id="active-label-{{ $val === '' ? 'all' : $val }}">
+                <input type="radio" name="_active_radio" value="{{ $val }}"
+                       class="cat-rb d-none" data-name="{{ $name }}" data-id="{{ $val }}"
+                       {{ $aStatus === (string)$val ? 'checked' : '' }} onchange="onCuisineDropdownChange(this, 'active')" />
+                <span class="cuisine-item-name">{{ $name }}</span>
+                <span class="cuisine-item-check"><i class="fas fa-check"></i></span>
+              </label>
+              @endforeach
+            </div>
+          </div>
+        </div>
       </div>
       <div class="col-lg-2 col-md-6 col-12">
         <label class="form-label fw-semibold">Source</label>
-        <select name="source" class="form-select select2" data-allow-clear="true">
-          <option value="">All Sources</option>
-          <option value="explorer_club" {{ request('source') === 'explorer_club' ? 'selected' : '' }}>Explorer Club</option>
-          <option value="footer" {{ request('source') === 'footer' ? 'selected' : '' }}>Footer</option>
-        </select>
+        @php
+            $sources = ['' => 'All Sources', 'explorer_club' => 'Explorer Club', 'footer' => 'Footer'];
+            $srcVal = request('source', '');
+        @endphp
+        <input type="hidden" name="source" id="source_value" value="{{ $srcVal }}">
+        <div class="cuisine-dropdown-wrapper" id="sourceDropdownWrapper">
+          <div class="cuisine-dropdown-trigger" id="sourceTrigger" onclick="toggleCuisineDropdown('source')">
+            <div class="cuisine-tags-area">
+              <span class="category-selected-text" id="sourcePlaceholder">{{ $sources[$srcVal] ?? 'All Sources' }}</span>
+            </div>
+            <i class="fas fa-chevron-down cuisine-dropdown-arrow" id="sourceArrow"></i>
+          </div>
+          <div class="cuisine-dropdown-panel" id="sourceDropdownPanel" style="display:none;">
+            <div class="cuisine-items-list" id="sourceItemsList" style="padding-top: 6px;">
+              @foreach($sources as $val => $name)
+              <label class="cuisine-item {{ $srcVal === (string)$val ? 'selected' : '' }}" id="source-label-{{ $val === '' ? 'all' : $val }}">
+                <input type="radio" name="_source_radio" value="{{ $val }}"
+                       class="cat-rb d-none" data-name="{{ $name }}" data-id="{{ $val }}"
+                       {{ $srcVal === (string)$val ? 'checked' : '' }} onchange="onCuisineDropdownChange(this, 'source')" />
+                <span class="cuisine-item-name">{{ $name }}</span>
+                <span class="cuisine-item-check"><i class="fas fa-check"></i></span>
+              </label>
+              @endforeach
+            </div>
+          </div>
+        </div>
       </div>
       <div class="col-lg-3 col-md-12 col-12">
         <label class="form-label d-none d-lg-block">&nbsp;</label>
@@ -109,64 +173,8 @@
 <!-- Subscribers List Card -->
 <div class="card border-0 shadow-sm">
   <div class="card-body pt-4">
-    <div class="table-responsive pt-0">
-      <table class="table align-middle">
-        <thead>
-          <tr>
-            <th>SR NO</th>
-            <th>Email</th>
-            <th>Source</th>
-            <th>Verified</th>
-            <th>Subscription Date</th>
-            <th>Verified Date</th>
-            <th width="100" class="text-center">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          @forelse($subscribers as $index => $sub)
-          <tr>
-            <td>{{ ($subscribers->currentPage() - 1) * $subscribers->perPage() + $loop->iteration }}</td>
-            <td>
-              <strong class="text-dark">{{ $sub->email }}</strong>
-            </td>
-            <td>
-              @if($sub->source === 'explorer_club')
-                <span class="badge bg-label-primary">Explorer Club</span>
-              @else
-                <span class="badge bg-label-secondary">Footer</span>
-              @endif
-            </td>
-            <td>
-              @if($sub->is_verified)
-                <span class="badge bg-label-success"><i class="fa-solid fa-circle-check me-1"></i> Verified</span>
-              @else
-                <span class="badge bg-label-warning"><i class="fa-solid fa-clock me-1"></i> Pending</span>
-              @endif
-            </td>
-            <td class="small text-muted">{{ $sub->created_at->format('M d, Y H:i A') }}</td>
-            <td class="small text-muted">
-              {{ $sub->verified_at ? $sub->verified_at->format('M d, Y H:i A') : 'N/A' }}
-            </td>
-            <td class="text-center">
-              <button type="button" class="btn btn-sm btn-danger delete-subscriber-btn" data-id="{{ $sub->id }}"><i class="fa fa-trash"></i></button>
-            </td>
-          </tr>
-          @empty
-          <tr>
-            <td colspan="9" class="text-center py-4 text-muted">No subscribers found matching the filters.</td>
-          </tr>
-          @endforelse
-        </tbody>
-      </table>
-      
-      <div class="d-flex justify-content-between align-items-center mt-4 px-3 mb-3 flex-wrap gap-2">
-        <div class="text-muted" style="font-size: 0.85rem;">
-          Showing {{ $subscribers->firstItem() ?? 0 }} to {{ $subscribers->lastItem() ?? 0 }} out of {{ $subscribers->total() }} records
-        </div>
-        <div>
-          {{ $subscribers->appends(request()->query())->links() }}
-        </div>
-      </div>
+    <div id="ajax-table-container">
+      @include('new_content.admin.subscribers._table')
     </div>
   </form>
 </div>
@@ -182,18 +190,6 @@
 @section('page-script')
 <script>
 $(document).ready(function() {
-    // Initialize Select2 on the filter dropdowns to match the Category dropdown styling
-    if ($.fn.select2) {
-        $('.select2').each(function() {
-            var $this = $(this);
-            $this.select2({
-                minimumResultsForSearch: Infinity,
-                width: '100%',
-                dropdownParent: $this.parent()
-            });
-        });
-    }
-
     // Delete button handler using SweetAlert2
     $('.delete-subscriber-btn').on('click', function() {
         var id = $(this).data('id');
@@ -218,5 +214,62 @@ $(document).ready(function() {
         });
     });
 });
+
+  // Custom Generalized Dropdown Logic
+  function toggleCuisineDropdown(type) {
+    const panel  = document.getElementById(type + 'DropdownPanel');
+    const arrow  = document.getElementById(type + 'Arrow');
+    const trigger = document.getElementById(type + 'Trigger');
+    const isOpen = panel.style.display !== 'none';
+    
+    // Close all dropdowns first
+    document.querySelectorAll('.cuisine-dropdown-panel').forEach(p => p.style.display = 'none');
+    document.querySelectorAll('.cuisine-dropdown-arrow').forEach(a => a.style.transform = 'rotate(0deg)');
+    document.querySelectorAll('.cuisine-dropdown-trigger').forEach(t => t.classList.remove('open'));
+    
+    if (isOpen) {
+        panel.style.display = 'none';
+        arrow.style.transform = 'rotate(0deg)';
+        trigger.classList.remove('open');
+    } else {
+        panel.style.display = 'block';
+        arrow.style.transform = 'rotate(180deg)';
+        trigger.classList.add('open');
+        const input = document.getElementById(type + 'SearchInput');
+        if(input) input.focus();
+    }
+  }
+
+  function onCuisineDropdownChange(rb, type) {
+    const id    = rb.dataset.id;
+    const name  = rb.dataset.name;
+    const hidden= document.getElementById(type + '_value');
+    const ph    = document.getElementById(type + 'Placeholder');
+
+    hidden.value = id;
+    document.querySelectorAll('#' + type + 'ItemsList .cuisine-item').forEach(l => l.classList.remove('selected'));
+    
+    const labelId = type + '-label-' + (id === '' ? 'all' : id);
+    const label = document.getElementById(labelId);
+    if(label) label.classList.add('selected');
+
+    if(ph) ph.textContent = name;
+    
+    // Auto-close dropdown
+    document.getElementById(type + 'DropdownPanel').style.display = 'none';
+    const arrow = document.getElementById(type + 'Arrow');
+    if(arrow) arrow.style.transform = 'rotate(0deg)';
+    const trigger = document.getElementById(type + 'Trigger');
+    if(trigger) trigger.classList.remove('open');
+  }
+
+  // Close dropdown on outside click
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.cuisine-dropdown-wrapper')) {
+      document.querySelectorAll('.cuisine-dropdown-panel').forEach(p => p.style.display = 'none');
+      document.querySelectorAll('.cuisine-dropdown-arrow').forEach(a => a.style.transform = 'rotate(0deg)');
+      document.querySelectorAll('.cuisine-dropdown-trigger').forEach(t => t.classList.remove('open'));
+    }
+  });
 </script>
 @endsection

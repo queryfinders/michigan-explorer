@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Subscriber;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Traits\Sortable;
 
 class SubscriberController extends Controller
 {
+    use Sortable;
     /**
      * Display a listing of the subscribers.
      */
@@ -48,7 +50,12 @@ class SubscriberController extends Controller
             }
         }
 
-        $subscribers = $query->orderByDesc('created_at')->paginate(15);
+        $query = $this->applySorting($query, ['id', 'email', 'source', 'is_verified', 'created_at', 'verified_at'], 'created_at', 'desc');
+        $subscribers = $query->paginate(15);
+
+        if ($request->ajax()) {
+            return view('new_content.admin.subscribers._table', compact('subscribers'))->render();
+        }
 
         return view('new_content.admin.subscribers.index', compact('subscribers'));
     }

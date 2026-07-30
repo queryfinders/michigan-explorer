@@ -5,11 +5,20 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
+use App\Traits\Sortable;
+
 class PageController extends Controller
 {
-    public function index()
+    use Sortable;
+    public function index(Request $request)
     {
-        $pages = \App\Models\Page::orderBy('created_at', 'desc')->paginate(10);
+        $query = \App\Models\Page::query();
+        $query = $this->applySorting($query, ['id', 'title', 'slug', 'status', 'created_at'], 'created_at', 'desc');
+        $pages = $query->paginate(10);
+        
+        if ($request->ajax()) {
+            return view('new_content.admin.pages._table', compact('pages'))->render();
+        }
         return view('new_content.admin.pages.index', compact('pages'));
     }
 
@@ -124,7 +133,7 @@ class PageController extends Controller
     public function changeStatus($id, $status)
     {
         $page = \App\Models\Page::findOrFail($id);
-        $page->status = $status == 1 ? 0 : 1;
+        $page->status = $status;
         $page->save();
 
         return response()->json(['success' => true, 'message' => 'Status updated successfully.', 'status' => $page->status]);

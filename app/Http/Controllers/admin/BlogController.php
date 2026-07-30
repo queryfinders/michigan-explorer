@@ -10,12 +10,21 @@ use App\Models\Author;
 use App\Models\BlogTag;
 use App\Models\BlogTagMap;
 use Illuminate\Support\Str;
+use App\Traits\Sortable;
 
 class BlogController extends Controller
 {
-    public function index()
+    use Sortable;
+    public function index(Request $request)
     {
-        $blogs = Blog::with(['category', 'author'])->orderBy('created_at', 'desc')->paginate(10);
+        $query = Blog::with(['category', 'author']);
+        $query = $this->applySorting($query, ['id', 'title', 'blog_category_id', 'status', 'published_at', 'created_at'], 'created_at', 'desc');
+        $blogs = $query->paginate(10);
+        
+        if ($request->ajax()) {
+            return view('new_content.admin.blogs._table', compact('blogs'))->render();
+        }
+        
         return view('new_content.admin.blogs.index', compact('blogs'));
     }
 
@@ -357,7 +366,7 @@ class BlogController extends Controller
     public function changeStatus($id, $status)
     {
         $blog = \App\Models\Blog::findOrFail($id);
-        $blog->status = $status === 'published' ? 'draft' : 'published';
+        $blog->status = $status == 1 ? 'published' : 'draft';
         
         if ($blog->status === 'published' && !$blog->published_at) {
             $blog->published_at = now();

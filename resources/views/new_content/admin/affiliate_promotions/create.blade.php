@@ -74,7 +74,6 @@
           @php
               $placements = [
                   'homepage_banner' => 'Homepage Banner',
-                  'homepage_sidebar' => 'Homepage Sidebar',
                   'hotel_detail' => 'Hotel Detail',
                   'restaurant_detail' => 'Restaurant Detail',
                   'attraction_detail' => 'Attraction Detail',
@@ -85,7 +84,7 @@
               $selectedPlacementName = $selectedPlacement ? ($placements[$selectedPlacement] ?? 'Select Placement...') : 'Select Placement...';
           @endphp
 
-          <input type="hidden" name="placement" id="placement_value" value="{{ $selectedPlacement }}" required>
+          <input type="hidden" name="placement" id="placement_value" value="{{ $selectedPlacement }}">
           
           <div class="cuisine-dropdown-wrapper" id="placementDropdownWrapper">
             <div class="cuisine-dropdown-trigger {{ $errors->has('placement') ? 'border-danger' : '' }}" id="placementTrigger" onclick="togglePlacementDropdown()">
@@ -128,70 +127,136 @@
 
         <div class="col-md-6">
           <label class="form-label fw-semibold">Priority <span class="text-danger">*</span></label>
-          <input type="number" name="priority" class="form-control @error('priority') is-invalid @enderror" value="{{ old('priority', 1) }}" min="1" required>
+          <input type="number" name="priority" id="priority" class="form-control @error('priority') is-invalid @enderror" value="{{ old('priority', 1) }}" min="1">
           <small class="text-muted">1 = Highest Priority (rendered first if multiple promos are scheduled)</small>
           @error('priority')
             <div class="invalid-feedback">{{ $message }}</div>
+          @else
+            <div class="invalid-feedback">The priority field is required.</div>
           @enderror
         </div>
 
         <!-- Badge & CTA Button -->
         <div class="col-md-6">
           <label class="form-label fw-semibold">Badge Text <span class="text-danger">*</span></label>
-          <input type="text" name="badge_text" class="form-control @error('badge_text') is-invalid @enderror" value="{{ old('badge_text', 'Special Promotion') }}" required placeholder="e.g. Special Offer, Limited Time">
+          <input type="text" name="badge_text" id="badge_text" class="form-control @error('badge_text') is-invalid @enderror" value="{{ old('badge_text', 'Special Promotion') }}" placeholder="e.g. Special Offer, Limited Time">
           @error('badge_text')
             <div class="invalid-feedback">{{ $message }}</div>
+          @else
+            <div class="invalid-feedback">The badge text field is required.</div>
           @enderror
         </div>
 
         <div class="col-md-6">
           <label class="form-label fw-semibold">CTA Button Text <span class="text-danger">*</span></label>
-          <input type="text" name="cta_text" class="form-control @error('cta_text') is-invalid @enderror" value="{{ old('cta_text', 'Claim Offer') }}" required placeholder="e.g. Claim Offer, Book Now">
+          <input type="text" name="cta_text" id="cta_text" class="form-control @error('cta_text') is-invalid @enderror" value="{{ old('cta_text', 'Claim Offer') }}" placeholder="e.g. Claim Offer, Book Now">
           @error('cta_text')
             <div class="invalid-feedback">{{ $message }}</div>
+          @else
+            <div class="invalid-feedback">The CTA text field is required.</div>
           @enderror
         </div>
 
         <!-- Title -->
         <div class="col-12">
           <label class="form-label fw-semibold">Title <span class="text-danger">*</span></label>
-          <input type="text" name="title" class="form-control @error('title') is-invalid @enderror" value="{{ old('title') }}" required placeholder="e.g. Save 20% on Romantic Lakefront Escapes">
+          <input type="text" name="title" id="title" class="form-control @error('title') is-invalid @enderror" value="{{ old('title') }}" placeholder="e.g. Save 20% on Romantic Lakefront Escapes">
           @error('title')
             <div class="invalid-feedback">{{ $message }}</div>
+          @else
+            <div class="invalid-feedback">The title field is required.</div>
           @enderror
         </div>
 
         <!-- Subtitle -->
         <div class="col-12">
           <label class="form-label fw-semibold">Subtitle <span class="text-danger">*</span></label>
-          <textarea name="subtitle" class="form-control @error('subtitle') is-invalid @enderror" rows="3" required placeholder="Add promotion campaign summary or description..."></textarea>
+          <textarea name="subtitle" id="subtitle" class="form-control @error('subtitle') is-invalid @enderror" rows="3" placeholder="Add promotion campaign summary or description..."></textarea>
           @error('subtitle')
             <div class="invalid-feedback">{{ $message }}</div>
+          @else
+            <div class="invalid-feedback">The subtitle field is required.</div>
           @enderror
         </div>
 
         <!-- Affiliate Link Selection -->
         <div class="col-12">
           <label class="form-label fw-semibold">Destination Affiliate Link</label>
-          <select name="affiliate_link_id" class="form-select @error('affiliate_link_id') is-invalid @enderror">
-            <option value="">Select Platform Link (for tracking redirects)...</option>
-            @foreach($affiliateLinks as $link)
-              <option value="{{ $link->id }}" {{ old('affiliate_link_id') == $link->id ? 'selected' : '' }}>{{ $link->name }} ({{ $link->provider }})</option>
-            @endforeach
-          </select>
-          <small class="text-muted">Links the promotion CTA button to a registered provider redirect for analytics.</small>
+          
+          @php
+              $selectedLink = old('affiliate_link_id');
+              $selectedLinkName = 'Select Platform Link (for tracking redirects)...';
+              if ($selectedLink) {
+                  $foundLink = $affiliateLinks->firstWhere('id', $selectedLink);
+                  if ($foundLink) {
+                      $selectedLinkName = $foundLink->name . ' (' . $foundLink->provider . ')';
+                  }
+              }
+          @endphp
+
+          <input type="hidden" name="affiliate_link_id" id="affiliate_link_id_value" value="{{ $selectedLink }}">
+          
+          <div class="cuisine-dropdown-wrapper" id="linkDropdownWrapper">
+            <div class="cuisine-dropdown-trigger {{ $errors->has('affiliate_link_id') ? 'border-danger' : '' }}" id="linkTrigger" onclick="toggleLinkDropdown()">
+              <div class="cuisine-tags-area" id="linkTagsArea">
+                <span class="category-selected-text" id="linkPlaceholder">{{ $selectedLinkName }}</span>
+              </div>
+              <i class="fas fa-chevron-down cuisine-dropdown-arrow" id="linkArrow"></i>
+            </div>
+            <div class="cuisine-dropdown-panel" id="linkDropdownPanel" style="display:none;">
+              <div class="cuisine-search-wrap">
+                <i class="fas fa-search cuisine-search-icon"></i>
+                <input type="text" class="cuisine-search-input" id="linkSearchInput"
+                       placeholder="Search links..." oninput="filterLinks(this.value)" autocomplete="off" />
+              </div>
+              <div class="cuisine-divider"></div>
+              <div class="cuisine-items-list" id="linkItemsList">
+                <label class="cuisine-item {{ !$selectedLink ? 'selected' : '' }}" id="link-label-empty">
+                  <input type="radio" name="_link_radio" value=""
+                         id="link_rb_empty"
+                         class="cat-rb d-none"
+                         data-name="Select Platform Link (for tracking redirects)..."
+                         data-id=""
+                         {{ !$selectedLink ? 'checked' : '' }}
+                         onchange="onLinkChange(this)" />
+                  <span class="cuisine-item-name text-muted">Select Platform Link (for tracking redirects)...</span>
+                  <span class="cuisine-item-check"><i class="fas fa-check"></i></span>
+                </label>
+                @foreach($affiliateLinks as $link)
+                @php $linkName = $link->name . ' (' . $link->provider . ')'; @endphp
+                <label class="cuisine-item {{ $selectedLink == $link->id ? 'selected' : '' }}" id="link-label-{{ $link->id }}">
+                  <input type="radio" name="_link_radio" value="{{ $link->id }}"
+                         id="link_rb_{{ $link->id }}"
+                         class="cat-rb d-none"
+                         data-name="{{ $linkName }}"
+                         data-id="{{ $link->id }}"
+                         {{ $selectedLink == $link->id ? 'checked' : '' }}
+                         onchange="onLinkChange(this)" />
+                  <span class="cuisine-item-name">{{ $linkName }}</span>
+                  <span class="cuisine-item-check"><i class="fas fa-check"></i></span>
+                </label>
+                @endforeach
+                <div class="cuisine-no-results d-none" id="linkNoResults">
+                  <i class="fas fa-search-minus me-2"></i>No links found
+                </div>
+              </div>
+            </div>
+          </div>
+          <small class="text-muted d-block mt-1">Links the promotion CTA button to a registered provider redirect for analytics.</small>
           @error('affiliate_link_id')
-            <div class="invalid-feedback">{{ $message }}</div>
+            <div class="text-danger small mt-1">{{ $message }}</div>
           @enderror
         </div>
 
         <!-- Desktop Banner Image -->
-        <div class="col-md-6">
+        <div class="col-12">
           <label class="form-label fw-semibold">Desktop Banner Image <span class="text-danger">*</span></label>
-          <input type="file" name="desktop_image" class="form-control @error('desktop_image') is-invalid @enderror" required>
-          <small class="text-muted">Recommended aspect ratio: 16:9 or custom wide banner dimensions (max 2MB).</small>
+          <input type="file" name="desktop_image" id="desktop_image" class="form-control @error('desktop_image') is-invalid @enderror">
+          <small class="text-muted d-block mt-1">Recommended aspect ratio: 16:9 or custom wide banner dimensions (max 2MB).</small>
           @error('desktop_image')
-            <div class="invalid-feedback">{{ $message }}</div>
+            <div class="text-danger small mt-1">{{ $message }}</div>
+          @else
+            <div class="invalid-feedback">The desktop banner image is required.</div>
           @enderror
         </div>
 
@@ -225,14 +290,7 @@
           @enderror
         </div>
 
-        <!-- Status Toggle switch 
-        <div class="col-12 my-3">
-          <div class="form-check form-switch form-check-md">
-            <input class="form-check-input" type="checkbox" name="is_active" id="is_active" value="1" {{ old('is_active', '1') == '1' ? 'checked' : '' }}>
-            <label class="form-check-label fw-semibold ms-2" for="is_active">Promotion Active Status</label>
-          </div>
-        </div>
-        -->
+
 
         <!-- Submit & Cancel Buttons -->
         <div class="col-12 pt-3 border-top d-flex gap-2">
@@ -248,13 +306,76 @@
 
 @section('page-script')
 <script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('affiliatePromotionCreateForm');
+      if (form) {
+          form.addEventListener('submit', function(event) {
+              let isValid = true;
+              let firstInvalid = null;
+
+              const fields = [
+                  { id: 'placement_value' },
+                  { id: 'priority' },
+                  { id: 'badge_text' },
+                  { id: 'cta_text' },
+                  { id: 'title' },
+                  { id: 'subtitle' },
+                  { id: 'desktop_image' }
+              ];
+
+              fields.forEach(f => {
+                  const el = document.getElementById(f.id);
+                  if (el) {
+                      if (!el.value.trim()) {
+                          isValid = false;
+                          if (!firstInvalid) firstInvalid = el;
+                          if (f.id === 'placement_value') {
+                              const trigger = document.getElementById('placementTrigger');
+                              if (trigger) trigger.classList.add('border-danger');
+                          } else {
+                              el.classList.add('is-invalid');
+                          }
+                      } else {
+                          if (f.id === 'placement_value') {
+                              const trigger = document.getElementById('placementTrigger');
+                              if (trigger) trigger.classList.remove('border-danger');
+                          } else {
+                              el.classList.remove('is-invalid');
+                          }
+                      }
+                  }
+              });
+
+              if (!isValid) {
+                  event.preventDefault();
+                  setTimeout(() => {
+                      if (firstInvalid) {
+                          if (firstInvalid.id === 'placement_value') {
+                              const trigger = document.getElementById('placementTrigger');
+                              if (trigger) trigger.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                          } else {
+                              firstInvalid.focus();
+                              firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                          }
+                      }
+                  }, 100);
+              }
+          });
+      }
+  });
+
   // Custom Placement Dropdown Logic
   function togglePlacementDropdown() {
-    const panel  = document.getElementById('placementDropdownPanel');
-    const arrow  = document.getElementById('placementArrow');
+    const panel = document.getElementById('placementDropdownPanel');
+    const arrow = document.getElementById('placementArrow');
     const trigger = document.getElementById('placementTrigger');
-    const isOpen = panel.style.display !== 'none';
+    const isOpen = panel.style.display === 'block';
     
+    // close link dropdown if open
+    document.getElementById('linkDropdownPanel').style.display = 'none';
+    document.getElementById('linkArrow').style.transform = 'rotate(0deg)';
+    document.getElementById('linkTrigger').classList.remove('open');
+
     if (isOpen) {
         panel.style.display = 'none';
         arrow.style.transform = 'rotate(0deg)';
@@ -264,6 +385,29 @@
         arrow.style.transform = 'rotate(180deg)';
         trigger.classList.add('open');
         document.getElementById('placementSearchInput').focus();
+    }
+  }
+
+  function toggleLinkDropdown() {
+    const panel = document.getElementById('linkDropdownPanel');
+    const arrow = document.getElementById('linkArrow');
+    const trigger = document.getElementById('linkTrigger');
+    const isOpen = panel.style.display === 'block';
+    
+    // close placement dropdown if open
+    document.getElementById('placementDropdownPanel').style.display = 'none';
+    document.getElementById('placementArrow').style.transform = 'rotate(0deg)';
+    document.getElementById('placementTrigger').classList.remove('open');
+
+    if (isOpen) {
+        panel.style.display = 'none';
+        arrow.style.transform = 'rotate(0deg)';
+        trigger.classList.remove('open');
+    } else {
+        panel.style.display = 'block';
+        arrow.style.transform = 'rotate(180deg)';
+        trigger.classList.add('open');
+        document.getElementById('linkSearchInput').focus();
     }
   }
 
@@ -278,6 +422,19 @@
       if (show) found++;
     });
     document.getElementById('placementNoResults').classList.toggle('d-none', found > 0);
+  }
+
+  function filterLinks(val) {
+    const term  = val.toLowerCase();
+    const items = document.querySelectorAll('#linkItemsList .cuisine-item');
+    let   found = 0;
+    items.forEach(item => {
+      const name = item.querySelector('.cuisine-item-name').textContent.toLowerCase();
+      const show = name.includes(term);
+      item.style.display = show ? '' : 'none';
+      if (show) found++;
+    });
+    document.getElementById('linkNoResults').classList.toggle('d-none', found > 0);
   }
 
   function onPlacementChange(rb) {
@@ -303,15 +460,47 @@
     document.getElementById('placementTrigger').classList.remove('border-danger');
   }
 
+  function onLinkChange(rb) {
+    const id    = rb.dataset.id;
+    const name  = rb.dataset.name;
+    const hidden= document.getElementById('affiliate_link_id_value');
+    const ph    = document.getElementById('linkPlaceholder');
+
+    hidden.value = id;
+    document.querySelectorAll('#linkItemsList .cuisine-item').forEach(l => l.classList.remove('selected'));
+    
+    const label = document.getElementById(id ? 'link-label-' + id : 'link-label-empty');
+    if(label) label.classList.add('selected');
+
+    ph.textContent = name;
+    
+    // Auto-close dropdown
+    document.getElementById('linkDropdownPanel').style.display = 'none';
+    document.getElementById('linkArrow').style.transform = 'rotate(0deg)';
+    document.getElementById('linkTrigger').classList.remove('open');
+    document.getElementById('linkTrigger').classList.remove('border-danger');
+  }
+
   // Close dropdown on outside click
   document.addEventListener('click', function(e) {
     const wrapper = document.getElementById('placementDropdownWrapper');
+    const linkWrapper = document.getElementById('linkDropdownWrapper');
+    
     if (wrapper && !wrapper.contains(e.target)) {
       const panel = document.getElementById('placementDropdownPanel');
       if(panel && panel.style.display !== 'none') {
         panel.style.display = 'none';
         document.getElementById('placementArrow').style.transform = 'rotate(0deg)';
         document.getElementById('placementTrigger').classList.remove('open');
+      }
+    }
+
+    if (linkWrapper && !linkWrapper.contains(e.target)) {
+      const panel = document.getElementById('linkDropdownPanel');
+      if(panel && panel.style.display !== 'none') {
+        panel.style.display = 'none';
+        document.getElementById('linkArrow').style.transform = 'rotate(0deg)';
+        document.getElementById('linkTrigger').classList.remove('open');
       }
     }
   });

@@ -4,12 +4,21 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Traits\Sortable;
 
 class EventController extends Controller
 {
-    public function index()
+    use Sortable;
+    public function index(Request $request)
     {
-        $events = \App\Models\Event::with('category')->orderBy('created_at', 'desc')->paginate(10);
+        $query = \App\Models\Event::with('category');
+        $query = $this->applySorting($query, ['id', 'name', 'event_category_id', 'status', 'created_at'], 'created_at', 'desc');
+        $events = $query->paginate(10);
+        
+        if ($request->ajax()) {
+            return view('new_content.admin.events._table', compact('events'))->render();
+        }
+        
         return view('new_content.admin.events.index', compact('events'));
     }
 

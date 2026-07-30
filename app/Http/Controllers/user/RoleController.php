@@ -8,15 +8,28 @@ use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
+use App\Traits\Sortable;
+
 class RoleController extends Controller
 {
+    use Sortable;
 
     public function role(Request $request){
-        return view('new_content.user.role_list');
+        $query = Role::query();
+        $query = $this->applySorting($query, ['id', 'role'], 'id', 'desc');
+        
+        $roles = $query->paginate(10);
+        
+        if ($request->ajax()) {
+            return view('new_content.user._role_table', compact('roles'))->render();
+        }
+
+        return view('new_content.user.role_list', compact('roles'));
     }
 
     public function index_role(Request $request)
     {
+        // Deprecated, kept for legacy
         $role= Role::all();
         return response()->json(['role' => $role]);
     }

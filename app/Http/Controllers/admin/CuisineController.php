@@ -5,12 +5,20 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\RestaurantCuisine;
+use App\Traits\Sortable;
 
 class CuisineController extends Controller
 {
-    public function index()
+    use Sortable;
+    public function index(Request $request)
     {
-        $cuisines = RestaurantCuisine::orderBy('sort_order')->orderBy('created_at', 'desc')->paginate(10);
+        $query = RestaurantCuisine::query();
+        $query = $this->applySorting($query, ['id', 'name', 'slug', 'sort_order', 'status', 'created_at'], 'sort_order', 'asc');
+        $cuisines = $query->paginate(10);
+        
+        if ($request->ajax()) {
+            return view('new_content.admin.cuisines._table', compact('cuisines'))->render();
+        }
         return view('new_content.admin.cuisines.index', compact('cuisines'));
     }
 
@@ -83,7 +91,7 @@ class CuisineController extends Controller
     public function changeStatus($id, $status)
     {
         $cuisine = RestaurantCuisine::findOrFail($id);
-        $cuisine->status = $status == 1 ? 0 : 1;
+        $cuisine->status = $status;
         $cuisine->save();
         return response()->json(['success' => true, 'status' => $cuisine->status]);
     }

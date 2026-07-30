@@ -11,12 +11,21 @@ use App\Models\RestaurantFaq;
 use App\Models\RestaurantCuisine;
 use App\Models\RestaurantFeature;
 use Illuminate\Support\Facades\Storage;
+use App\Traits\Sortable;
 
 class RestaurantController extends Controller
 {
-    public function index()
+    use Sortable;
+    public function index(Request $request)
     {
-        $restaurants = Restaurant::with('category')->orderBy('created_at', 'desc')->paginate(10);
+        $query = Restaurant::with('category');
+        $query = $this->applySorting($query, ['id', 'name', 'restaurant_category_id', 'is_featured', 'status', 'created_at'], 'created_at', 'desc');
+        $restaurants = $query->paginate(10);
+        
+        if ($request->ajax()) {
+            return view('new_content.admin.restaurants._table', compact('restaurants'))->render();
+        }
+        
         return view('new_content.admin.restaurants.index', compact('restaurants'));
     }
 
@@ -378,7 +387,7 @@ class RestaurantController extends Controller
     public function changeStatus($id, $status)
     {
         $restaurant = Restaurant::findOrFail($id);
-        $restaurant->status = $status == 1 ? 0 : 1;
+        $restaurant->status = $status;
         $restaurant->save();
 
         return response()->json([

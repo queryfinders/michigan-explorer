@@ -30,8 +30,7 @@
         <label class="form-label fw-semibold" for="attraction_category_id">Category <span class="text-danger">*</span></label>
         {{-- Hidden input that holds the selected category id --}}
         <input type="hidden" name="attraction_category_id" id="attraction_category_id"
-               value="{{ old('attraction_category_id', isset($attraction) ? $attraction->attraction_category_id : '') }}" required />
-        @error('attraction_category_id') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+               value="{{ old('attraction_category_id', isset($attraction) ? $attraction->attraction_category_id : '') }}" />
 
         <div class="cuisine-dropdown-wrapper" id="categoryDropdownWrapper">
           <div class="cuisine-dropdown-trigger" id="categoryTrigger" onclick="toggleCategoryDropdown()">
@@ -76,16 +75,17 @@
             </div>
           </div>
         </div>
+        @error('attraction_category_id') <div class="text-danger small mt-1">The category field is required.</div> @else <div class="text-danger small mt-1 d-none" id="category-error-msg">The category field is required.</div> @enderror
       </div>
       <div class="col-md-4 mb-3">
         <label class="form-label" for="name">Name <span class="text-danger">*</span></label>
         <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', isset($attraction) ? $attraction->name : '') }}" placeholder="e.g. The Grand Attraction" />
-        @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+        @error('name') <div class="invalid-feedback">{{ $message }}</div> @else <div class="invalid-feedback">The name field is required.</div> @enderror
       </div>
       <div class="col-md-4 mb-3">
         <label class="form-label" for="slug">Slug <span class="text-danger">*</span></label>
         <input type="text" class="form-control @error('slug') is-invalid @enderror" id="slug" name="slug" value="{{ old('slug', isset($attraction) ? $attraction->slug : '') }}" placeholder="e.g. the-grand-attraction" />
-        @error('slug') <div class="invalid-feedback">{{ $message }}</div> @enderror
+        @error('slug') <div class="invalid-feedback">{{ $message }}</div> @else <div class="invalid-feedback">The slug field is required.</div> @enderror
       </div>
     </div>
     <div class="mb-3">
@@ -825,6 +825,64 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     updateCount('meta_description', 'meta_desc_count');
     updateCount('og_description', 'og_desc_count');
+
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(event) {
+            let isValid = true;
+            
+            // Validate Category
+            const categoryInput = document.getElementById('attraction_category_id');
+            const categoryError = document.getElementById('category-error-msg');
+            const categoryTrigger = document.getElementById('categoryTrigger');
+            if (categoryInput && !categoryInput.value) {
+                isValid = false;
+                if (categoryError) categoryError.classList.remove('d-none');
+                if (categoryTrigger) categoryTrigger.style.borderColor = '#dc3545';
+            } else {
+                if (categoryError) categoryError.classList.add('d-none');
+                if (categoryTrigger) categoryTrigger.style.borderColor = '';
+            }
+
+            // Validate Name
+            const nameInput = document.getElementById('name');
+            if (nameInput && !nameInput.value.trim()) {
+                isValid = false;
+                if (nameInput) nameInput.classList.add('is-invalid');
+            } else {
+                if (nameInput) nameInput.classList.remove('is-invalid');
+            }
+
+            // Validate Slug
+            const slugInput = document.getElementById('slug');
+            if (slugInput && !slugInput.value.trim()) {
+                isValid = false;
+                if (slugInput) slugInput.classList.add('is-invalid');
+            } else {
+                if (slugInput) slugInput.classList.remove('is-invalid');
+            }
+
+            if (!isValid) {
+                event.preventDefault(); // Prevent form submission and page reload
+                
+                // Switch to Basic Info tab if not active
+                const basicTab = document.getElementById('basic-tab');
+                if (basicTab && !basicTab.classList.contains('active')) {
+                    const tab = new bootstrap.Tab(basicTab);
+                    tab.show();
+                }
+                
+                // Focus on first invalid field
+                setTimeout(() => {
+                    if (nameInput && !nameInput.value.trim()) {
+                        nameInput.focus();
+                    } else if (slugInput && !slugInput.value.trim()) {
+                        slugInput.focus();
+                    }
+                }, 250);
+            }
+        });
+    }
 });
 </script>
 @endsection

@@ -17,8 +17,8 @@
 {{-- 1. HERO --}}
 <section class="blog-hero position-relative overflow-hidden" style="height:520px;padding-top:80px;background-image:linear-gradient(to bottom,rgba(0,0,0,0.25),rgba(0,0,0,0.82)),url('{{ isset($page) && $page->featured_image ? asset($page->featured_image) : asset('images/attraction_nature_1783508280642.jpg') }}');background-size:cover;background-position:center;background-attachment:fixed;">
     <div class="container h-100 d-flex flex-column justify-content-center align-items-center text-center">
-        <nav aria-label="breadcrumb" class="mb-3 slide-up-anim">
-            <ol class="breadcrumb justify-content-center text-white opacity-75 small text-uppercase">
+        <nav aria-label="breadcrumb" class="mb-4 slide-up-anim">
+            <ol class="breadcrumb justify-content-center text-white opacity-75">
                 <li class="breadcrumb-item"><a href="{{ route('web.home') }}" class="text-white text-decoration-none">Home</a></li>
                 <li class="breadcrumb-item active text-white fw-bold" aria-current="page">Travel Guides</li>
             </ol>
@@ -91,9 +91,9 @@
                 <div class="d-flex justify-content-xl-end align-items-center flex-shrink-0">
                     <div class="sort-tabs mt-2">
                         <span class="text-muted small fw-bold me-2 ms-2 d-none d-sm-inline">Sort:</span>
-                        <a href="?sort=latest" class="sort-tab {{ $activeSort == 'latest' ? 'active' : '' }}">Latest</a>
-                        <a href="?sort=popular" class="sort-tab {{ $activeSort == 'popular' ? 'active' : '' }}">Popular</a>
-                        <a href="?sort=oldest" class="sort-tab {{ $activeSort == 'oldest' ? 'active' : '' }}">Oldest</a>
+                        <a href="javascript:void(0)" data-url="?sort=latest" class="sort-tab {{ $activeSort == 'latest' ? 'active' : '' }}" onclick="handleSortAJAX(event, this)">Latest</a>
+                        <a href="javascript:void(0)" data-url="?sort=popular" class="sort-tab {{ $activeSort == 'popular' ? 'active' : '' }}" onclick="handleSortAJAX(event, this)">Popular</a>
+                        <a href="javascript:void(0)" data-url="?sort=oldest" class="sort-tab {{ $activeSort == 'oldest' ? 'active' : '' }}" onclick="handleSortAJAX(event, this)">Oldest</a>
                     </div>
                 </div>
             </div>
@@ -108,7 +108,7 @@
             <div class="col-lg-8">
 
 
-                <div class="row g-4">
+                <div class="row g-4" id="infinite-scroll-grid">
                     @forelse($blogs as $blog)
                         <div class="col-md-6 fade-up-card">
                             <div class="blog-card h-100">
@@ -156,34 +156,11 @@
                     @endforelse
                 </div>
 
-                @if($blogs->hasPages())
-                <div class="d-flex justify-content-center mt-5 pt-4">
-                    <nav aria-label="Blog pagination">
-                        <ul class="pagination pagination-lg premium-pagination mb-0 gap-2">
-                            @if ($blogs->onFirstPage())
-                                <li class="page-item disabled"><span class="page-link rounded-circle border-0 d-flex align-items-center justify-content-center bg-light text-muted" style="width:44px;height:44px;"><i class="fas fa-chevron-left"></i></span></li>
-                            @else
-                                <li class="page-item"><a class="page-link rounded-circle border-0 shadow-sm d-flex align-items-center justify-content-center hover-bg-primary hover-text-white transition-all" style="width:44px;height:44px;" href="{{ $blogs->previousPageUrl() }}" rel="prev"><i class="fas fa-chevron-left"></i></a></li>
-                            @endif
-                            @foreach ($blogs->links()->elements as $element)
-                                @if (is_string($element))<li class="page-item disabled"><span class="page-link border-0 bg-transparent">{{ $element }}</span></li>@endif
-                                @if (is_array($element))
-                                    @foreach ($element as $page => $url)
-                                        @if ($page == $blogs->currentPage())
-                                            <li class="page-item active" aria-current="page"><span class="page-link rounded-circle border-0 shadow-sm bg-primary d-flex align-items-center justify-content-center" style="width:44px;height:44px;">{{ $page }}</span></li>
-                                        @else
-                                            <li class="page-item"><a class="page-link rounded-circle border-0 shadow-sm d-flex align-items-center justify-content-center hover-bg-primary hover-text-white transition-all text-dark bg-white" style="width:44px;height:44px;" href="{{ $url }}">{{ $page }}</a></li>
-                                        @endif
-                                    @endforeach
-                                @endif
-                            @endforeach
-                            @if ($blogs->hasMorePages())
-                                <li class="page-item"><a class="page-link rounded-circle border-0 shadow-sm d-flex align-items-center justify-content-center hover-bg-primary hover-text-white transition-all" style="width:44px;height:44px;" href="{{ $blogs->nextPageUrl() }}" rel="next"><i class="fas fa-chevron-right"></i></a></li>
-                            @else
-                                <li class="page-item disabled"><span class="page-link rounded-circle border-0 d-flex align-items-center justify-content-center bg-light text-muted" style="width:44px;height:44px;"><i class="fas fa-chevron-right"></i></span></li>
-                            @endif
-                        </ul>
-                    </nav>
+                @if ($blogs->hasMorePages())
+                <div id="infinite-scroll-trigger" data-next-url="{{ $blogs->nextPageUrl() }}" class="d-flex justify-content-center mt-5 pt-4">
+                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem; opacity: 0.5;">
+                        <span class="visually-hidden">Loading more...</span>
+                    </div>
                 </div>
                 @endif
 
@@ -391,10 +368,107 @@
 </style>
 @endsection
 
-@section('page-script')
+@section('webLayoutScript')
 <script>
+window.initInfiniteScroll = function() {
+    var trigger = document.getElementById('infinite-scroll-trigger');
+    var grid = document.getElementById('infinite-scroll-grid');
+    
+    if(window.scrollObserver) {
+        window.scrollObserver.disconnect();
+    }
+
+    if (trigger && grid && 'IntersectionObserver' in window) {
+        var isLoading = false;
+        window.scrollObserver = new IntersectionObserver(function(entries) {
+            if (entries[0].isIntersecting && !isLoading) {
+                var nextUrl = trigger.getAttribute('data-next-url');
+                if (!nextUrl) return;
+
+                isLoading = true;
+                fetch(nextUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(function(res) { return res.text(); })
+                    .then(function(html) {
+                        var parser = new DOMParser();
+                        var doc = parser.parseFromString(html, 'text/html');
+                        
+                        var newCards = doc.querySelectorAll('#infinite-scroll-grid > .col-md-6');
+                        newCards.forEach(function(card) {
+                            grid.appendChild(card);
+                        });
+
+                        var newTrigger = doc.getElementById('infinite-scroll-trigger');
+                        if (newTrigger) {
+                            trigger.setAttribute('data-next-url', newTrigger.getAttribute('data-next-url'));
+                        } else {
+                            trigger.remove();
+                            window.scrollObserver.disconnect();
+                        }
+                        isLoading = false;
+                    })
+                    .catch(function(err) {
+                        console.error('Infinite scroll failed:', err);
+                        isLoading = false;
+                    });
+            }
+        }, { rootMargin: '400px' });
+
+        window.scrollObserver.observe(trigger);
+    }
+};
+
+window.handleSortAJAX = function(e, element) {
+    e.preventDefault();
+    e.stopPropagation();
+    var url = element.getAttribute('data-url');
+    
+    document.querySelectorAll('.sort-tab').forEach(function(t) { t.classList.remove('active'); });
+    element.classList.add('active');
+    
+    var container = document.querySelector('#all-blogs .col-lg-8');
+    if(container) {
+        container.style.opacity = '0.4';
+        container.style.pointerEvents = 'none';
+        container.style.transition = 'opacity 0.2s';
+    }
+    
+    fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(function(res) { return res.text(); })
+        .then(function(html) {
+            var parser = new DOMParser();
+            var doc = parser.parseFromString(html, 'text/html');
+            var newContent = doc.querySelector('#all-blogs .col-lg-8');
+            if(newContent && container) {
+                container.innerHTML = newContent.innerHTML;
+                container.style.opacity = '1';
+                container.style.pointerEvents = 'auto';
+                
+                var filterBar = document.getElementById('stickyFilterBar');
+                var offset = filterBar ? filterBar.offsetHeight + 20 : 100;
+                var targetPos = document.getElementById('all-blogs').getBoundingClientRect().top + window.scrollY - offset;
+                window.scrollTo({top: targetPos, behavior: 'smooth'});
+                
+                window.initInfiniteScroll();
+            }
+        })
+        .catch(function(err) {
+            console.error('AJAX sort failed:', err);
+            if(container) {
+                container.style.opacity = '1';
+                container.style.pointerEvents = 'auto';
+            }
+        });
+    return false;
+};
+
 document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el){ new bootstrap.Tooltip(el); });
+    window.initInfiniteScroll();
+    
+    try {
+        if(typeof bootstrap !== 'undefined') {
+            document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el){ new bootstrap.Tooltip(el); });
+        }
+    } catch(e) { console.error(e); }
     var filterBar = document.getElementById('stickyFilterBar');
     window.addEventListener('scroll', function() {
         if(window.scrollY > 400){ filterBar.classList.replace('py-3','py-2'); }
@@ -417,11 +491,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }, {threshold:0.5});
         statEls.forEach(function(el){ obs.observe(el); });
     } else { statEls.forEach(animateCounter); }
-    document.querySelectorAll('.category-pill, .sort-tab, .modal-category-card').forEach(function(el) {
+    document.querySelectorAll('.category-pill, .modal-category-card').forEach(function(el) {
         el.addEventListener('click', function() {
             sessionStorage.setItem('scrollToGrid', '1');
         });
     });
+
 
     const modalSearchInput = document.getElementById('categorySearch');
     if (modalSearchInput) {

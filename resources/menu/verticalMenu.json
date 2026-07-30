@@ -61,7 +61,8 @@
       "slug": [
         "restaurants",
         "restaurant-categories",
-        "cuisines"
+        "cuisines",
+        "features"
       ],
       "submenu": [
         {
@@ -81,6 +82,12 @@
           "url": "/admin/cuisines",
           "icon": "menu-icon tf-icons ti ti-soup",
           "slug": "cuisines.index"
+        },
+        {
+          "name": "Features",
+          "url": "/admin/features",
+          "icon": "menu-icon tf-icons ti ti-list-check",
+          "slug": "features.index"
         }
       ]
     },
