@@ -74,7 +74,6 @@
           @php
               $placements = [
                   'homepage_banner' => 'Homepage Banner',
-                  'homepage_sidebar' => 'Homepage Sidebar',
                   'hotel_detail' => 'Hotel Detail',
                   'restaurant_detail' => 'Restaurant Detail',
                   'attraction_detail' => 'Attraction Detail',
@@ -85,7 +84,7 @@
               $selectedPlacementName = $selectedPlacement ? ($placements[$selectedPlacement] ?? 'Select Placement...') : 'Select Placement...';
           @endphp
 
-          <input type="hidden" name="placement" id="placement_value" value="{{ $selectedPlacement }}" required>
+          <input type="hidden" name="placement" id="placement_value" value="{{ $selectedPlacement }}">
           
           <div class="cuisine-dropdown-wrapper" id="placementDropdownWrapper">
             <div class="cuisine-dropdown-trigger {{ $errors->has('placement') ? 'border-danger' : '' }}" id="placementTrigger" onclick="togglePlacementDropdown()">
@@ -128,45 +127,55 @@
 
         <div class="col-md-6">
           <label class="form-label fw-semibold">Priority <span class="text-danger">*</span></label>
-          <input type="number" name="priority" class="form-control @error('priority') is-invalid @enderror" value="{{ old('priority', 1) }}" min="1" required>
+          <input type="number" name="priority" id="priority" class="form-control @error('priority') is-invalid @enderror" value="{{ old('priority', 1) }}" min="1">
           <small class="text-muted">1 = Highest Priority (rendered first if multiple promos are scheduled)</small>
           @error('priority')
             <div class="invalid-feedback">{{ $message }}</div>
+          @else
+            <div class="invalid-feedback">The priority field is required.</div>
           @enderror
         </div>
 
         <!-- Badge & CTA Button -->
         <div class="col-md-6">
           <label class="form-label fw-semibold">Badge Text <span class="text-danger">*</span></label>
-          <input type="text" name="badge_text" class="form-control @error('badge_text') is-invalid @enderror" value="{{ old('badge_text', 'Special Promotion') }}" required placeholder="e.g. Special Offer, Limited Time">
+          <input type="text" name="badge_text" id="badge_text" class="form-control @error('badge_text') is-invalid @enderror" value="{{ old('badge_text', 'Special Promotion') }}" placeholder="e.g. Special Offer, Limited Time">
           @error('badge_text')
             <div class="invalid-feedback">{{ $message }}</div>
+          @else
+            <div class="invalid-feedback">The badge text field is required.</div>
           @enderror
         </div>
 
         <div class="col-md-6">
           <label class="form-label fw-semibold">CTA Button Text <span class="text-danger">*</span></label>
-          <input type="text" name="cta_text" class="form-control @error('cta_text') is-invalid @enderror" value="{{ old('cta_text', 'Claim Offer') }}" required placeholder="e.g. Claim Offer, Book Now">
+          <input type="text" name="cta_text" id="cta_text" class="form-control @error('cta_text') is-invalid @enderror" value="{{ old('cta_text', 'Claim Offer') }}" placeholder="e.g. Claim Offer, Book Now">
           @error('cta_text')
             <div class="invalid-feedback">{{ $message }}</div>
+          @else
+            <div class="invalid-feedback">The CTA text field is required.</div>
           @enderror
         </div>
 
         <!-- Title -->
         <div class="col-12">
           <label class="form-label fw-semibold">Title <span class="text-danger">*</span></label>
-          <input type="text" name="title" class="form-control @error('title') is-invalid @enderror" value="{{ old('title') }}" required placeholder="e.g. Save 20% on Romantic Lakefront Escapes">
+          <input type="text" name="title" id="title" class="form-control @error('title') is-invalid @enderror" value="{{ old('title') }}" placeholder="e.g. Save 20% on Romantic Lakefront Escapes">
           @error('title')
             <div class="invalid-feedback">{{ $message }}</div>
+          @else
+            <div class="invalid-feedback">The title field is required.</div>
           @enderror
         </div>
 
         <!-- Subtitle -->
         <div class="col-12">
           <label class="form-label fw-semibold">Subtitle <span class="text-danger">*</span></label>
-          <textarea name="subtitle" class="form-control @error('subtitle') is-invalid @enderror" rows="3" required placeholder="Add promotion campaign summary or description..."></textarea>
+          <textarea name="subtitle" id="subtitle" class="form-control @error('subtitle') is-invalid @enderror" rows="3" placeholder="Add promotion campaign summary or description..."></textarea>
           @error('subtitle')
             <div class="invalid-feedback">{{ $message }}</div>
+          @else
+            <div class="invalid-feedback">The subtitle field is required.</div>
           @enderror
         </div>
 
@@ -188,10 +197,12 @@
         <!-- Desktop Banner Image -->
         <div class="col-md-6">
           <label class="form-label fw-semibold">Desktop Banner Image <span class="text-danger">*</span></label>
-          <input type="file" name="desktop_image" class="form-control @error('desktop_image') is-invalid @enderror" required>
+          <input type="file" name="desktop_image" id="desktop_image" class="form-control @error('desktop_image') is-invalid @enderror">
           <small class="text-muted">Recommended aspect ratio: 16:9 or custom wide banner dimensions (max 2MB).</small>
           @error('desktop_image')
             <div class="invalid-feedback">{{ $message }}</div>
+          @else
+            <div class="invalid-feedback">The desktop banner image is required.</div>
           @enderror
         </div>
 
@@ -248,6 +259,64 @@
 
 @section('page-script')
 <script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('affiliatePromotionCreateForm');
+      if (form) {
+          form.addEventListener('submit', function(event) {
+              let isValid = true;
+              let firstInvalid = null;
+
+              const fields = [
+                  { id: 'placement_value' },
+                  { id: 'priority' },
+                  { id: 'badge_text' },
+                  { id: 'cta_text' },
+                  { id: 'title' },
+                  { id: 'subtitle' },
+                  { id: 'desktop_image' }
+              ];
+
+              fields.forEach(f => {
+                  const el = document.getElementById(f.id);
+                  if (el) {
+                      if (!el.value.trim()) {
+                          isValid = false;
+                          if (!firstInvalid) firstInvalid = el;
+                          if (f.id === 'placement_value') {
+                              const trigger = document.getElementById('placementTrigger');
+                              if (trigger) trigger.classList.add('border-danger');
+                          } else {
+                              el.classList.add('is-invalid');
+                          }
+                      } else {
+                          if (f.id === 'placement_value') {
+                              const trigger = document.getElementById('placementTrigger');
+                              if (trigger) trigger.classList.remove('border-danger');
+                          } else {
+                              el.classList.remove('is-invalid');
+                          }
+                      }
+                  }
+              });
+
+              if (!isValid) {
+                  event.preventDefault();
+                  setTimeout(() => {
+                      if (firstInvalid) {
+                          if (firstInvalid.id === 'placement_value') {
+                              const trigger = document.getElementById('placementTrigger');
+                              if (trigger) trigger.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                          } else {
+                              firstInvalid.focus();
+                              firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                          }
+                      }
+                  }, 100);
+              }
+          });
+      }
+  });
+
   // Custom Placement Dropdown Logic
   function togglePlacementDropdown() {
     const panel  = document.getElementById('placementDropdownPanel');

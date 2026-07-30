@@ -94,9 +94,9 @@
                 <div class="d-flex justify-content-xl-end align-items-center flex-shrink-0">
                     <div class="sort-tabs mt-2">
                         <span class="text-muted small fw-bold me-2 ms-2 d-none d-sm-inline">Sort:</span>
-                        <a href="?sort=latest" class="sort-tab {{ $activeSort == 'latest' ? 'active' : '' }}">Latest</a>
-                        <a href="?sort=popular" class="sort-tab {{ $activeSort == 'popular' ? 'active' : '' }}">Popular</a>
-                        <a href="?sort=oldest" class="sort-tab {{ $activeSort == 'oldest' ? 'active' : '' }}">Oldest</a>
+                        <a href="javascript:void(0)" data-url="?sort=latest" class="sort-tab {{ $activeSort == 'latest' ? 'active' : '' }}" onclick="handleSortAJAX(event, this)">Latest</a>
+                        <a href="javascript:void(0)" data-url="?sort=popular" class="sort-tab {{ $activeSort == 'popular' ? 'active' : '' }}" onclick="handleSortAJAX(event, this)">Popular</a>
+                        <a href="javascript:void(0)" data-url="?sort=oldest" class="sort-tab {{ $activeSort == 'oldest' ? 'active' : '' }}" onclick="handleSortAJAX(event, this)">Oldest</a>
                     </div>
                 </div>
             </div>
@@ -394,10 +394,56 @@
 </style>
 @endsection
 
-@section('page-script')
+@section('webLayoutScript')
 <script>
+window.handleSortAJAX = function(e, element) {
+    e.preventDefault();
+    e.stopPropagation();
+    var url = element.getAttribute('data-url');
+    
+    document.querySelectorAll('.sort-tab').forEach(function(t) { t.classList.remove('active'); });
+    element.classList.add('active');
+    
+    var container = document.querySelector('#all-blogs .col-lg-8');
+    if(container) {
+        container.style.opacity = '0.4';
+        container.style.pointerEvents = 'none';
+        container.style.transition = 'opacity 0.2s';
+    }
+    
+    fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(function(res) { return res.text(); })
+        .then(function(html) {
+            var parser = new DOMParser();
+            var doc = parser.parseFromString(html, 'text/html');
+            var newContent = doc.querySelector('#all-blogs .col-lg-8');
+            if(newContent && container) {
+                container.innerHTML = newContent.innerHTML;
+                container.style.opacity = '1';
+                container.style.pointerEvents = 'auto';
+                
+                var filterBar = document.getElementById('stickyFilterBar');
+                var offset = filterBar ? filterBar.offsetHeight + 20 : 100;
+                var targetPos = document.getElementById('all-blogs').getBoundingClientRect().top + window.scrollY - offset;
+                window.scrollTo({top: targetPos, behavior: 'smooth'});
+            }
+        })
+        .catch(function(err) {
+            console.error('AJAX sort failed:', err);
+            if(container) {
+                container.style.opacity = '1';
+                container.style.pointerEvents = 'auto';
+            }
+        });
+    return false;
+};
+
 document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el){ new bootstrap.Tooltip(el); });
+    try {
+        if(typeof bootstrap !== 'undefined') {
+            document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el){ new bootstrap.Tooltip(el); });
+        }
+    } catch(e) { console.error(e); }
     var filterBar = document.getElementById('stickyFilterBar');
     window.addEventListener('scroll', function() {
         if(window.scrollY > 400){ filterBar.classList.replace('py-3','py-2'); }
@@ -420,11 +466,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }, {threshold:0.5});
         statEls.forEach(function(el){ obs.observe(el); });
     } else { statEls.forEach(animateCounter); }
-    document.querySelectorAll('.category-pill, .sort-tab, .modal-category-card').forEach(function(el) {
+    document.querySelectorAll('.category-pill, .modal-category-card').forEach(function(el) {
         el.addEventListener('click', function() {
             sessionStorage.setItem('scrollToGrid', '1');
         });
     });
+
 
     const modalSearchInput = document.getElementById('categorySearch');
     if (modalSearchInput) {

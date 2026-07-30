@@ -20,6 +20,14 @@
 
 @section('content')
 
+<nav aria-label="breadcrumb" class="mb-4">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="{{ route('user-add') }}">Users</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ isset($user) ? "Edit User" : "Create User" }}</li>
+  </ol>
+</nav>
+
 <div class="card">
     <h5 class="card-header">{{ isset($user) ? "Edit User" : "Create User" }}</h5>
     <div class="card-body">
@@ -27,20 +35,20 @@
         @csrf
             <div class="row">
                 <div class="mb-3 col-4">
-                    <label class="form-label" for="name">User Name</label>
+                    <label class="form-label" for="name">User Name <span class="text-danger">*</span></label>
                     <input type="text" name="name" id="name" class="form-control" placeholder="Enter Name" value="{{ isset($user) && isset($user->name) ? $user->name : old('name') }}"/>
                 </div>
                 <div class="mb-3 col-4">
-                    <label class="form-label" for="email">Email</label>
+                    <label class="form-label" for="email">Email <span class="text-danger">*</span></label>
                     <input type="text" name="email_id" id="email_id" class="form-control" placeholder="Enter Email Addess" value="{{ isset($user) && isset($user->email_id) ? $user->email_id : old('email_id') }}"/>
                     <span id="email_error" class="auto-style-5">
                 </div>
                 <div class="mb-3 col-4">
-                    <label class="form-label" for="contact_no">Contact No.</label>
+                    <label class="form-label" for="contact_no">Contact No. <span class="text-danger">*</span></label>
                     <input type="text" name="contact_no" id="contact_no" class="form-control" placeholder="Enter Contact No." value="{{ isset($user) && isset($user->contact_no) ? $user->contact_no : old('contact_no') }}"/>
                 </div>
                 <div class="mb-3 col-4">
-                    <label class="form-label" for="job_title">Job Title</label>
+                    <label class="form-label" for="job_title">Job Title <span class="text-danger">*</span></label>
                     <input type="text" name="job_title" id="job_title" class="form-control" placeholder="Enter Job title" value="{{ isset($user) && isset($user->job_title) ? $user->job_title : old('job_title') }}"/>
                 </div>
                 <div class="mb-3 col-4">
@@ -53,12 +61,12 @@
                 </div>
                 @if(!(isset($user) && isset($user->password)))
                 <div class="mb-3 col-4">
-                    <label class="form-label" for="password">Password</label>
+                    <label class="form-label" for="password">Password <span class="text-danger">*</span></label>
                     <input type="password" name="password" id="password" class="form-control" placeholder="Enter Password" value=""/>
                 </div>
                 @endif
                 <div class="mb-3 col-4">
-                    <label for="role_id" class="form-label">Role</label>
+                    <label for="role_id" class="form-label">Role <span class="text-danger">*</span></label>
                     <select name="role_id" id="role_id" class="select2 form-select">
                         <option value="">Select role</option>
                             @if(isset($role) && !empty($role) && count($role) > 0)
@@ -70,7 +78,7 @@
                 </div>
                 <div class="mb-3 d-flex justify-content-end">
                     <button class="btn btn-primary me-2" type="submit">{{ isset($user) ? "Edit User" : "Add User" }}</button>
-                    <a href="{{ route('user-add') }}" class="btn btn-info">Back</a>
+                    <!-- <a href="{{ route('user-add') }}" class="btn btn-info">Back</a> -->
                 </div>
             </div>
         </form>

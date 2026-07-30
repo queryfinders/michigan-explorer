@@ -38,12 +38,14 @@
         <!-- Tab 1: Page Content -->
         <div class="tab-pane fade show active" id="content-pane" role="tabpanel" aria-labelledby="content-tab">
           <div class="mb-3">
-            <label class="form-label" for="title">Title</label>
-            <input type="text" class="form-control" id="title" name="title" placeholder="Enter page title" required />
+            <label class="form-label fw-semibold" for="title">Title <span class="text-danger">*</span></label>
+            <input type="text" class="form-control @error('title') is-invalid @enderror" id="title" name="title" value="{{ old('title') }}" placeholder="Enter page title" />
+            @error('title') <div class="invalid-feedback">{{ $message }}</div> @else <div class="invalid-feedback">The title field is required.</div> @enderror
           </div>
           <div class="mb-3">
-            <label class="form-label" for="slug">Slug</label>
-            <input type="text" class="form-control" id="slug" name="slug" placeholder="Enter page slug (e.g. about-us)" required />
+            <label class="form-label fw-semibold" for="slug">Slug <span class="text-danger">*</span></label>
+            <input type="text" class="form-control @error('slug') is-invalid @enderror" id="slug" name="slug" value="{{ old('slug') }}" placeholder="Enter page slug (e.g. about-us)" />
+            @error('slug') <div class="invalid-feedback">{{ $message }}</div> @else <div class="invalid-feedback">The slug field is required.</div> @enderror
           </div>
           {{-- 
           <div class="mb-3">
@@ -63,14 +65,7 @@
             <label class="form-label" for="banner_subtitle">Banner Subtitle</label>
             <textarea class="form-control" id="banner_subtitle" name="banner_subtitle" rows="3" placeholder="Enter banner subtitle"></textarea>
           </div>
-          <div class="mb-3">
-            <label class="form-label" for="banner_button_text">Button Text</label>
-            <input type="text" class="form-control" id="banner_button_text" name="banner_button_text" placeholder="Enter button text (e.g. Explore Now)" />
-          </div>
-          <div class="mb-3">
-            <label class="form-label" for="banner_button_link">Button Link</label>
-            <input type="text" class="form-control" id="banner_button_link" name="banner_button_link" placeholder="e.g., #all-hotels or https://example.com" />
-          </div>
+
           <div class="mb-3">
             <label class="form-label" for="featured_image_file">Banner Image</label>
             <input type="file" class="form-control" id="featured_image_file" name="featured_image_file" accept="image/*" />
@@ -145,6 +140,57 @@
     }
     updateCount('meta_description', 'meta_desc_count');
     updateCount('og_description', 'og_desc_count');
+
+    // Custom Form Validation & Tab Redirection
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(event) {
+            let isValid = true;
+            let firstInvalidTab = null;
+
+            // Validate Title
+            const titleInput = document.getElementById('title');
+            if (titleInput && !titleInput.value.trim()) {
+                isValid = false;
+                titleInput.classList.add('is-invalid');
+                if (!firstInvalidTab) firstInvalidTab = 'content-tab';
+            } else if (titleInput) {
+                titleInput.classList.remove('is-invalid');
+            }
+
+            // Validate Slug
+            const slugInput = document.getElementById('slug');
+            if (slugInput && !slugInput.value.trim()) {
+                isValid = false;
+                slugInput.classList.add('is-invalid');
+                if (!firstInvalidTab) firstInvalidTab = 'content-tab';
+            } else if (slugInput) {
+                slugInput.classList.remove('is-invalid');
+            }
+
+            if (!isValid) {
+                event.preventDefault(); // Prevent submission
+                
+                // Switch to the tab containing the first invalid field
+                if (firstInvalidTab) {
+                    const tabBtn = document.getElementById(firstInvalidTab);
+                    if (tabBtn && !tabBtn.classList.contains('active')) {
+                        const tab = new bootstrap.Tab(tabBtn);
+                        tab.show();
+                    }
+                }
+                
+                // Focus on first invalid field
+                setTimeout(() => {
+                    if (titleInput && !titleInput.value.trim()) {
+                        titleInput.focus();
+                    } else if (slugInput && !slugInput.value.trim()) {
+                        slugInput.focus();
+                    }
+                }, 250);
+            }
+        });
+    }
   });
 </script>
 @endsection

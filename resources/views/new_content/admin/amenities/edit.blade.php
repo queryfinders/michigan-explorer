@@ -94,6 +94,7 @@
 @endsection
 
 @section('page-script')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
       const nameInput = document.getElementById('name');
@@ -130,6 +131,32 @@
               selectedIconDisplay.className = `${iconName} me-2`;
               selectedIconText.textContent = iconName;
           });
+      });
+  });
+
+  $(document).ready(function() {
+      // jQuery Validation
+      $('form').validate({
+          rules: {
+              name: { required: true },
+              slug: { required: true },
+              icon: { required: true }
+          },
+          messages: {
+              name: { required: "Please enter amenity name" },
+              slug: { required: "Please enter slug" },
+              icon: { required: "Please select an icon" }
+          },
+          errorElement: 'div',
+          errorClass: 'text-danger mt-1 small',
+          errorPlacement: function(error, element) {
+              if(element.attr("name") == "icon") {
+                  error.insertAfter(element.parent());
+              } else {
+                  error.insertAfter(element);
+              }
+          },
+          ignore: [] // Allow validating hidden fields like icon_input
       });
   });
 </script>

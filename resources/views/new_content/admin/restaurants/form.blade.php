@@ -87,12 +87,12 @@
       <div class="col-md-4 mb-3">
         <label class="form-label" for="name">Name <span class="text-danger">*</span></label>
         <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', isset($restaurant) ? $restaurant->name : '') }}" placeholder="e.g. The Grand Hotel" />
-        @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+        @error('name') <div class="invalid-feedback">{{ $message }}</div> @else <div class="invalid-feedback">The name field is required.</div> @enderror
       </div>
       <div class="col-md-4 mb-3">
         <label class="form-label" for="slug">Slug <span class="text-danger">*</span></label>
         <input type="text" class="form-control @error('slug') is-invalid @enderror" id="slug" name="slug" value="{{ old('slug', isset($restaurant) ? $restaurant->slug : '') }}" placeholder="e.g. the-grand-hotel" />
-        @error('slug') <div class="invalid-feedback">{{ $message }}</div> @enderror
+        @error('slug') <div class="invalid-feedback">{{ $message }}</div> @else <div class="invalid-feedback">The slug field is required.</div> @enderror
       </div>
     </div>
 

@@ -54,7 +54,7 @@
         <label class="form-label" for="icon">Icon <span class="text-danger">*</span></label>
         <div class="dropdown">
           <button class="btn btn-outline-secondary w-100 text-start d-flex justify-content-between align-items-center" type="button" id="iconDropdownButton" data-bs-toggle="dropdown" aria-expanded="false" style="background: #fff; border: 1px solid #d9dee3; padding: 8px 12px; height: 38px;">
-            <span><i id="selected_icon_display" class="{{ old('icon', 'fas fa-wifi') }} me-2"></i> <span id="selected_icon_text">{{ old('icon', 'fas fa-wifi') }}</span></span>
+            <span><i id="selected_icon_display" class="{{ old('icon', '') }} me-2"></i> <span id="selected_icon_text">{{ old('icon', 'Select Icon') }}</span></span>
             <i class="ti ti-chevron-down"></i>
           </button>
           <div class="dropdown-menu w-100 p-3" aria-labelledby="iconDropdownButton">
@@ -68,7 +68,7 @@
             </div>
           </div>
         </div>
-        <input type="hidden" name="icon" id="icon_input" value="{{ old('icon', 'fas fa-wifi') }}">
+        <input type="hidden" name="icon" id="icon_input" value="{{ old('icon', '') }}">
         @error('icon')
           <div class="text-danger mt-1 small">{{ $message }}</div>
         @enderror
@@ -93,6 +93,7 @@
 @endsection
 
 @section('page-script')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
       const nameInput = document.getElementById('name');
@@ -129,6 +130,32 @@
               selectedIconDisplay.className = `${iconName} me-2`;
               selectedIconText.textContent = iconName;
           });
+      });
+  });
+
+  $(document).ready(function() {
+      // jQuery Validation
+      $('form').validate({
+          rules: {
+              name: { required: true },
+              slug: { required: true },
+              icon: { required: true }
+          },
+          messages: {
+              name: { required: "Please enter amenity name" },
+              slug: { required: "Please enter slug" },
+              icon: { required: "Please select an icon" }
+          },
+          errorElement: 'div',
+          errorClass: 'text-danger mt-1 small',
+          errorPlacement: function(error, element) {
+              if(element.attr("name") == "icon") {
+                  error.insertAfter(element.parent());
+              } else {
+                  error.insertAfter(element);
+              }
+          },
+          ignore: [] // Allow validating hidden fields like icon_input
       });
   });
 </script>

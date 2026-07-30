@@ -75,7 +75,6 @@
           @php
               $placements = [
                   'homepage_banner' => 'Homepage Banner',
-                  'homepage_sidebar' => 'Homepage Sidebar',
                   'hotel_detail' => 'Hotel Detail',
                   'restaurant_detail' => 'Restaurant Detail',
                   'attraction_detail' => 'Attraction Detail',
@@ -86,7 +85,7 @@
               $selectedPlacementName = $selectedPlacement ? ($placements[$selectedPlacement] ?? 'Select Placement...') : 'Select Placement...';
           @endphp
 
-          <input type="hidden" name="placement" id="placement_value" value="{{ $selectedPlacement }}" required>
+          <input type="hidden" name="placement" id="placement_value" value="{{ $selectedPlacement }}">
           
           <div class="cuisine-dropdown-wrapper" id="placementDropdownWrapper">
             <div class="cuisine-dropdown-trigger {{ $errors->has('placement') ? 'border-danger' : '' }}" id="placementTrigger" onclick="togglePlacementDropdown()">
@@ -127,36 +126,36 @@
 
         <div class="col-md-6">
           <label class="form-label fw-semibold">Priority <span class="text-danger">*</span></label>
-          <input type="number" name="priority" class="form-control @error('priority') is-invalid @enderror" value="{{ old('priority', $promotion->priority) }}" min="1" required>
+          <input type="number" name="priority" id="priority" class="form-control @error('priority') is-invalid @enderror" value="{{ old('priority', $promotion->priority) }}" min="1">
           <small class="text-muted">1 = Highest Priority</small>
-          @error('priority')<div class="invalid-feedback">{{ $message }}</div>@enderror
+          @error('priority')<div class="invalid-feedback">{{ $message }}</div>@else<div class="invalid-feedback">The priority field is required.</div>@enderror
         </div>
 
         <!-- Badge & CTA Button -->
         <div class="col-md-6">
           <label class="form-label fw-semibold">Badge Text <span class="text-danger">*</span></label>
-          <input type="text" name="badge_text" class="form-control @error('badge_text') is-invalid @enderror" value="{{ old('badge_text', $promotion->badge_text) }}" required>
-          @error('badge_text')<div class="invalid-feedback">{{ $message }}</div>@enderror
+          <input type="text" name="badge_text" id="badge_text" class="form-control @error('badge_text') is-invalid @enderror" value="{{ old('badge_text', $promotion->badge_text) }}">
+          @error('badge_text')<div class="invalid-feedback">{{ $message }}</div>@else<div class="invalid-feedback">The badge text field is required.</div>@enderror
         </div>
 
         <div class="col-md-6">
           <label class="form-label fw-semibold">CTA Button Text <span class="text-danger">*</span></label>
-          <input type="text" name="cta_text" class="form-control @error('cta_text') is-invalid @enderror" value="{{ old('cta_text', $promotion->cta_text) }}" required>
-          @error('cta_text')<div class="invalid-feedback">{{ $message }}</div>@enderror
+          <input type="text" name="cta_text" id="cta_text" class="form-control @error('cta_text') is-invalid @enderror" value="{{ old('cta_text', $promotion->cta_text) }}">
+          @error('cta_text')<div class="invalid-feedback">{{ $message }}</div>@else<div class="invalid-feedback">The CTA text field is required.</div>@enderror
         </div>
 
         <!-- Title -->
         <div class="col-12">
           <label class="form-label fw-semibold">Title <span class="text-danger">*</span></label>
-          <input type="text" name="title" class="form-control @error('title') is-invalid @enderror" value="{{ old('title', $promotion->title) }}" required>
-          @error('title')<div class="invalid-feedback">{{ $message }}</div>@enderror
+          <input type="text" name="title" id="title" class="form-control @error('title') is-invalid @enderror" value="{{ old('title', $promotion->title) }}">
+          @error('title')<div class="invalid-feedback">{{ $message }}</div>@else<div class="invalid-feedback">The title field is required.</div>@enderror
         </div>
 
         <!-- Subtitle -->
         <div class="col-12">
           <label class="form-label fw-semibold">Subtitle <span class="text-danger">*</span></label>
-          <textarea name="subtitle" class="form-control @error('subtitle') is-invalid @enderror" rows="3" required>{{ old('subtitle', $promotion->subtitle) }}</textarea>
-          @error('subtitle')<div class="invalid-feedback">{{ $message }}</div>@enderror
+          <textarea name="subtitle" id="subtitle" class="form-control @error('subtitle') is-invalid @enderror" rows="3">{{ old('subtitle', $promotion->subtitle) }}</textarea>
+          @error('subtitle')<div class="invalid-feedback">{{ $message }}</div>@else<div class="invalid-feedback">The subtitle field is required.</div>@enderror
         </div>
 
         <!-- Affiliate Link Selection -->
@@ -180,7 +179,7 @@
               <small class="d-block text-muted mt-1">Current desktop banner. Upload below to replace it.</small>
             </div>
           @endif
-          <input type="file" name="desktop_image" class="form-control @error('desktop_image') is-invalid @enderror">
+          <input type="file" name="desktop_image" id="desktop_image" class="form-control @error('desktop_image') is-invalid @enderror">
           <small class="text-muted">Leave empty to keep current image (max 2MB).</small>
           @error('desktop_image')<div class="invalid-feedback">{{ $message }}</div>@enderror
         </div>
@@ -240,6 +239,63 @@
 
 @section('page-script')
 <script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const form = document.querySelector('form');
+      if (form) {
+          form.addEventListener('submit', function(event) {
+              let isValid = true;
+              let firstInvalid = null;
+
+              const fields = [
+                  { id: 'placement_value' },
+                  { id: 'priority' },
+                  { id: 'badge_text' },
+                  { id: 'cta_text' },
+                  { id: 'title' },
+                  { id: 'subtitle' }
+              ];
+
+              fields.forEach(f => {
+                  const el = document.getElementById(f.id);
+                  if (el) {
+                      if (!el.value.trim()) {
+                          isValid = false;
+                          if (!firstInvalid) firstInvalid = el;
+                          if (f.id === 'placement_value') {
+                              const trigger = document.getElementById('placementTrigger');
+                              if (trigger) trigger.classList.add('border-danger');
+                          } else {
+                              el.classList.add('is-invalid');
+                          }
+                      } else {
+                          if (f.id === 'placement_value') {
+                              const trigger = document.getElementById('placementTrigger');
+                              if (trigger) trigger.classList.remove('border-danger');
+                          } else {
+                              el.classList.remove('is-invalid');
+                          }
+                      }
+                  }
+              });
+
+              if (!isValid) {
+                  event.preventDefault();
+                  setTimeout(() => {
+                      if (firstInvalid) {
+                          if (firstInvalid.id === 'placement_value') {
+                              const trigger = document.getElementById('placementTrigger');
+                              if (trigger) trigger.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                          } else {
+                              firstInvalid.focus();
+                              firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                          }
+                      }
+                  }, 100);
+              }
+          });
+      }
+  });
+
   // Custom Placement Dropdown Logic
   function togglePlacementDropdown() {
     const panel  = document.getElementById('placementDropdownPanel');

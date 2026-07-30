@@ -4,7 +4,7 @@
         <div class="hero-bg-zoom" role="img" aria-label="{{ $page->featured_image_alt ?? 'Michigan Explorer Banner' }}" style="background-image: url('{{ $page && $page->featured_image ? asset($page->featured_image) : asset('images/hero_banner_1783508250640.jpg') }}');"></div>
     </div>
 
-    <div class="container position-relative z-index-1 text-white py-5 my-5">
+    <div class="container position-relative text-white py-5 my-5">
         
         <!-- Typography with Stagger Animation -->
         <div class="text-center mb-3">

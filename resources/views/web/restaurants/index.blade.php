@@ -52,11 +52,13 @@
         <h1 class="display-3 fw-bold text-white mb-3 auto-style-7">{{ $bannerTitle }}</h1>
         <p class="lead text-white opacity-75 mb-4">{{ $bannerSubtitle }}</p>
         
+        {{-- 
         @if($bannerBtnText)
         <div class="d-flex justify-content-center gap-3 mt-4">
             <a href="{{ $bannerBtnLink }}" class="btn btn-secondary rounded-pill px-4 py-2 fw-bold shadow-sm">{{ $bannerBtnText }}</a>
         </div>
         @endif
+        --}}
     </div>
 </section>
 

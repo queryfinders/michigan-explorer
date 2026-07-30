@@ -98,8 +98,8 @@ use App\Helpers\AccessRights;
                         var role = data.role || '';
                         
                         // Fix profile url mapping
-                        var imgUrl = data.profile_url ? "{{ asset('storage') }}" + data.profile_url : "{{ asset('assets/img/avatars/1.jpg') }}";
-                        var profile = '<img src="' + imgUrl + '" onerror="this.onerror=null; this.src=\'{{ asset("assets/img/avatars/1.jpg") }}\';" alt="' + (data.name || '') + '" height="38" width="38" class="rounded-circle" style="object-fit: cover;" />';
+                        var imgUrl = data.profile_url ? "{{ asset('storage') }}" + data.profile_url : "{{ asset('assets/img/avatars/1.png') }}";
+                        var profile = '<img src="' + imgUrl + '" onerror="this.onerror=null; this.src=\'{{ asset("assets/img/avatars/1.png") }}\';" alt="' + (data.name || '') + '" height="38" width="38" class="rounded-circle" style="object-fit: cover;" />';
                         
                         var checked = data.is_active == 1 ? 'checked' : '';
                         var status = '<label class="switch"><input type="checkbox" class="switch-input" data-id="' + data.id + '" data-status="' + data.is_active + '" ' + checked + '><span class="switch-toggle-slider"></span></label>';

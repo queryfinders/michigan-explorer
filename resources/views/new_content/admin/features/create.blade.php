@@ -1,44 +1,43 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'Edit Cuisine')
+@section('title', 'Add Feature')
 
 @section('content')
 <nav aria-label="breadcrumb" class="mb-4">
   <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Dashboard</a></li>
-    <li class="breadcrumb-item"><a href="{{ route('cuisines.index') }}">Cuisines</a></li>
-    <li class="breadcrumb-item active" aria-current="page">Edit Cuisine</li>
+    <li class="breadcrumb-item"><a href="{{ route('features.index') }}">Features</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Add Feature</li>
   </ol>
 </nav>
 
 <div class="card mb-4">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <h5 class="mb-0">Edit Cuisine</h5>
+    <h5 class="mb-0">Add Feature</h5>
   </div>
   <div class="card-body">
-    <form action="{{ route('cuisines.update', $cuisine->id) }}" method="POST">
+    <form action="{{ route('features.store') }}" method="POST">
       @csrf
-      @method('PUT')
       <div class="row">
         <div class="col-md-4 mb-3">
           <label class="form-label" for="name">Name <span class="text-danger">*</span></label>
-          <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $cuisine->name) }}" placeholder="e.g. Italian" required />
+          <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" placeholder="e.g. Italian" value="{{ old('name') }}" required />
           @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
         <div class="col-md-4 mb-3">
           <label class="form-label" for="slug">Slug <span class="text-danger">*</span></label>
-          <input type="text" class="form-control @error('slug') is-invalid @enderror" id="slug" name="slug" value="{{ old('slug', $cuisine->slug) }}" placeholder="e.g. italian" required />
+          <input type="text" class="form-control @error('slug') is-invalid @enderror" id="slug" name="slug" placeholder="e.g. italian" value="{{ old('slug') }}" required />
           @error('slug') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
         <div class="col-md-4 mb-3">
           <label class="form-label" for="sort_order">Sort Order</label>
-          <input type="number" class="form-control @error('sort_order') is-invalid @enderror" id="sort_order" name="sort_order" value="{{ old('sort_order', $cuisine->sort_order) }}" placeholder="e.g. 0" />
+          <input type="number" class="form-control @error('sort_order') is-invalid @enderror" id="sort_order" name="sort_order" placeholder="e.g. 0" value="{{ old('sort_order', 0) }}" />
           @error('sort_order') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
       </div>
-      <input type="hidden" name="status" value="{{ $cuisine->status ?? 1 }}">
-      <button type="submit" class="btn btn-primary">Update</button>
-      <a href="{{ route('cuisines.index') }}" class="btn btn-secondary">Cancel</a>
+      <input type="hidden" name="status" value="1">
+      <button type="submit" class="btn btn-primary">Save</button>
+      <a href="{{ route('features.index') }}" class="btn btn-secondary">Cancel</a>
     </form>
   </div>
 </div>
@@ -47,6 +46,7 @@
 @section('page-script')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
 <script>
+  // Simple slug generator helper
   document.getElementById('name').addEventListener('input', function() {
     let nameVal = this.value;
     let slugInput = document.getElementById('slug');
@@ -63,8 +63,8 @@
               slug: { required: true }
           },
           messages: {
-              name: { required: "Please enter cuisine name" },
-              slug: { required: "Please enter cuisine slug" }
+              name: { required: "Please enter Feature name" },
+              slug: { required: "Please enter Feature slug" }
           },
           errorElement: 'div',
           errorClass: 'invalid-feedback d-block',

@@ -17,9 +17,8 @@
     <p class="text-muted mb-0">Manage all third-party booking affiliate links.</p>
   </div>
   <div class="d-flex align-items-center gap-2">
-    <form action="{{ route('affiliate-links.index') }}" method="GET" class="d-flex gap-2">
-        <input type="text" name="search" class="form-control" placeholder="Search..." style="width: 220px;" value="{{ request('search') }}" />
-        <button type="submit" class="btn btn-warning text-white"><i class="fa fa-search"></i></button>
+    <form action="{{ route('affiliate-links.index') }}" method="GET" class="m-0 p-0">
+        <input type="text" name="search" class="form-control global-search-input" placeholder="Search..." style="width: 220px;" value="{{ request('search') }}" />
     </form>
     <a href="{{ route('affiliate-links.create') }}" class="btn btn-warning text-white">Add Link</a>
   </div>
