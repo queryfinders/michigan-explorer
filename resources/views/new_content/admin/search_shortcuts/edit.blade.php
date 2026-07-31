@@ -19,7 +19,7 @@
     <form action="{{ route('search-shortcuts.update', $searchShortcut->id) }}" method="POST">
         @csrf
         @method('PUT')
-        @include('new_content.admin.search_shortcuts._form')
+        @include('new_content.admin.search_shortcuts.form')
     </form>
 </div>
 

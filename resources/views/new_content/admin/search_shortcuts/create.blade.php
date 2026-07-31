@@ -18,7 +18,7 @@
 
     <form action="{{ route('search-shortcuts.store') }}" method="POST">
         @csrf
-        @include('new_content.admin.search_shortcuts._form')
+        @include('new_content.admin.search_shortcuts.form')
     </form>
 </div>
 

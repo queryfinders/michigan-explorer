@@ -187,7 +187,7 @@
 
                 <div class="d-flex justify-content-between align-items-center mt-4">
                     <a href="{{ route('search-shortcuts.index') }}" class="btn btn-label-secondary">Cancel</a>
-                    <button type="submit" class="btn btn-primary"><i class="bx bx-save me-1"></i> Save Shortcut</button>
+                    <button type="submit" class="btn btn-warning"><i class="bx bx-save me-1"></i> Save Shortcut</button>
                 </div>
             </div>
         </div>

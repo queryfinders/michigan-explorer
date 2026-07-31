@@ -150,7 +150,7 @@
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center pt-4">
         <h5 class="mb-0 fw-bold"><i class="fa-regular fa-paper-plane me-2 text-primary"></i>Latest Contact Messages</h5>
-        <a href="{{ route('contact-messages.index') }}" class="btn btn-primary btn-sm">View All Inquiries</a>
+        <a href="{{ route('contact-messages.index') }}" class="btn btn-warning btn-sm">View All Inquiries</a>
       </div>
       <div class="card-body pt-2">
         <div class="table-responsive">

@@ -38,10 +38,10 @@
                     </td>
                     <td>
                         <a href="{{ route('search-shortcuts.edit', $shortcut->id) }}" class="btn btn-sm btn-primary"><i class="fa fa-edit"></i></a>
-                        <form action="{{ route('search-shortcuts.destroy', $shortcut->id) }}" method="POST" class="d-inline">
+                        <form action="{{ route('search-shortcuts.destroy', $shortcut->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this search shortcut?');">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')"><i class="fa fa-trash"></i></button>
+                            <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
                         </form>
                     </td>
                 </tr>

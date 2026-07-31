@@ -605,7 +605,7 @@
 </div>
 
 <div class="mt-4 pt-3 border-top">
-  <button type="submit" class="btn btn-primary">Save</button>
+  <button type="submit" class="btn btn-warning">Save</button>
   <a href="{{ route('hotels.index') }}" class="btn btn-secondary">Cancel</a>
 </div>
 
@@ -630,7 +630,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" onclick="saveNewCategory()">
+        <button type="button" class="btn btn-warning" onclick="saveNewCategory()">
           <span id="saveCategoryBtnText"><i class="fas fa-plus me-1"></i>Add Category</span>
           <span id="saveCategoryBtnSpinner" class="d-none"><span class="spinner-border spinner-border-sm me-1"></span>Saving...</span>
         </button>
@@ -815,7 +815,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" onclick="saveNewAmenity()">
+        <button type="button" class="btn btn-warning" onclick="saveNewAmenity()">
           <span id="saveAmenityBtnText"><i class="fas fa-plus me-1"></i>Add Amenity</span>
           <span id="saveCategoryBtnSpinner" class="d-none"><span class="spinner-border spinner-border-sm me-1"></span>Saving...</span>
         </button>
@@ -862,7 +862,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" onclick="saveNewBookingFeature()">
+        <button type="button" class="btn btn-warning" onclick="saveNewBookingFeature()">
           <span id="saveBfBtnText">Save Feature</span>
           <div id="saveBfBtnSpinner" class="spinner-border spinner-border-sm d-none" role="status"></div>
         </button>
@@ -895,7 +895,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" onclick="saveNewHotelPolicy()">
+        <button type="button" class="btn btn-warning" onclick="saveNewHotelPolicy()">
           <span id="savePolicyBtnText">Save Policy</span>
           <div id="savePolicyBtnSpinner" class="spinner-border spinner-border-sm d-none" role="status"></div>
         </button>
@@ -1671,7 +1671,7 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" onclick="saveNewAffiliateLink()">
+        <button type="button" class="btn btn-warning" onclick="saveNewAffiliateLink()">
           <span id="saveAfflinkBtnText"><i class="fas fa-plus me-1"></i>Add Link</span>
           <span id="saveAfflinkBtnSpinner" class="d-none"><span class="spinner-border spinner-border-sm me-1"></span>Saving...</span>
         </button>

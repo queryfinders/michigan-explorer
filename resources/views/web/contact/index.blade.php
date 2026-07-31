@@ -37,7 +37,7 @@
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb justify-content-center text-white opacity-75 mb-0">
-                <li class="breadcrumb-item"><a href="{{ route('web.home') }}" class="text-white text-decoration-none hover-text-primary transition-all">Home</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('web.home') }}" class="text-white text-decoration-none transition-all">Home</a></li>
                 <li class="breadcrumb-item active text-white fw-bold" aria-current="page">{{ $pageTitle }}</li>
             </ol>
         </nav>

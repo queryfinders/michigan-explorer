@@ -77,7 +77,7 @@
                     </select>
                 </div>
                 <div class="mb-3 d-flex justify-content-end">
-                    <button class="btn btn-primary me-2" type="submit">{{ isset($user) ? "Edit User" : "Add User" }}</button>
+                    <button class="btn btn-warning me-2" type="submit">{{ isset($user) ? "Edit User" : "Add User" }}</button>
                     <!-- <a href="{{ route('user-add') }}" class="btn btn-info">Back</a> -->
                 </div>
             </div>

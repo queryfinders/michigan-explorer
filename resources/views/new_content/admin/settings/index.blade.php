@@ -86,7 +86,7 @@
       </div>
       
       <div class="mt-4">
-        <button type="submit" class="btn btn-primary">Save Settings</button>
+        <button type="submit" class="btn btn-warning">Save Settings</button>
       </div>
     </form>
   </div>

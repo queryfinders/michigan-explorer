@@ -73,7 +73,7 @@
 </div>
 
 <div class="mt-4 d-flex gap-2">
-    <button type="submit" class="btn btn-primary">
+    <button type="submit" class="btn btn-warning">
         {{ isset($affiliateLink) ? 'Update Affiliate Link' : 'Create Affiliate Link' }}
     </button>
     <a href="{{ route('affiliate-links.index') }}" class="btn btn-secondary">Cancel</a>

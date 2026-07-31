@@ -74,7 +74,7 @@
                     </div>
                 </div>
                 <div class="mb-3 d-flex justify-content-end">
-                    <button class="btn btn-primary me-2" type="submit">{{ isset($role) ? "Edit Role" : "Add Role" }}</button>
+                    <button class="btn btn-warning me-2" type="submit">{{ isset($role) ? "Edit Role" : "Add Role" }}</button>
                     <a href="{{ route('role') }}" class="btn btn-info">Back</a>
                 </div>
             </div>
