@@ -5,21 +5,59 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Traits\Sortable;
+use App\Traits\Exportable;
 
 class AttractionController extends Controller
 {
-    use Sortable;
+    use Sortable, Exportable;
     public function index(Request $request)
     {
         $query = \App\Models\Attraction::with('category');
+        
+        // Filtering
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('city', 'like', "%{$search}%");
+            });
+        }
+        if ($request->filled('category')) {
+            $query->where('attraction_category_id', $request->category);
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('is_featured')) {
+            $query->where('is_featured', $request->is_featured);
+        }
+
         $query = $this->applySorting($query, ['id', 'name', 'attraction_category_id', 'status', 'created_at'], 'created_at', 'desc');
+        
+        // Export
+        if ($request->has('export')) {
+            return $this->exportData($query, $request->export, 'attractions_export', function ($attraction) {
+                return [
+                    'ID' => $attraction->id,
+                    'Name' => $attraction->name,
+                    'Category' => $attraction->category ? $attraction->category->name : '',
+                    'City' => $attraction->city,
+                    'State' => $attraction->state ?? '',
+                    'Featured' => $attraction->is_featured ? 'Yes' : 'No',
+                    'Status' => $attraction->status ? 'Active' : 'Inactive',
+                    'Created At' => $attraction->created_at ? $attraction->created_at->format('Y-m-d H:i:s') : '',
+                ];
+            });
+        }
+        
         $attractions = $query->paginate(10);
         
         if ($request->ajax()) {
             return view('new_content.admin.attractions._table', compact('attractions'))->render();
         }
         
-        return view('new_content.admin.attractions.index', compact('attractions'));
+        $categories = \App\Models\AttractionCategory::where('status', 1)->get();
+        return view('new_content.admin.attractions.index', compact('attractions', 'categories'));
     }
 
     public function create()

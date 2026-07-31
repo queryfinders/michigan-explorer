@@ -12,21 +12,59 @@ use App\Models\RestaurantCuisine;
 use App\Models\RestaurantFeature;
 use Illuminate\Support\Facades\Storage;
 use App\Traits\Sortable;
+use App\Traits\Exportable;
 
 class RestaurantController extends Controller
 {
-    use Sortable;
+    use Sortable, Exportable;
     public function index(Request $request)
     {
         $query = Restaurant::with('category');
+        
+        // Filtering
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('city', 'like', "%{$search}%");
+            });
+        }
+        if ($request->filled('category')) {
+            $query->where('restaurant_category_id', $request->category);
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('is_featured')) {
+            $query->where('is_featured', $request->is_featured);
+        }
+
         $query = $this->applySorting($query, ['id', 'name', 'restaurant_category_id', 'is_featured', 'status', 'created_at'], 'created_at', 'desc');
+        
+        // Export
+        if ($request->has('export')) {
+            return $this->exportData($query, $request->export, 'restaurants_export', function ($restaurant) {
+                return [
+                    'ID' => $restaurant->id,
+                    'Name' => $restaurant->name,
+                    'Category' => $restaurant->category ? $restaurant->category->name : '',
+                    'City' => $restaurant->city,
+                    'State' => $restaurant->state ?? '',
+                    'Featured' => $restaurant->is_featured ? 'Yes' : 'No',
+                    'Status' => $restaurant->status ? 'Active' : 'Inactive',
+                    'Created At' => $restaurant->created_at ? $restaurant->created_at->format('Y-m-d H:i:s') : '',
+                ];
+            });
+        }
+        
         $restaurants = $query->paginate(10);
         
         if ($request->ajax()) {
             return view('new_content.admin.restaurants._table', compact('restaurants'))->render();
         }
         
-        return view('new_content.admin.restaurants.index', compact('restaurants'));
+        $categories = \App\Models\RestaurantCategory::where('status', 1)->get();
+        return view('new_content.admin.restaurants.index', compact('restaurants', 'categories'));
     }
 
     public function create()

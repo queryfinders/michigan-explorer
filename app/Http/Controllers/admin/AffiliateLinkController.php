@@ -15,7 +15,7 @@ use App\Traits\Sortable;
 
 class AffiliateLinkController extends Controller
 {
-    use Sortable;
+    use Sortable, \App\Traits\Exportable;
     public function index(Request $request)
     {
         $query = AffiliateLink::query();
@@ -29,7 +29,26 @@ class AffiliateLinkController extends Controller
             });
         }
 
+        if ($request->filled('status')) {
+            $query->where('is_active', $request->status);
+        }
+
         $query = $this->applySorting($query, ['id', 'name', 'provider', 'link', 'is_active', 'created_at'], 'created_at', 'desc');
+        
+        // Export
+        if ($request->has('export')) {
+            return $this->exportData($query, $request->export, 'affiliate_links_export', function ($link) {
+                return [
+                    'ID' => $link->id,
+                    'Name' => $link->name,
+                    'Provider' => $link->provider,
+                    'Link' => $link->link,
+                    'Status' => $link->is_active ? 'Active' : 'Inactive',
+                    'Created At' => $link->created_at ? $link->created_at->format('Y-m-d H:i:s') : '',
+                ];
+            });
+        }
+        
         $affiliateLinks = $query->paginate(15);
         
         if ($request->ajax()) {

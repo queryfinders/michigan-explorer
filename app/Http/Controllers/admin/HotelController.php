@@ -5,21 +5,60 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Traits\Sortable;
+use App\Traits\Exportable;
 
 class HotelController extends Controller
 {
-    use Sortable;
+    use Sortable, Exportable;
     public function index(Request $request)
     {
         $query = \App\Models\Hotel::with('category');
+        
+        // Filtering
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('city', 'like', "%{$search}%")
+                  ->orWhere('state', 'like', "%{$search}%");
+            });
+        }
+        if ($request->filled('category')) {
+            $query->where('hotel_category_id', $request->category);
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('is_featured')) {
+            $query->where('is_featured', $request->is_featured);
+        }
+
         $query = $this->applySorting($query, ['id', 'name', 'hotel_category_id', 'is_featured', 'status', 'created_at'], 'created_at', 'desc');
+        
+        // Export
+        if ($request->has('export')) {
+            return $this->exportData($query, $request->export, 'hotels_export', function ($hotel) {
+                return [
+                    'ID' => $hotel->id,
+                    'Name' => $hotel->name,
+                    'Category' => $hotel->category ? $hotel->category->name : '',
+                    'City' => $hotel->city,
+                    'State' => $hotel->state,
+                    'Featured' => $hotel->is_featured ? 'Yes' : 'No',
+                    'Status' => $hotel->status ? 'Active' : 'Inactive',
+                    'Created At' => $hotel->created_at ? $hotel->created_at->format('Y-m-d H:i:s') : '',
+                ];
+            });
+        }
+        
         $hotels = $query->paginate(10);
         
         if ($request->ajax()) {
             return view('new_content.admin.hotels._table', compact('hotels'))->render();
         }
         
-        return view('new_content.admin.hotels.index', compact('hotels'));
+        $categories = \App\Models\HotelCategory::where('status', 1)->get();
+        return view('new_content.admin.hotels.index', compact('hotels', 'categories'));
     }
 
     public function create()

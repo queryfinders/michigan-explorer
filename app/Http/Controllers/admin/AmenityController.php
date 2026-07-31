@@ -10,11 +10,34 @@ use App\Traits\Sortable;
 
 class AmenityController extends Controller
 {
-    use Sortable;
+    use Sortable, \App\Traits\Exportable;
     public function index(Request $request)
     {
         $query = Amenity::query();
+        
+        // Filtering
+        if ($request->filled('search')) {
+            $query->where('name', 'like', "%{$request->search}%");
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
         $query = $this->applySorting($query, ['id', 'name', 'slug', 'status'], 'name', 'asc');
+        
+        // Export
+        if ($request->has('export')) {
+            return $this->exportData($query, $request->export, 'hotel_amenities_export', function ($amenity) {
+                return [
+                    'ID' => $amenity->id,
+                    'Name' => $amenity->name,
+                    'Slug' => $amenity->slug,
+                    'Icon' => $amenity->icon,
+                    'Status' => $amenity->status ? 'Active' : 'Inactive',
+                ];
+            });
+        }
+        
         $amenities = $query->paginate(10);
         if ($request->ajax()) {
             return view('new_content.admin.amenities._table', compact('amenities'))->render();

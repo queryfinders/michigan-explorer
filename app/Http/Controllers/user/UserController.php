@@ -11,10 +11,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 use App\Traits\Sortable;
+use App\Traits\Exportable;
 
 class UserController extends Controller
 {
-    use Sortable;
+    use Sortable, Exportable;
 
     public function user(Request $request){
         if (!\App\Helpers\AccessRights::accessRights('users.list')) {
@@ -27,9 +28,47 @@ class UserController extends Controller
         }
 
         $query = AdminUser::leftJoin('role','admin_user.role_id','=','role.id')
-            ->select(['admin_user.id', 'admin_user.name', 'admin_user.email_id', 'admin_user.contact_no', 'admin_user.job_title', 'admin_user.role_id', 'admin_user.is_active', 'admin_user.profile_url', 'role.role']);
+            ->select(['admin_user.id', 'admin_user.name', 'admin_user.email_id', 'admin_user.contact_no', 'admin_user.job_title', 'admin_user.role_id', 'admin_user.is_active', 'admin_user.profile_url', 'admin_user.created_at', 'role.role']);
             
-        $query = $this->applySorting($query, ['admin_user.id', 'name', 'email_id', 'contact_no', 'job_title', 'role', 'is_active'], 'admin_user.id', 'desc');
+        // Filtering
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('admin_user.name', 'like', "%{$search}%")
+                  ->orWhere('admin_user.email_id', 'like', "%{$search}%")
+                  ->orWhere('admin_user.contact_no', 'like', "%{$search}%");
+            });
+        }
+        if ($request->filled('role')) {
+            $query->where('admin_user.role_id', $request->role);
+        }
+        if ($request->filled('status')) {
+            $query->where('admin_user.is_active', $request->status);
+        }
+        if ($request->filled('date_from')) {
+            $query->whereDate('admin_user.created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('admin_user.created_at', '<=', $request->date_to);
+        }
+            
+        $query = $this->applySorting($query, ['admin_user.id', 'name', 'email_id', 'contact_no', 'job_title', 'role', 'is_active', 'created_at'], 'admin_user.id', 'desc');
+        
+        // Export
+        if ($request->has('export')) {
+            return $this->exportData($query, $request->export, 'users_export', function ($user) {
+                return [
+                    'ID' => $user->id,
+                    'Name' => $user->name,
+                    'Email' => $user->email_id,
+                    'Phone' => $user->contact_no,
+                    'Job Title' => $user->job_title,
+                    'Role' => $user->role,
+                    'Status' => $user->is_active ? 'Active' : 'Inactive',
+                    'Registration Date' => $user->created_at ? $user->created_at->format('Y-m-d H:i:s') : '',
+                ];
+            });
+        }
         
         $users = $query->paginate(10);
 
@@ -37,7 +76,9 @@ class UserController extends Controller
             return view('new_content.user._table', compact('users'))->render();
         }
 
-        return view('new_content.user.user_list', compact('users'));
+        $roles = Role::all();
+
+        return view('new_content.user.user_list', compact('users', 'roles'));
     }
 
     public function index_user(Request $request)

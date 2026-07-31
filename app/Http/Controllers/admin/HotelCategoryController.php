@@ -5,14 +5,38 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Traits\Sortable;
+use App\Traits\Exportable;
 
 class HotelCategoryController extends Controller
 {
-    use Sortable;
+    use Sortable, Exportable;
     public function index(Request $request)
     {
         $query = \App\Models\HotelCategory::query();
+        
+        // Filtering
+        if ($request->filled('search')) {
+            $query->where('name', 'like', "%{$request->search}%");
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
         $query = $this->applySorting($query, ['id', 'name', 'status', 'created_at'], 'created_at', 'desc');
+        
+        // Export
+        if ($request->has('export')) {
+            return $this->exportData($query, $request->export, 'hotel_categories_export', function ($category) {
+                return [
+                    'ID' => $category->id,
+                    'Name' => $category->name,
+                    'Slug' => $category->slug,
+                    'Status' => $category->status ? 'Active' : 'Inactive',
+                    'Created At' => $category->created_at ? $category->created_at->format('Y-m-d H:i:s') : '',
+                ];
+            });
+        }
+        
         $categories = $query->paginate(10);
         
         if ($request->ajax()) {

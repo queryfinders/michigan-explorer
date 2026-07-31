@@ -11,21 +11,60 @@ use App\Models\BlogTag;
 use App\Models\BlogTagMap;
 use Illuminate\Support\Str;
 use App\Traits\Sortable;
+use App\Traits\Exportable;
 
 class BlogController extends Controller
 {
-    use Sortable;
+    use Sortable, Exportable;
     public function index(Request $request)
     {
         $query = Blog::with(['category', 'author']);
+        
+        // Filtering
+        if ($request->filled('title')) {
+            $query->where('title', 'like', "%{$request->title}%");
+        }
+        if ($request->filled('category')) {
+            $query->where('blog_category_id', $request->category);
+        }
+        if ($request->filled('author')) {
+            $query->where('author_id', $request->author);
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('date_from')) {
+            $query->whereDate('published_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('published_at', '<=', $request->date_to);
+        }
+
         $query = $this->applySorting($query, ['id', 'title', 'blog_category_id', 'status', 'published_at', 'created_at'], 'created_at', 'desc');
+        
+        // Export
+        if ($request->has('export')) {
+            return $this->exportData($query, $request->export, 'blogs_export', function ($blog) {
+                return [
+                    'ID' => $blog->id,
+                    'Title' => $blog->title,
+                    'Category' => $blog->category ? $blog->category->name : '',
+                    'Author' => $blog->author ? $blog->author->name : 'Michigan Explorer',
+                    'Status' => ucfirst($blog->status),
+                    'Published Date' => $blog->published_at ? \Carbon\Carbon::parse($blog->published_at)->format('Y-m-d H:i:s') : '',
+                ];
+            });
+        }
+        
         $blogs = $query->paginate(10);
         
         if ($request->ajax()) {
             return view('new_content.admin.blogs._table', compact('blogs'))->render();
         }
         
-        return view('new_content.admin.blogs.index', compact('blogs'));
+        $categories = BlogCategory::where('status', 1)->get();
+        $authors = Author::all();
+        return view('new_content.admin.blogs.index', compact('blogs', 'categories', 'authors'));
     }
 
     public function create()

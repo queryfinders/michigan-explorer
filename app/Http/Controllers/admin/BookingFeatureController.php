@@ -9,11 +9,34 @@ use App\Traits\Sortable;
 
 class BookingFeatureController extends Controller
 {
-    use Sortable;
+    use Sortable, \App\Traits\Exportable;
     public function index(Request $request)
     {
         $query = BookingFeature::query();
+        
+        // Filtering
+        if ($request->filled('search')) {
+            $query->where('name', 'like', "%{$request->search}%");
+        }
+        if ($request->filled('is_active')) {
+            $query->where('is_active', $request->is_active);
+        }
+
         $query = $this->applySorting($query, ['id', 'name', 'icon', 'sort_order', 'is_active'], 'sort_order', 'asc');
+        
+        // Export
+        if ($request->has('export')) {
+            return $this->exportData($query, $request->export, 'hotel_booking_features_export', function ($feature) {
+                return [
+                    'ID' => $feature->id,
+                    'Name' => $feature->name,
+                    'Icon' => $feature->icon,
+                    'Sort Order' => $feature->sort_order,
+                    'Status' => $feature->is_active ? 'Active' : 'Inactive',
+                ];
+            });
+        }
+        
         $features = $query->paginate(20);
         
         if ($request->ajax()) {

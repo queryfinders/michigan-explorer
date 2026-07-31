@@ -10,7 +10,7 @@ use App\Traits\Sortable;
 
 class SubscriberController extends Controller
 {
-    use Sortable;
+    use Sortable, \App\Traits\Exportable;
     /**
      * Display a listing of the subscribers.
      */
@@ -49,8 +49,32 @@ class SubscriberController extends Controller
                 $query->where('source', $source);
             }
         }
+        
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
 
         $query = $this->applySorting($query, ['id', 'email', 'source', 'is_verified', 'created_at', 'verified_at'], 'created_at', 'desc');
+        
+        // Export using Exportable trait
+        if ($request->has('export')) {
+            return $this->exportData($query, $request->export, 'subscribers_export', function ($sub) {
+                return [
+                    'ID' => $sub->id,
+                    'Email' => $sub->email,
+                    'Source' => $sub->source,
+                    'Verified' => $sub->is_verified ? 'Yes' : 'No',
+                    'Verified At' => $sub->verified_at ? \Carbon\Carbon::parse($sub->verified_at)->format('Y-m-d H:i:s') : '',
+                    'Active' => $sub->is_active ? 'Yes' : 'No',
+                    'Unsubscribed At' => $sub->unsubscribed_at ? \Carbon\Carbon::parse($sub->unsubscribed_at)->format('Y-m-d H:i:s') : '',
+                    'Created At' => $sub->created_at ? \Carbon\Carbon::parse($sub->created_at)->format('Y-m-d H:i:s') : '',
+                ];
+            });
+        }
+        
         $subscribers = $query->paginate(15);
 
         if ($request->ajax()) {
@@ -121,96 +145,4 @@ class SubscriberController extends Controller
         return redirect()->back()->with('error', 'Invalid action.');
     }
 
-    /**
-     * Export subscribers as CSV or Excel (XLSX).
-     */
-    public function export($format)
-    {
-        $subscribers = Subscriber::orderByDesc('created_at')->get();
-
-        if ($format === 'csv') {
-            return $this->exportCsv($subscribers);
-        }
-
-        if ($format === 'excel') {
-            return $this->exportExcel($subscribers);
-        }
-
-        abort(404);
-    }
-
-    protected function exportCsv($subscribers)
-    {
-        $fileName = 'subscribers_' . date('Y-m-d') . '.csv';
-        $headers = [
-            "Content-type"        => "text/csv",
-            "Content-Disposition" => "attachment; filename=$fileName",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0"
-        ];
-
-        $callback = function() use($subscribers) {
-            $file = fopen('php://output', 'w');
-            fputcsv($file, ['ID', 'Email', 'Source', 'Verified', 'Verified At', 'Active', 'Unsubscribed At', 'IP Address', 'User Agent', 'Created At']);
-
-            foreach ($subscribers as $sub) {
-                fputcsv($file, [
-                    $sub->id,
-                    $sub->email,
-                    $sub->source,
-                    $sub->is_verified ? 'Yes' : 'No',
-                    $sub->verified_at ? $sub->verified_at->toDateTimeString() : '',
-                    $sub->is_active ? 'Yes' : 'No',
-                    $sub->unsubscribed_at ? $sub->unsubscribed_at->toDateTimeString() : '',
-                    $sub->ip_address,
-                    $sub->user_agent,
-                    $sub->created_at->toDateTimeString()
-                ]);
-            }
-
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
-    }
-
-    protected function exportExcel($subscribers)
-    {
-        // For standard server-side compatibility without installing massive third-party packages (like PhpSpreadsheet),
-        // exporting as a clean Tab-Separated Values (TSV) file with .xls extension allows Microsoft Excel to open it natively!
-        $fileName = 'subscribers_' . date('Y-m-d') . '.xls';
-        $headers = [
-            "Content-type"        => "application/vnd.ms-excel",
-            "Content-Disposition" => "attachment; filename=$fileName",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0"
-        ];
-
-        $callback = function() use($subscribers) {
-            $file = fopen('php://output', 'w');
-            
-            // Excel expects tab separators for clean display
-            fwrite($file, "ID\tEmail\tSource\tVerified\tVerified At\tActive\tUnsubscribed At\tIP Address\tCreated At\n");
-
-            foreach ($subscribers as $sub) {
-                fwrite($file, implode("\t", [
-                    $sub->id,
-                    $sub->email,
-                    $sub->source,
-                    $sub->is_verified ? 'Yes' : 'No',
-                    $sub->verified_at ? $sub->verified_at->toDateTimeString() : '',
-                    $sub->is_active ? 'Yes' : 'No',
-                    $sub->unsubscribed_at ? $sub->unsubscribed_at->toDateTimeString() : '',
-                    $sub->ip_address,
-                    $sub->created_at->toDateTimeString()
-                ]) . "\n");
-            }
-
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
-    }
 }

@@ -5,14 +5,44 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Traits\Sortable;
+use App\Traits\Exportable;
 
 class EventController extends Controller
 {
-    use Sortable;
+    use Sortable, Exportable;
     public function index(Request $request)
     {
         $query = \App\Models\Event::with('category');
+        
+        // Filtering
+        if ($request->filled('name')) {
+            $query->where('name', 'like', "%{$request->name}%");
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('event_date')) {
+            $query->whereDate('start_date', '<=', $request->event_date)
+                  ->whereDate('end_date', '>=', $request->event_date);
+        }
+
         $query = $this->applySorting($query, ['id', 'name', 'event_category_id', 'status', 'created_at'], 'created_at', 'desc');
+        
+        // Export
+        if ($request->has('export')) {
+            return $this->exportData($query, $request->export, 'events_export', function ($event) {
+                return [
+                    'ID' => $event->id,
+                    'Event Name' => $event->name,
+                    'Category' => $event->category ? $event->category->name : '',
+                    'Location' => $event->venue_name ?? $event->city ?? '',
+                    'Start Date' => $event->start_date ? \Carbon\Carbon::parse($event->start_date)->format('Y-m-d') : '',
+                    'End Date' => $event->end_date ? \Carbon\Carbon::parse($event->end_date)->format('Y-m-d') : '',
+                    'Status' => $event->status ? 'Active' : 'Inactive',
+                ];
+            });
+        }
+        
         $events = $query->paginate(10);
         
         if ($request->ajax()) {

@@ -10,7 +10,7 @@ use App\Traits\Sortable;
 
 class ContactMessageController extends Controller
 {
-    use Sortable;
+    use Sortable, \App\Traits\Exportable;
     /**
      * Display a listing of contact messages.
      */
@@ -35,8 +35,31 @@ class ContactMessageController extends Controller
                 $query->where('status', $status);
             }
         }
+        
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
 
         $query = $this->applySorting($query, ['id', 'full_name', 'email', 'phone', 'subject', 'created_at'], 'created_at', 'desc');
+        
+        // Export using Exportable trait
+        if ($request->has('export')) {
+            return $this->exportData($query, $request->export, 'contact_messages_export', function ($message) {
+                return [
+                    'ID' => $message->id,
+                    'Name' => $message->full_name,
+                    'Email' => $message->email,
+                    'Phone' => $message->phone,
+                    'Subject' => $message->subject,
+                    'Status' => ucfirst($message->status),
+                    'Received At' => $message->created_at ? \Carbon\Carbon::parse($message->created_at)->format('Y-m-d H:i:s') : '',
+                ];
+            });
+        }
+        
         $messages = $query->paginate(15);
 
         if ($request->ajax()) {

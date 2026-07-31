@@ -12,7 +12,7 @@ use App\Traits\Sortable;
 
 class AffiliatePromotionController extends Controller
 {
-    use Sortable;
+    use Sortable, \App\Traits\Exportable;
     public function index(Request $request)
     {
         $query = AffiliatePromotion::with('affiliateLink');
@@ -48,6 +48,23 @@ class AffiliatePromotionController extends Controller
                 ->first();
 
             $promo->last_click_at = $lastClick ? $lastClick->clicked_at : null;
+        }
+
+        // Export
+        if ($request->has('export')) {
+            return $this->exportData($query, $request->export, 'affiliate_promotions_export', function ($promo) {
+                return [
+                    'ID' => $promo->id,
+                    'Title' => $promo->title,
+                    'Badge Text' => $promo->badge_text,
+                    'Placement' => $promo->placement,
+                    'Affiliate Link' => $promo->affiliateLink ? $promo->affiliateLink->name : 'N/A',
+                    'Priority' => $promo->priority,
+                    'Status' => $promo->is_active ? 'Active' : 'Inactive',
+                    'Starts At' => $promo->starts_at ? \Carbon\Carbon::parse($promo->starts_at)->format('Y-m-d H:i') : '',
+                    'Ends At' => $promo->ends_at ? \Carbon\Carbon::parse($promo->ends_at)->format('Y-m-d H:i') : '',
+                ];
+            });
         }
 
         if ($request->ajax()) {

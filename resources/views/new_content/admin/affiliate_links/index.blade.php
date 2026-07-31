@@ -17,10 +17,39 @@
     <p class="text-muted mb-0">Manage all third-party booking affiliate links.</p>
   </div>
   <div class="d-flex align-items-center gap-2">
-    <form action="{{ route('affiliate-links.index') }}" method="GET" class="m-0 p-0">
-        <input type="text" name="search" class="form-control global-search-input" placeholder="Search..." style="width: 220px;" value="{{ request('search') }}" />
+      <button type="button" class="btn btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse">
+        <i class="bx bx-filter-alt"></i> Filters
+      </button>
+      <button type="submit" form="filterForm" name="export" value="csv" class="btn btn-success">
+        <i class="bx bx-export"></i> Export CSV
+      </button>
+      <a href="{{ route('affiliate-links.create') }}" class="btn btn-warning text-white">Add Link</a>
+  </div>
+</div>
+
+<div class="collapse mb-4 {{ request()->anyFilled(['search', 'status']) ? 'show' : '' }}" id="filterCollapse">
+  <div class="card card-body">
+    <form id="filterForm" method="GET" action="{{ route('affiliate-links.index') }}">
+      <div class="row g-3">
+        <div class="col-md-5">
+          <label class="form-label">Search Name/Provider</label>
+          <input type="text" name="search" class="form-control" value="{{ request('search') }}" placeholder="Search...">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Status</label>
+          @php
+            $statusOptions = ['' => 'All Status', '1' => 'Active', '0' => 'Inactive'];
+          @endphp
+          <x-filter-dropdown name="status" :options="$statusOptions" :selected="request('status')" placeholder="All Status" />
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+          <div class="d-flex gap-2 w-100">
+            <a href="{{ route('affiliate-links.index') }}" class="btn btn-secondary w-50">Reset</a>
+            <button type="submit" class="btn btn-primary w-50">Filter</button>
+          </div>
+        </div>
+      </div>
     </form>
-    <a href="{{ route('affiliate-links.create') }}" class="btn btn-warning text-white">Add Link</a>
   </div>
 </div>
 

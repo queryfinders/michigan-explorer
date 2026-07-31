@@ -125,6 +125,137 @@
               }
           });
       });
+      // Prevent 'Enter' key in filter inputs from triggering the Export button
+      $(document).on('keydown', 'form#filterForm input', function(e) {
+          if (e.key === 'Enter' || e.keyCode === 13) {
+              e.preventDefault();
+              $(this).closest('form').find('button[type="submit"]:not([name="export"])').first().click();
+          }
+      });
+
+      // AJAX form submission for Filter forms (prevents page reload and empty URL params)
+      $(document).on('submit', 'form#filterForm', function(e) {
+          var form = $(this);
+          var submitter = e.originalEvent && e.originalEvent.submitter ? e.originalEvent.submitter : null;
+
+          // If the Export button was clicked, allow standard form submission
+          if (submitter && submitter.name === 'export') {
+              // Temporarily disable empty fields so they don't appear in the URL
+              form.find(':input').filter(function() { return !this.value; }).prop('disabled', true);
+              setTimeout(function() { form.find(':input').prop('disabled', false); }, 100);
+              return true;
+          }
+
+          // Otherwise, handle as an AJAX filter search
+          e.preventDefault();
+
+          // Serialize excluding empty fields
+          var formData = form.serializeArray().filter(function(item) {
+              return item.value.trim() !== '';
+          });
+          var queryString = $.param(formData);
+          
+          var url = form.attr('action');
+          if (queryString) {
+              url += '?' + queryString;
+          }
+          
+          // Do NOT update URL with pushState so the address bar remains completely clean!
+          // window.history.pushState({}, '', url);
+          
+          var $container = $('#ajax-table-container');
+          if ($container.length) {
+              $container.css('opacity', '0.5');
+              $.ajax({
+                  url: url,
+                  type: 'GET',
+                  headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                  success: function(response) {
+                      $container.html(response);
+                      $container.css('opacity', '1');
+                  },
+                  error: function() {
+                      $container.css('opacity', '1');
+                      console.error('Failed to load table data.');
+                  }
+              });
+          } else {
+              window.location.href = url;
+          }
+      });
+  });
+
+  // Global Reusable Dropdown Component Logic
+  window.toggleCustomDropdown = function(idPrefix) {
+    const panel  = document.getElementById(idPrefix + 'DropdownPanel');
+    const arrow  = document.getElementById(idPrefix + 'Arrow');
+    const trigger = document.getElementById(idPrefix + 'Trigger');
+    if(!panel || !trigger) return;
+    
+    const isOpen = panel.style.display !== 'none';
+    
+    // Close all other dropdowns
+    document.querySelectorAll('.custom-dropdown-panel').forEach(p => p.style.display = 'none');
+    document.querySelectorAll('.custom-dropdown-arrow').forEach(a => a.style.transform = 'rotate(0deg)');
+    document.querySelectorAll('.custom-dropdown-trigger').forEach(t => t.classList.remove('open'));
+    
+    if (isOpen) {
+        panel.style.display = 'none';
+        if(arrow) arrow.style.transform = 'rotate(0deg)';
+        trigger.classList.remove('open');
+    } else {
+        panel.style.display = 'block';
+        if(arrow) arrow.style.transform = 'rotate(180deg)';
+        trigger.classList.add('open');
+        const input = document.getElementById(idPrefix + 'SearchInput');
+        if(input) input.focus();
+    }
+  };
+
+  window.filterCustomDropdown = function(val, idPrefix) {
+    const term  = val.toLowerCase();
+    const items = document.querySelectorAll('#' + idPrefix + 'ItemsList .custom-item');
+    let   found = 0;
+    items.forEach(item => {
+      const name = item.querySelector('.custom-item-name').textContent.toLowerCase();
+      const show = name.includes(term);
+      item.style.display = show ? '' : 'none';
+      if (show) found++;
+    });
+    const noRes = document.getElementById(idPrefix + 'NoResults');
+    if(noRes) noRes.classList.toggle('d-none', found > 0);
+  };
+
+  window.onCustomDropdownChange = function(rb, idPrefix) {
+    const id    = rb.dataset.id;
+    const name  = rb.dataset.name;
+    const hidden= document.getElementById(idPrefix + '_value');
+    const ph    = document.getElementById(idPrefix + 'Placeholder');
+
+    if(hidden) hidden.value = id;
+    document.querySelectorAll('#' + idPrefix + 'ItemsList .custom-item').forEach(l => l.classList.remove('selected'));
+    
+    const label = rb.closest('.custom-item');
+    if(label) label.classList.add('selected');
+
+    if(ph) ph.textContent = name;
+    
+    // Auto-close dropdown
+    const panel = document.getElementById(idPrefix + 'DropdownPanel');
+    if(panel) panel.style.display = 'none';
+    const arrow = document.getElementById(idPrefix + 'Arrow');
+    if(arrow) arrow.style.transform = 'rotate(0deg)';
+    const trigger = document.getElementById(idPrefix + 'Trigger');
+    if(trigger) trigger.classList.remove('open');
+  };
+
+  // Close dropdown on outside click
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.custom-dropdown-wrapper')) {
+      document.querySelectorAll('.custom-dropdown-panel').forEach(p => p.style.display = 'none');
+      document.querySelectorAll('.custom-dropdown-arrow').forEach(a => a.style.transform = 'rotate(0deg)');
+      document.querySelectorAll('.custom-dropdown-trigger').forEach(t => t.classList.remove('open'));
+    }
   });
 </script>
 

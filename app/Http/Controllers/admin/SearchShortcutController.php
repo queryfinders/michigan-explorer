@@ -23,7 +23,7 @@ use App\Traits\Sortable;
  */
 class SearchShortcutController extends Controller
 {
-    use Sortable;
+    use Sortable, \App\Traits\Exportable;
     /**
      * Display a listing of the search shortcuts.
      *
@@ -32,8 +32,33 @@ class SearchShortcutController extends Controller
     public function index(Request $request)
     {
         $query = SearchShortcut::query();
+        
+        // Filtering
+        if ($request->filled('search')) {
+            $query->where('title', 'like', "%{$request->search}%");
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
         $query = $this->applySorting($query, ['id', 'title', 'action_type', 'target_url', 'click_count', 'status', 'sort_order'], 'sort_order', 'asc');
-        $searchShortcuts = $query->get();
+        
+        // Export
+        if ($request->has('export')) {
+            return $this->exportData($query, $request->export, 'search_shortcuts_export', function ($shortcut) {
+                return [
+                    'ID' => $shortcut->id,
+                    'Title' => $shortcut->title,
+                    'Action Type' => $shortcut->action_type,
+                    'Target URL' => $shortcut->target_url,
+                    'Click Count' => $shortcut->click_count,
+                    'Status' => $shortcut->status ? 'Active' : 'Inactive',
+                    'Sort Order' => $shortcut->sort_order,
+                ];
+            });
+        }
+        
+        $searchShortcuts = $query->paginate(10);
         if ($request->ajax()) {
             return view('new_content.admin.search_shortcuts._table', compact('searchShortcuts'))->render();
         }

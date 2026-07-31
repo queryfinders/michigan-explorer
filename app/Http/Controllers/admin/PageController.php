@@ -9,11 +9,34 @@ use App\Traits\Sortable;
 
 class PageController extends Controller
 {
-    use Sortable;
+    use Sortable, \App\Traits\Exportable;
     public function index(Request $request)
     {
         $query = \App\Models\Page::query();
+        
+        // Filtering
+        if ($request->filled('search')) {
+            $query->where('title', 'like', "%{$request->search}%");
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
         $query = $this->applySorting($query, ['id', 'title', 'slug', 'status', 'created_at'], 'created_at', 'desc');
+        
+        // Export
+        if ($request->has('export')) {
+            return $this->exportData($query, $request->export, 'pages_export', function ($page) {
+                return [
+                    'ID' => $page->id,
+                    'Title' => $page->title,
+                    'Slug' => $page->slug,
+                    'Status' => $page->status ? 'Active' : 'Inactive',
+                    'Created At' => $page->created_at ? $page->created_at->format('Y-m-d H:i:s') : '',
+                ];
+            });
+        }
+        
         $pages = $query->paginate(10);
         
         if ($request->ajax()) {

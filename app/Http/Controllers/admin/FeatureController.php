@@ -9,11 +9,35 @@ use App\Traits\Sortable;
 
 class FeatureController extends Controller
 {
-    use Sortable;
+    use Sortable, \App\Traits\Exportable;
     public function index(Request $request)
     {
         $query = RestaurantFeature::query();
+        
+        // Filtering
+        if ($request->filled('search')) {
+            $query->where('name', 'like', "%{$request->search}%");
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
         $query = $this->applySorting($query, ['id', 'name', 'slug', 'sort_order', 'status', 'created_at'], 'sort_order', 'asc');
+        
+        // Export
+        if ($request->has('export')) {
+            return $this->exportData($query, $request->export, 'restaurant_features_export', function ($feature) {
+                return [
+                    'ID' => $feature->id,
+                    'Name' => $feature->name,
+                    'Slug' => $feature->slug,
+                    'Icon Class' => $feature->icon_class,
+                    'Sort Order' => $feature->sort_order,
+                    'Status' => $feature->status ? 'Active' : 'Inactive',
+                ];
+            });
+        }
+        
         $features = $query->paginate(10);
         
         if ($request->ajax()) {
