@@ -178,7 +178,7 @@
 
                 @if($blog->category)
                 <div class="mb-3 fade-up-anim">
-                    <a href="{{ route('web.blogs.index') }}?category={{ $blog->category->slug }}" class="badge bg-primary text-white text-uppercase px-3 py-2 rounded-pill fw-bold text-decoration-none shadow-sm" style="font-size: 0.8rem; letter-spacing: 0.5px;">
+                    <a href="{{ route('web.blogs.index') }}?category={{ $blog->category->slug }}" class="badge bg-primary text-white text-uppercase px-3 py-2 rounded-pill fw-bold text-decoration-none shadow-sm custom-blog-badge">
                         {{ $blog->category->name }}
                     </a>
                 </div>
@@ -399,7 +399,7 @@
 
             <!-- Right: Table of Contents -->
             <div class="col-lg-3 col-xl-4 d-none d-lg-block">
-                <div class="sticky-top pt-4 auto-style-44" style="top: 60px; z-index: 10;">
+                <div class="sticky-top pt-4 auto-style-44 custom-sticky-top-60">
                     <div class="toc-premium-card p-4 rounded-4 shadow-sm bg-white border border-light">
                         <h6 class="text-uppercase fw-bold letter-spacing-1 mb-3 text-primary d-flex align-items-center">
                             <i class="fas fa-list-ul me-2"></i> In this article
@@ -418,17 +418,17 @@
                         <div class="d-flex flex-column gap-3">
                             @foreach($relatedBlogs->take(3) as $related)
                             <div class="d-flex align-items-center gap-3 pb-2 border-bottom border-light">
-                                <a href="{{ route('web.blogs.show', $related->slug) }}" class="flex-shrink-0" style="width: 70px; height: 70px;">
+                                <a href="{{ route('web.blogs.show', $related->slug) }}" class="flex-shrink-0 custom-related-thumb">
                                     @if($related->featured_image)
                                         <img src="{{ Str::startsWith($related->featured_image, ['http://', 'https://']) ? $related->featured_image : asset($related->featured_image) }}" class="rounded-3 w-100 h-100 object-fit-cover shadow-sm" alt="{{ $related->title }}">
                                     @else
-                                        <div class="rounded-3 w-100 h-100 d-flex align-items-center justify-content-center shadow-sm" style="background: linear-gradient(135deg, #7367f0 0%, #ce93d8 100%);">
-                                            <i class="fas fa-compass text-white opacity-50" style="font-size: 1.5rem;"></i>
+                                        <div class="rounded-3 w-100 h-100 d-flex align-items-center justify-content-center shadow-sm custom-gradient-bg">
+                                            <i class="fas fa-compass text-white opacity-50 custom-icon-1-5rem"></i>
                                         </div>
                                     @endif
                                 </a>
                                 <div>
-                                    <h6 class="mb-1 fw-bold" style="font-size: 0.9rem; line-height: 1.3;">
+                                    <h6 class="mb-1 fw-bold custom-title-line-height">
                                         <a href="{{ route('web.blogs.show', $related->slug) }}" class="text-dark text-decoration-none hover-text-primary transition-all">{{ Str::limit($related->title, 45) }}</a>
                                     </h6>
                                     <span class="text-muted small">{{ $related->published_at ? \Carbon\Carbon::parse($related->published_at)->format('M d, Y') : $related->created_at->format('M d, Y') }}</span>
@@ -454,9 +454,9 @@
                     @endif
 
                     <!-- Sidebar Ad / Promo Placeholder -->
-                    <!-- <div class="mt-4 rounded-4 overflow-hidden position-relative shadow-sm group hover-shadow-lg transition-all" style="border: 1px solid #f1f5f9;">
+                    <!-- <div class="mt-4 rounded-4 overflow-hidden position-relative shadow-sm group hover-shadow-lg transition-all custom-ad-border">
                         <a href="#" class="d-block">
-                            <img src="{{ asset('images/michigan_explorer_ad.jpg') }}" class="w-100 object-fit-cover hover-zoom auto-style-45" alt="Explore Michigan Explorer Premium" style="transition: transform 0.3s ease;">
+                            <img src="{{ asset('images/michigan_explorer_ad.jpg') }}" class="w-100 object-fit-cover hover-zoom auto-style-45 custom-transition-transform" alt="Explore Michigan Explorer Premium">
                         </a>
                     </div> -->
 
@@ -482,8 +482,8 @@
                                 @if($related->featured_image)
                                     <img src="{{ Str::startsWith($related->featured_image, ['http://', 'https://']) ? $related->featured_image : asset($related->featured_image) }}" class="w-100 h-100 object-fit-cover hover-zoom" alt="{{ $related->title }}">
                                 @else
-                                    <div class="w-100 h-100 d-flex align-items-center justify-content-center hover-zoom" style="background: linear-gradient(135deg, #7367f0 0%, #ce93d8 100%);">
-                                        <i class="fas fa-compass text-white opacity-50" style="font-size: 3.5rem;"></i>
+                                    <div class="w-100 h-100 d-flex align-items-center justify-content-center hover-zoom custom-gradient-bg">
+                                        <i class="fas fa-compass text-white opacity-50 custom-icon-3-5rem"></i>
                                     </div>
                                 @endif
                             </a>

@@ -27,7 +27,7 @@
 @section('webLayoutContent')
 
 <!-- 1. Hero Banner -->
-<section class="hotel-detail-hero position-relative" style="height: 500px; background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.5)), url('{{ $heroImage }}'); background-size: cover; background-position: center; background-attachment: fixed;">
+<section class="hotel-detail-hero position-relative custom-hero-banner-attraction" style="background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.5)), url('{{ $heroImage }}');">
     <div class="container h-100 d-flex flex-column justify-content-center align-items-center text-center pt-5">
         <nav aria-label="breadcrumb" class="mb-3">
             <ol class="breadcrumb justify-content-center">
@@ -73,9 +73,9 @@
                     <div class="row g-2">
                         <div class="col-md-8 position-relative">
                             @if(!empty($attraction->video))
-                                <div class="video-wrapper-premium w-100 h-100 position-relative" style="min-height: 350px;">
+                                <div class="video-wrapper-premium w-100 h-100 position-relative custom-iframe-min-height">
                                     <div class="video-loading-spinner" id="videoSpinnerAttractions">
-                                        <div class="spinner-border text-white" role="status" style="width: 1.5rem; height: 1.5rem;">
+                                        <div class="spinner-border text-white custom-spinner-size" role="status">
                                             <span class="visually-hidden">Loading...</span>
                                         </div>
                                     </div>
@@ -84,9 +84,9 @@
                                         $youtubeId = $isYoutube ? $matches[1] : null;
                                     @endphp
                                     @if($isYoutube)
-                                        <iframe class="w-100 h-100 rounded-3 shadow-sm" style="min-height:350px;" src="https://www.youtube.com/embed/{{ $youtubeId }}?autoplay=1&mute=1&loop=1&playlist={{ $youtubeId }}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen onload="document.getElementById('videoSpinnerAttractions').style.display='none'"></iframe>
+                                        <iframe class="w-100 h-100 rounded-3 shadow-sm custom-iframe-min-height" src="https://www.youtube.com/embed/{{ $youtubeId }}?autoplay=1&mute=1&loop=1&playlist={{ $youtubeId }}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen onload="document.getElementById('videoSpinnerAttractions').style.display='none'"></iframe>
                                     @else
-                                        <video class="w-100 h-100 object-fit-cover rounded-3 shadow-sm" controls autoplay muted loop playsinline style="object-fit: cover; min-height: 350px;"
+                                        <video class="w-100 h-100 object-fit-cover rounded-3 shadow-sm custom-video-cover-min-height" controls autoplay muted loop playsinline
                                                onplay="document.getElementById('videoSpinnerAttractions').style.display='none'"
                                                onplaying="document.getElementById('videoSpinnerAttractions').style.display='none'"
                                                onwaiting="document.getElementById('videoSpinnerAttractions').style.display='flex'"
@@ -97,7 +97,7 @@
                                     @endif
                                     
                                     {{-- Fullscreen button overlay --}}
-                                    <div class="position-absolute bottom-0 end-0 m-3" style="z-index: 11;">
+                                    <div class="position-absolute bottom-0 end-0 m-3 custom-z-index-11">
                                         <button class="btn btn-sm btn-dark bg-opacity-75 rounded-pill px-3 text-white border-0" onclick="openCustomGallery(0)">
                                             <i class="fas fa-expand-arrows-alt me-1"></i> View Video Gallery
                                         </button>
@@ -119,7 +119,7 @@
                                     <div class="col-12 h-50 cursor-pointer position-relative" onclick="openCustomGallery({{ !empty($attraction->video) ? 2 : 1 }})">
                                         <img src="{{ asset($attraction->images[1]->image) }}" class="img-fluid rounded-3 w-100 h-100 object-fit-cover shadow-sm transition-hover" alt="{{ $attraction->images[1]->alt_text ?? 'Gallery 2' }}">
                                         @if($attraction->images->count() > 2)
-                                        <div class="position-absolute top-0 start-0 w-100 h-100 rounded-3 d-flex justify-content-center align-items-center text-white fw-bold fs-4 transition-hover" style="background: rgba(0,0,0,0.4);">
+                                        <div class="position-absolute top-0 start-0 w-100 h-100 rounded-3 d-flex justify-content-center align-items-center text-white fw-bold fs-4 transition-hover custom-bg-overlay-40">
                                             +{{ $attraction->images->count() - 2 }}
                                         </div>
                                         @endif
@@ -161,7 +161,7 @@
             <div class="col-lg-4">
                 
                 <!-- Visitor Information Card -->
-                <div class="card border-0 shadow-sm rounded-4 mb-4 sticky-top" style="top: 100px; z-index: 10;">
+                <div class="card border-0 shadow-sm rounded-4 mb-4 sticky-top custom-sticky-top-offset">
                     <div class="card-body p-4">
                         <h4 class="fw-bold mb-4 auto-style-7">Visitor Information</h4>
                         
@@ -224,19 +224,12 @@
               <h3 class="fw-bold mb-4">Location</h3>
               <p class="text-muted mb-3"><i class="fas fa-map-marker-alt text-primary me-2"></i> {{ $attraction->address ?? 'Main Street' }}, {{ $attraction->city ?? '' }} {{ $attraction->zip ?? '' }}</p>
               
-              <div class="rounded-3 overflow-hidden bg-light w-100 map-wrapper" style="height: 400px;">
-                <style>
-                    .map-wrapper iframe {
-                        width: 100% !important;
-                        height: 100% !important;
-                        border: 0;
-                    }
-                </style>
+              <div class="rounded-3 overflow-hidden bg-light w-100 map-wrapper custom-map-height">
                 @if(!empty($attraction->map_iframe))
                     @if(str_contains($attraction->map_iframe, '<iframe'))
                         {!! $attraction->map_iframe !!}
                     @else
-                        <iframe width="100%" height="100%" frameborder="0" style="border:0;" src="{{ $attraction->map_iframe }}"></iframe>
+                        <iframe width="100%" height="100%" frameborder="0" class="custom-border-0" src="{{ $attraction->map_iframe }}"></iframe>
                     @endif
                 @else
                     <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q={{ urlencode(($attraction->address ?? 'Main Street') . ' ' . ($attraction->city ?? 'Michigan')) }}&t=&z=13&ie=UTF8&iwloc=&output=embed"></iframe>
@@ -310,15 +303,15 @@
 <x-promo-banner :promotion="$detailPromotion ?? null" />
 
 <!-- Custom Fullscreen Gallery Lightbox -->
-<div id="customGalleryLightbox" class="custom-lightbox" style="display: none;">
+<div id="customGalleryLightbox" class="custom-lightbox custom-display-none">
     <button class="lightbox-close" onclick="closeCustomGallery()"><i class="fas fa-times"></i></button>
     <div class="lightbox-counter"><span id="lightbox-current-idx">1</span> / <span id="lightbox-total-idx">5</span></div>
     
     <button class="lightbox-nav lightbox-prev" onclick="changeLightboxImage(-1)"><i class="fas fa-chevron-left"></i></button>
     
     <div class="lightbox-image-container">
-        <img id="lightbox-main-img" src="" alt="Gallery Image" style="display: block;">
-        <video id="lightbox-main-video" controls autoplay muted style="display: none; max-width: 90%; max-height: 80vh;" class="rounded"></video>
+        <img id="lightbox-main-img" src="" alt="Gallery Image" class="custom-display-block">
+        <video id="lightbox-main-video" controls autoplay muted class="rounded custom-lightbox-video"></video>
     </div>
     
     <button class="lightbox-nav lightbox-next" onclick="changeLightboxImage(1)"><i class="fas fa-chevron-right"></i></button>

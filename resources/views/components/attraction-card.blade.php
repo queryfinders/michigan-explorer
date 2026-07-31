@@ -37,7 +37,7 @@
             {{ $attraction->name ?? 'Sleeping Bear Dunes' }}
         </h3>
         
-        <p class="listing-desc text-muted mb-4 lh-16 transition-base fs-095rem" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+        <p class="listing-desc text-muted mb-4 lh-16 transition-base fs-095rem custom-line-clamp-2">
             {{ Str::limit(strip_tags($attraction->description ?? 'Experience towering sand dunes and spectacular views of Lake Michigan at this national lakeshore.'), 150) }}
         </p>
         

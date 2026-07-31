@@ -32,8 +32,8 @@
 
 @section('webLayoutContent')
 <!-- Hero Banner -->
-<section class="hotel-listing-hero position-relative" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8)), url('{{ $bannerImage }}'); background-size: cover; background-position: center; background-attachment: fixed;">
-    <div class="content d-flex flex-column justify-content-center align-items-center h-100 text-center w-100 position-relative" style="z-index: 2;">
+<section class="hotel-listing-hero position-relative custom-contact-hero-banner" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8)), url('{{ $bannerImage }}');">
+    <div class="content d-flex flex-column justify-content-center align-items-center h-100 text-center w-100 position-relative custom-z-index-2">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb justify-content-center text-white opacity-75 mb-0">
@@ -42,8 +42,8 @@
             </ol>
         </nav>
 
-        <h1 class="display-3 fw-bold text-white mb-3" style="letter-spacing: -1px;">{{ $bannerTitle }}</h1>
-        <p class="lead text-white opacity-75 mb-0" style="max-width: 600px;">{{ $bannerSubtitle }}</p>
+        <h1 class="display-3 fw-bold text-white mb-3 custom-letter-spacing-minus-1">{{ $bannerTitle }}</h1>
+        <p class="lead text-white opacity-75 mb-0 custom-max-w-600">{{ $bannerSubtitle }}</p>
     </div>
 </section>
 
@@ -106,7 +106,7 @@
                                 <div class="col-12">
                                     <div class="form-group">
                                         <label for="message" class="form-label fw-semibold text-dark">Your Message <span class="text-danger">*</span></label>
-                                        <textarea name="message" class="form-control form-control-lg bg-light border-0 px-4 py-3" id="message" style="height: 150px; resize: none;" placeholder="Tell us more about your inquiry..."></textarea>
+                                        <textarea name="message" class="form-control form-control-lg bg-light border-0 px-4 py-3 custom-textarea-fixed" id="message" placeholder="Tell us more about your inquiry..."></textarea>
                                         <div class="error-feedback text-danger small mt-1" id="err-message"></div>
                                     </div>
                                 </div>
@@ -130,7 +130,7 @@
             <div class="col-lg-5">
                 <div class="d-flex flex-column gap-4 h-100">
                     <div class="card border-0 shadow-sm rounded-4 p-4 p-lg-5 bg-white hover-shadow transition-all flex-grow-1">
-                        <div class="icon-box bg-light-primary text-primary rounded-circle d-flex align-items-center justify-content-center mb-4" style="width: 70px; height: 70px;">
+                        <div class="icon-box bg-light-primary text-primary rounded-circle d-flex align-items-center justify-content-center mb-4 custom-icon-box-70">
                             <i class="fa-solid fa-location-dot fs-3"></i>
                         </div>
                         <h4 class="fw-bold mb-3">Headquarters</h4>
@@ -138,7 +138,7 @@
                     </div>
 
                     <div class="card border-0 shadow-sm rounded-4 p-4 p-lg-5 bg-white hover-shadow transition-all flex-grow-1">
-                        <div class="icon-box bg-light-primary text-primary rounded-circle d-flex align-items-center justify-content-center mb-4" style="width: 70px; height: 70px;">
+                        <div class="icon-box bg-light-primary text-primary rounded-circle d-flex align-items-center justify-content-center mb-4 custom-icon-box-70">
                             <i class="fa-solid fa-phone fs-3"></i>
                         </div>
                         <h4 class="fw-bold mb-3">Phone</h4>
@@ -148,7 +148,7 @@
                     </div>
                     
                     <div class="card border-0 shadow-sm rounded-4 p-4 p-lg-5 bg-white hover-shadow transition-all flex-grow-1">
-                        <div class="icon-box bg-light-primary text-primary rounded-circle d-flex align-items-center justify-content-center mb-4" style="width: 70px; height: 70px;">
+                        <div class="icon-box bg-light-primary text-primary rounded-circle d-flex align-items-center justify-content-center mb-4 custom-icon-box-70">
                             <i class="fa-solid fa-envelope fs-3"></i>
                         </div>
                         <h4 class="fw-bold mb-3">Email</h4>
@@ -164,49 +164,17 @@
 </section>
 
 <!-- Map Section -->
-<section class="position-relative map-wrapper">
+<section class="position-relative contact-map-wrapper">
     @php $mapUrl = $settings['contact_map_url'] ?? 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d182236.42571253018!2d-85.74830113876077!3d44.75056708688463!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x881e32b2d7da29dd%3A0x47bfdc3f3f745621!2sTraverse%20City%2C%20MI!5e0!3m2!1sen!2sus!4v1716301389278!5m2!1sen!2sus'; @endphp
     @if(str_starts_with(trim($mapUrl), '<iframe'))
         {!! $mapUrl !!}
     @else
-        <iframe src="{{ $mapUrl }}" width="100%" height="450" style="border:0; display:block;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <iframe src="{{ $mapUrl }}" width="100%" height="450" class="custom-iframe-block" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
     @endif
 </section>
 
 <!-- Additional Style for hover effects -->
-<style>
-    .map-wrapper iframe {
-        width: 100% !important;
-        display: block;
-    }
-    .hover-shadow:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 1rem 3rem rgba(0,0,0,.1) !important;
-    }
-    .hover-text-primary:hover {
-        color: var(--bs-primary) !important;
-    }
-    .transition-all {
-        transition: all 0.3s ease;
-    }
-    .form-control {
-        border: 1px solid #ced4da !important;
-    }
-    .form-control:focus {
-        background-color: #fff !important;
-        border-color: var(--bs-primary) !important;
-        box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
-    }
-    .icon-box i {
-        color: var(--bs-primary) !important;
-    }
-    .bg-light-primary {
-        background-color: rgba(13, 110, 253, 0.1) !important;
-    }
-    .bg-success-light {
-        background-color: rgba(25, 135, 84, 0.1) !important;
-    }
-</style>
+
 @endsection
 
 @section('webLayoutScript')

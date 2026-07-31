@@ -393,4 +393,23 @@ document.addEventListener('DOMContentLoaded', function () {
         footerForm.addEventListener('submit', handleSubscribe);
     }
 });
+
+// Global Page Loader Logic
+window.addEventListener('load', function() {
+    const loader = document.getElementById('global-loader');
+    if (loader) {
+        // Ensure loader shows for at least 1 second (1000ms) since page start
+        const timeElapsed = performance.now();
+        const minTime = 1000;
+        const delay = Math.max(0, minTime - timeElapsed);
+
+        setTimeout(() => {
+            loader.classList.add('loader-hidden');
+            // Remove from DOM after CSS transition
+            setTimeout(() => {
+                loader.style.display = 'none';
+            }, 500); 
+        }, delay);
+    }
+});
 </script>

@@ -83,7 +83,7 @@
             @if(!empty($hotel->video))
                 <div class="video-wrapper-premium w-100 h-100 position-relative">
                     <div class="video-loading-spinner" id="videoSpinnerHotels">
-                        <div class="spinner-border text-white" role="status" style="width: 1.5rem; height: 1.5rem;">
+                        <div class="spinner-border text-white custom-spinner-size" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
                     </div>
@@ -92,9 +92,9 @@
                         $youtubeId = $isYoutube ? $matches[1] : null;
                     @endphp
                     @if($isYoutube)
-                        <iframe class="w-100 h-100 rounded-3 shadow-sm" style="min-height:350px;" src="https://www.youtube.com/embed/{{ $youtubeId }}?autoplay=1&mute=1&loop=1&playlist={{ $youtubeId }}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen onload="document.getElementById('videoSpinnerHotels').style.display='none'"></iframe>
+                        <iframe class="w-100 h-100 rounded-3 shadow-sm custom-iframe-min-height" src="https://www.youtube.com/embed/{{ $youtubeId }}?autoplay=1&mute=1&loop=1&playlist={{ $youtubeId }}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen onload="document.getElementById('videoSpinnerHotels').style.display='none'"></iframe>
                     @else
-                        <video class="w-100 h-100 object-fit-cover rounded-3 shadow-sm" controls autoplay muted loop playsinline style="object-fit: cover;"
+                        <video class="w-100 h-100 object-fit-cover rounded-3 shadow-sm custom-video-cover" controls autoplay muted loop playsinline
                                onplay="document.getElementById('videoSpinnerHotels').style.display='none'"
                                onplaying="document.getElementById('videoSpinnerHotels').style.display='none'"
                                onwaiting="document.getElementById('videoSpinnerHotels').style.display='flex'"
@@ -105,7 +105,7 @@
                     @endif
                     
                     {{-- Fullscreen button overlay --}}
-                    <div class="position-absolute bottom-0 end-0 m-3" style="z-index: 11;">
+                    <div class="position-absolute bottom-0 end-0 m-3 custom-z-index-11">
                         <button class="btn btn-sm btn-dark bg-opacity-75 rounded-pill px-3 text-white border-0" onclick="openCustomGallery(0)">
                             <i class="fas fa-expand-arrows-alt me-1"></i> View Video Gallery
                         </button>
@@ -247,7 +247,7 @@
                         @if($hotel->starting_price)
                         <div class="sidebar-price">${{ $hotel->starting_price }} <span>/night</span></div>
                         @else
-                        <div class="sidebar-price" style="font-size: 1.5rem;">Check Rates</div>
+                        <div class="sidebar-price custom-sidebar-price-alt">Check Rates</div>
                         @endif
                     </div>
                 </div>
@@ -263,7 +263,7 @@
                     Check Availability & Book <i class="fas fa-external-link-alt ms-2"></i>
                 </a>
                 @else
-                <button class="btn-affiliate-book disabled" disabled style="opacity: 0.6; cursor: not-allowed;">
+                <button class="btn-affiliate-book disabled custom-disabled-btn" disabled>
                     Currently Unavailable Online
                 </button>
                 @endif
@@ -293,7 +293,7 @@
                     @if(str_contains($hotel->map_iframe, '<iframe'))
                         {!! $hotel->map_iframe !!}
                     @else
-                        <iframe width="100%" height="100%" frameborder="0" style="border:0;" src="{{ $hotel->map_iframe }}"></iframe>
+                        <iframe width="100%" height="100%" frameborder="0" class="custom-border-0" src="{{ $hotel->map_iframe }}"></iframe>
                     @endif
                 @else
                     <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q={{ urlencode(($hotel->address ?? 'Main Street') . ' ' . ($hotel->city ?? 'Mackinac Island')) }}&t=&z=13&ie=UTF8&iwloc=&output=embed"></iframe>
@@ -347,15 +347,15 @@
 /> -->
 
 <!-- Custom Fullscreen Gallery Lightbox -->
-<div id="customGalleryLightbox" class="custom-lightbox" style="display: none;">
+<div id="customGalleryLightbox" class="custom-lightbox custom-display-none">
     <button class="lightbox-close" onclick="closeCustomGallery()"><i class="fas fa-times"></i></button>
     <div class="lightbox-counter"><span id="lightbox-current-idx">1</span> / <span id="lightbox-total-idx">5</span></div>
     
     <button class="lightbox-nav lightbox-prev" onclick="changeLightboxImage(-1)"><i class="fas fa-chevron-left"></i></button>
     
     <div class="lightbox-image-container">
-        <img id="lightbox-main-img" src="" alt="Gallery Image" style="display: block;">
-        <video id="lightbox-main-video" controls autoplay muted style="display: none; max-width: 90%; max-height: 80vh;" class="rounded"></video>
+        <img id="lightbox-main-img" src="" alt="Gallery Image" class="custom-display-block">
+        <video id="lightbox-main-video" controls autoplay muted class="rounded custom-lightbox-video"></video>
     </div>
     
     <button class="lightbox-nav lightbox-next" onclick="changeLightboxImage(1)"><i class="fas fa-chevron-right"></i></button>

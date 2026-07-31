@@ -123,23 +123,20 @@
             
             <div class="d-flex gap-2 w-100 mt-1">
                 <a href="{{ route('web.restaurants.show', $restaurant->slug ?? 'demo') }}" 
-                   class="btn btn-outline-primary rounded-pill w-50 fw-bold shadow-sm d-flex align-items-center justify-content-center px-1 py-2"
-                   style="font-size: 0.8rem;"
+                   class="btn btn-outline-primary rounded-pill w-50 fw-bold shadow-sm d-flex align-items-center justify-content-center px-1 py-2 custom-hotel-card-btn"
                    onclick="event.stopPropagation();">
                     View Details
                 </a>
                 
                 @if(isset($restaurant->affiliate_link_id) && $restaurant->affiliate_link_id)
                 <a href="{{ route('affiliate.redirect', ['type' => 'restaurant', 'id' => $restaurant->id]) }}" 
-                   class="btn btn-secondary hotel-book-btn rounded-pill w-50 fw-bold shadow-sm d-flex align-items-center justify-content-center text-white px-1 py-2"
-                   style="font-size: 0.8rem;"
+                   class="btn btn-secondary hotel-book-btn rounded-pill w-50 fw-bold shadow-sm d-flex align-items-center justify-content-center text-white px-1 py-2 custom-hotel-card-btn"
                    onclick="event.stopPropagation();" 
                    target="_blank">
                     Reserve Table
                 </a>
                 @else
-                <button class="btn btn-secondary rounded-pill w-50 fw-bold shadow-sm d-flex align-items-center justify-content-center text-white px-1 py-2 disabled"
-                   style="font-size: 0.8rem; opacity: 0.55; cursor: not-allowed;"
+                <button class="btn btn-secondary rounded-pill w-50 fw-bold shadow-sm d-flex align-items-center justify-content-center text-white px-1 py-2 disabled custom-hotel-card-btn-disabled"
                    onclick="event.stopPropagation();" 
                    disabled>
                     Unavailable

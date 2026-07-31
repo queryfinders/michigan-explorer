@@ -9,7 +9,7 @@
 @endphp
 
 <!-- 1. Hero Banner -->
-<section class="hotel-detail-hero position-relative" style="height: 500px; background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.5)), url('{{ $heroImage }}'); background-size: cover; background-position: center; background-attachment: fixed;">
+<section class="hotel-detail-hero position-relative custom-hero-banner-attraction" style="background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.5)), url('{{ $heroImage }}');">
     <div class="container h-100 d-flex flex-column justify-content-center align-items-center text-center pt-5">
         <nav aria-label="breadcrumb" class="mb-3">
             <ol class="breadcrumb justify-content-center">
@@ -82,7 +82,7 @@
                     <h3 class="fw-bold mb-4 auto-style-7">Event Preview Video</h3>
                     <div class="video-wrapper-premium w-100 h-100">
                         <div class="video-loading-spinner" id="videoSpinnerEvents">
-                            <div class="spinner-border text-white" role="status" style="width: 1.5rem; height: 1.5rem;">
+                            <div class="spinner-border text-white custom-spinner-size" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
                         </div>
@@ -91,9 +91,9 @@
                             $youtubeId = $isYoutube ? $matches[1] : null;
                         @endphp
                         @if($isYoutube)
-                            <iframe class="w-100 h-100 rounded-3 shadow-sm" style="min-height:350px;" src="https://www.youtube.com/embed/{{ $youtubeId }}?autoplay=1&mute=1&loop=1&playlist={{ $youtubeId }}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen onload="document.getElementById('videoSpinnerEvents').style.display='none'"></iframe>
+                            <iframe class="w-100 h-100 rounded-3 shadow-sm custom-iframe-min-height" src="https://www.youtube.com/embed/{{ $youtubeId }}?autoplay=1&mute=1&loop=1&playlist={{ $youtubeId }}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen onload="document.getElementById('videoSpinnerEvents').style.display='none'"></iframe>
                         @else
-                            <video class="w-100 h-100 object-fit-cover rounded-3 shadow-sm" controls autoplay muted loop playsinline style="object-fit: cover;"
+                            <video class="w-100 h-100 object-fit-cover rounded-3 shadow-sm custom-video-cover" controls autoplay muted loop playsinline
                                    onplay="document.getElementById('videoSpinnerEvents').style.display='none'"
                                    onplaying="document.getElementById('videoSpinnerEvents').style.display='none'"
                                    onwaiting="document.getElementById('videoSpinnerEvents').style.display='flex'"
@@ -138,7 +138,7 @@
             </div>
             
             <!-- Right Column: Sidebar Information -->
-            <div class="col-lg-4" style="align-self: start; position: sticky; top: 90px;">
+            <div class="col-lg-4 custom-sticky-top-90">
                 <!-- Event Booking Card -->
                 <div class="card border-0 shadow-sm rounded-4 mb-4 auto-style-16">
                     <div class="card-body p-4">
@@ -183,9 +183,9 @@
 
                 {{-- Sidebar Widget 1: Latest Upcoming Event --}}
                 @if($latestUpcomingEvent)
-                <div class="card border-0 shadow-sm rounded-4 mb-4" style="margin-top: 0;">
+                <div class="card border-0 shadow-sm rounded-4 mb-4 mt-0">
                     <div class="card-body p-4">
-                        <h6 class="fw-bold text-uppercase text-muted mb-3" style="font-size: 0.75rem; letter-spacing: 0.05em;">
+                        <h6 class="fw-bold text-uppercase text-muted mb-3 custom-text-xs-spacing">
                             <i class="fas fa-bolt me-1 text-warning"></i> Latest Upcoming Event
                         </h6>
                         @php
@@ -195,14 +195,14 @@
                             <div class="d-flex align-items-start gap-3">
                                 @if($latestUpcomingEvent->featured_image)
                                 <img src="{{ asset($latestUpcomingEvent->featured_image) }}" alt="{{ $latestUpcomingEvent->featured_image_alt ?? $latestUpcomingEvent->name }}"
-                                     class="rounded-3 object-fit-cover flex-shrink-0" style="width: 70px; height: 70px; object-fit: cover;">
+                                     class="rounded-3 flex-shrink-0 custom-thumb-70">
                                 @else
-                                <div class="rounded-3 bg-primary bg-opacity-10 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 70px; height: 70px;">
+                                <div class="rounded-3 bg-primary bg-opacity-10 d-flex align-items-center justify-content-center flex-shrink-0 custom-thumb-70">
                                     <i class="fas fa-calendar-alt text-primary fs-4"></i>
                                 </div>
                                 @endif
                                 <div class="overflow-hidden">
-                                    <div class="fw-bold text-dark mb-1" style="font-size: 0.9rem; line-height: 1.3;">{{ Str::limit($latestUpcomingEvent->name, 55) }}</div>
+                                    <div class="fw-bold text-dark mb-1 custom-title-line-height">{{ Str::limit($latestUpcomingEvent->name, 55) }}</div>
                                     @if($lupDate)
                                     <div class="small text-primary fw-semibold"><i class="fas fa-calendar-alt me-1"></i>{{ $lupDate->format('M j, Y') }}</div>
                                     @endif
@@ -223,7 +223,7 @@
                 @if($categoryEvents->count() > 0)
                 <div class="card border-0 shadow-sm rounded-4 mb-4">
                     <div class="card-body p-4">
-                        <h6 class="fw-bold text-uppercase text-muted mb-3" style="font-size: 0.75rem; letter-spacing: 0.05em;">
+                        <h6 class="fw-bold text-uppercase text-muted mb-3 custom-text-xs-spacing">
                             <i class="fas fa-layer-group me-1 text-primary"></i>
                             More in {{ $event->category->name ?? 'This Category' }}
                         </h6>
@@ -235,14 +235,14 @@
                             <a href="{{ route('web.events.show', $catEvent->slug) }}" class="text-decoration-none d-flex align-items-start gap-3">
                                 @if($catEvent->featured_image)
                                 <img src="{{ asset($catEvent->featured_image) }}" alt="{{ $catEvent->featured_image_alt ?? $catEvent->name }}"
-                                     class="rounded-3 object-fit-cover flex-shrink-0" style="width: 60px; height: 60px; object-fit: cover;">
+                                     class="rounded-3 flex-shrink-0 custom-thumb-60">
                                 @else
-                                <div class="rounded-3 bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 60px; height: 60px;">
+                                <div class="rounded-3 bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center flex-shrink-0 custom-thumb-60">
                                     <i class="fas fa-calendar text-secondary"></i>
                                 </div>
                                 @endif
                                 <div class="overflow-hidden">
-                                    <div class="fw-semibold text-dark mb-1" style="font-size: 0.85rem; line-height: 1.3;">{{ Str::limit($catEvent->name, 45) }}</div>
+                                    <div class="fw-semibold text-dark mb-1 custom-title-line-height-sm">{{ Str::limit($catEvent->name, 45) }}</div>
                                     @if($catEventDate)
                                     <div class="small text-primary"><i class="fas fa-calendar-alt me-1"></i>{{ $catEventDate->format('M j, Y') }}</div>
                                     @endif
@@ -269,19 +269,12 @@
         <div class="bg-white rounded-4 shadow-sm p-4 p-md-5 mt-4">
             <h3 class="fw-bold mb-4 auto-style-7">Venue Map</h3>
             <p class="text-muted mb-4"><i class="fas fa-map-marker-alt me-2 text-primary"></i> {{ $event->venue_name ?? '' }} - {{ $event->address ?? '' }}, {{ $event->city ?? '' }}, {{ $event->state ?? 'MI' }}</p>
-            <div class="rounded-3 overflow-hidden bg-light auto-style-51 map-wrapper" style="height: 400px; width: 100%;">
-                <style>
-                    .map-wrapper iframe {
-                        width: 100% !important;
-                        height: 100% !important;
-                        border: 0;
-                    }
-                </style>
+            <div class="rounded-3 overflow-hidden bg-light auto-style-51 map-wrapper custom-map-height-w100">
                 @if(!empty($event->map_iframe))
                     @if(str_contains($event->map_iframe, '<iframe'))
                         {!! $event->map_iframe !!}
                     @else
-                        <iframe width="100%" height="100%" frameborder="0" style="border:0;" src="{{ $event->map_iframe }}"></iframe>
+                        <iframe width="100%" height="100%" frameborder="0" class="custom-border-0" src="{{ $event->map_iframe }}"></iframe>
                     @endif
                 @else
                     <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q={{ urlencode(($event->venue_name ?? '') . ' ' . ($event->city ?? 'Michigan')) }}&t=&z=14&ie=UTF8&iwloc=&output=embed"></iframe>

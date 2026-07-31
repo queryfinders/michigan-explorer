@@ -2,69 +2,6 @@
 
 @section('webLayoutContent')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<style>
-    /* Modern Flatpickr styling to match premium theme */
-    .flatpickr-calendar {
-        background: #ffffff !important;
-        border: none !important;
-        border-radius: 16px !important;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
-        font-family: inherit !important;
-        padding: 6px !important;
-    }
-    .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange,
-    .flatpickr-day.selected.inRange, .flatpickr-day.startRange.inRange, .flatpickr-day.endRange.inRange,
-    .flatpickr-day.selected:focus, .flatpickr-day.startRange:focus, .flatpickr-day.endRange:focus,
-    .flatpickr-day.selected:hover, .flatpickr-day.startRange:hover, .flatpickr-day.endRange:hover,
-    .flatpickr-day.prevMonthDay.selected, .flatpickr-day.nextMonthDay.selected {
-        background: #ff9f1c !important;
-        border-color: #ff9f1c !important;
-        color: #fff !important;
-        border-radius: 8px !important;
-    }
-    .flatpickr-day.today {
-        border-color: #ff9f1c !important;
-    }
-    .flatpickr-day:hover {
-        background: #f1f5f9 !important;
-        border-radius: 8px !important;
-    }
-    .flatpickr-day {
-        border-radius: 8px !important;
-    }
-    .flatpickr-months .flatpickr-month {
-        color: #0f172a !important;
-        fill: #0f172a !important;
-    }
-    .flatpickr-current-month .numInputWrapper span.arrowUp:after {
-        border-bottom-color: #0f172a !important;
-    }
-    .flatpickr-current-month .numInputWrapper span.arrowDown:after {
-        border-top-color: #0f172a !important;
-    }
-    .flatpickr-months .flatpickr-prev-month, .flatpickr-months .flatpickr-next-month {
-        color: #0f172a !important;
-        fill: #0f172a !important;
-    }
-    @media (max-width: 360px) {
-        .flatpickr-calendar {
-            width: 280px !important;
-        }
-        .flatpickr-days {
-            width: 280px !important;
-        }
-        .dayContainer {
-            width: 280px !important;
-            min-width: 280px !important;
-            max-width: 280px !important;
-        }
-        .flatpickr-day {
-            max-width: 35px !important;
-            height: 35px !important;
-            line-height: 35px !important;
-        }
-    }
-</style>
 
 <!-- 1. Hero Banner -->
 <section class="hotel-listing-hero position-relative" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), url('{{ isset($page) && $page->featured_image && !isset($currentCategory) ? asset($page->featured_image) : asset('images/attraction_nature_1783508280642.jpg') }}');">
@@ -140,13 +77,13 @@
             <div class="col-md-6 d-flex justify-content-md-end">
                 <div id="date-range-filter" class="d-flex align-items-center justify-content-md-end gap-2 flex-wrap w-100 w-md-auto">
                     <span class="small fw-semibold text-muted">Filter by Date:</span>
-                    <div class="d-flex align-items-center rounded-pill border bg-white px-3 py-1 shadow-sm gap-1" style="height: 38px;">
+                    <div class="d-flex align-items-center rounded-pill border bg-white px-3 py-1 shadow-sm gap-1 custom-h-38px">
                         <i class="far fa-calendar-alt text-primary me-1"></i>
-                        <input type="text" id="filter-start-date" class="border-0 bg-transparent text-center focus-none" placeholder="Start Date" style="width: 95px; font-size: 0.85rem; outline: none; box-shadow: none;" readonly>
+                        <input type="text" id="filter-start-date" class="border-0 bg-transparent text-center focus-none custom-date-filter-input" placeholder="Start Date" readonly>
                         <span class="text-muted small mx-1">to</span>
-                        <input type="text" id="filter-end-date" class="border-0 bg-transparent text-center focus-none" placeholder="End Date" style="width: 95px; font-size: 0.85rem; outline: none; box-shadow: none;" readonly>
+                        <input type="text" id="filter-end-date" class="border-0 bg-transparent text-center focus-none custom-date-filter-input" placeholder="End Date" readonly>
                     </div>
-                    <button type="button" id="clear-date-filter" class="btn btn-sm btn-light rounded-pill px-3 d-none" style="height: 38px;">Clear</button>
+                    <button type="button" id="clear-date-filter" class="btn btn-sm btn-light rounded-pill px-3 d-none custom-h-38px">Clear</button>
                 </div>
             </div>
         </div>
@@ -182,7 +119,7 @@
                     <div class="col-md-3 col-sm-6">
                         <a href="{{ route('web.events.category', $cat->slug) }}" class="modal-category-card">
                             <div>
-                                <div class="fw-bold text-heading" style="font-size: 0.9rem;">{{ $cat->name }}</div>
+                                <div class="fw-bold text-heading custom-font-size-09rem">{{ $cat->name }}</div>
                                 <div class="text-muted fs-xs mt-1">{{ $cat->events_count ?? 0 }} {{ Str::plural('Event', $cat->events_count ?? 0) }}</div>
                             </div>
                             <i class="fas fa-chevron-right text-muted opacity-50 fs-xs"></i>

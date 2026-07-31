@@ -1,7 +1,7 @@
 @props(['blog'])
 
 <div class="card premium-card h-100 border-0 rounded-4 shadow-sm overflow-hidden text-decoration-none">
-    <div class="img-wrapper position-relative" style="height: 220px; overflow: hidden;">
+    <div class="img-wrapper position-relative custom-blog-card-img-wrapper">
         <img src="{{ $blog->featured_image ? asset($blog->featured_image) : asset('images/travel_guide_1783508300840.jpg') }}" class="card-img-top w-100 h-100 object-fit-cover transition-transform" alt="{{ $blog->title }}">
     </div>
     <div class="card-body bg-white d-flex flex-column p-4">
