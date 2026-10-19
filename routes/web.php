@@ -39,7 +39,7 @@ Route::get('/storageLink', function () {
 $controller_path = 'App\Http\Controllers';
 
 //login
-Route::get('admin', $controller_path . '\Admin\LoginController@login')->name('login');
+Route::get('admin', $controller_path . '\admin\LoginController@login')->name('login');
 Route::post('/admin/login-details', $controller_path . '\Admin\LoginController@login_details')->name('admin.login');
 
 //forgot password
