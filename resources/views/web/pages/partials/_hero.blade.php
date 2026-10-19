@@ -1,7 +1,11 @@
 <!-- 1. PREMIUM HERO SECTION -->
 <section class="hero-premium position-relative overflow-hidden">
     <div class="hero-bg-parallax">
-        <div class="hero-bg-zoom" role="img" aria-label="{{ $page->featured_image_alt ?? 'Michigan Explorer Banner' }}" style="background-image: url('{{ $page && $page->featured_image ? asset($page->featured_image) : asset('images/hero_banner_1783508250640.jpg') }}');"></div>
+        @php
+            $hasValidBanner = $page && !empty($page->featured_image) && !in_array($page->featured_image, ['storage', 'storage/']) && str_contains($page->featured_image, '.');
+            $bannerImgUrl = $hasValidBanner ? asset($page->featured_image) : asset('images/hero_banner_1783508250640.jpg');
+        @endphp
+        <div class="hero-bg-zoom" role="img" aria-label="{{ $page->featured_image_alt ?? 'Michigan Explorer Banner' }}" style="background-image: url('{{ $bannerImgUrl }}');"></div>
     </div>
 
     <div class="container position-relative text-white py-5 my-5">
