@@ -151,7 +151,7 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::resource('/admin/amenities', \App\Http\Controllers\Admin\AmenityController::class);
     Route::get('/admin/amenities/status/{id}/{status}', [\App\Http\Controllers\Admin\AmenityController::class, 'changeStatus'])->name('amenities.status');
 
-    Route::resource('/admin/settings', \App\Http\Controllers\Admin\SettingController::class);
+    Route::resource('/admin/settings', \App\Http\Controllers\admin\SettingController::class);
 
     // Search Shortcuts
     Route::post('/admin/search-shortcuts/reorder', [\App\Http\Controllers\Admin\SearchShortcutController::class, 'reorder'])->name('search-shortcuts.reorder');
