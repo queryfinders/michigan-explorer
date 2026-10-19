@@ -40,13 +40,13 @@ $controller_path = 'App\Http\Controllers';
 
 //login
 Route::get('admin', $controller_path . '\admin\LoginController@login')->name('login');
-Route::post('/admin/login-details', $controller_path . '\Admin\LoginController@login_details')->name('admin.login');
+Route::post('/admin/login-details', $controller_path . '\admin\LoginController@login_details')->name('admin.login');
 
 //forgot password
-Route::get('/admin/forgot_password', $controller_path . '\Admin\LoginController@forgot_password')->name('forgot-password');
-Route::post('/admin/forgotpass', $controller_path . '\Admin\LoginController@sendResetLinkEmail')->name('forgotpass');
-Route::get('/admin/reset_password/{token}', $controller_path . '\Admin\LoginController@reset_password')->name('reset-password');
-Route::post('/admin/resetpass', $controller_path . '\Admin\LoginController@reset')->name('resetpass');
+Route::get('/admin/forgot_password', $controller_path . '\admin\LoginController@forgot_password')->name('forgot-password');
+Route::post('/admin/forgotpass', $controller_path . '\admin\LoginController@sendResetLinkEmail')->name('forgotpass');
+Route::get('/admin/reset_password/{token}', $controller_path . '\admin\LoginController@reset_password')->name('reset-password');
+Route::post('/admin/resetpass', $controller_path . '\admin\LoginController@reset')->name('resetpass');
 
 //middleware
 Route::get('/search-shortcuts/track/{id}', [\App\Http\Controllers\Frontend\SearchController::class, 'trackShortcut'])->name('web.search_shortcuts.track');
