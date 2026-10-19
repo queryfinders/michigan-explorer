@@ -48,17 +48,9 @@
 
           <div class="mb-3">
             <label class="form-label" for="featured_image_file">Banner Image</label>
-            <input type="file" class="form-control @error('featured_image_file') is-invalid @enderror" id="featured_image_file" name="featured_image_file" accept="image/*" onchange="previewBannerImage(this)" />
-            @error('featured_image_file')
-              <div class="invalid-feedback d-block">{{ $message }}</div>
-            @enderror
-            <div id="new_image_preview_box" class="mt-2 mb-2 d-none">
-              <span class="badge bg-label-info mb-1">New Selected Image Preview:</span><br>
-              <img id="new_image_preview" src="" alt="New Preview" class="img-thumbnail" style="max-height: 200px;">
-            </div>
-            @if($page->featured_image && !in_array($page->featured_image, ['storage', 'storage/']) && str_contains($page->featured_image, '.'))
-              <div class="mt-2 mb-3" id="current_image_box">
-                <span class="text-muted small">Current Banner Image:</span><br>
+            <input type="file" class="form-control" id="featured_image_file" name="featured_image_file" accept="image/*" />
+            @if($page->featured_image)
+              <div class="mt-2 mb-3">
                 <img src="{{ asset($page->featured_image) }}" alt="{{ $page->featured_image_alt ?? 'Banner Image' }}" class="img-thumbnail" style="max-height: 200px;">
               </div>
             @endif
@@ -176,34 +168,6 @@
             }
         });
     }
-
-    // Auto-switch tab if validation errors exist
-    @if($errors->has('featured_image_file') || $errors->has('banner_title') || $errors->has('banner_subtitle') || $errors->has('featured_image_alt'))
-      const bannerTabBtn = document.getElementById('banner-tab');
-      if (bannerTabBtn) {
-        new bootstrap.Tab(bannerTabBtn).show();
-      }
-    @elseif($errors->has('meta_title') || $errors->has('meta_description') || $errors->has('og_title') || $errors->has('og_description'))
-      const seoTabBtn = document.getElementById('seo-tab');
-      if (seoTabBtn) {
-        new bootstrap.Tab(seoTabBtn).show();
-      }
-    @endif
   });
-
-  function previewBannerImage(input) {
-    const previewBox = document.getElementById('new_image_preview_box');
-    const previewImg = document.getElementById('new_image_preview');
-    if (input.files && input.files[0]) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        previewImg.src = e.target.result;
-        previewBox.classList.remove('d-none');
-      };
-      reader.readAsDataURL(input.files[0]);
-    } else {
-      previewBox.classList.add('d-none');
-    }
-  }
 </script>
 @endsection

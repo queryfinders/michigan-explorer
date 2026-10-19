@@ -131,7 +131,9 @@ class RestaurantController extends Controller
 
         if ($request->hasFile('featured_image_file')) {
             $path = $request->file('featured_image_file')->store('restaurants', 'public');
-            $data['featured_image'] = 'storage/' . $path;
+            if ($path) {
+                $data['featured_image'] = 'storage/' . $path;
+            }
         }
 
         $restaurant = Restaurant::create($data);
@@ -296,7 +298,9 @@ class RestaurantController extends Controller
                 Storage::disk('public')->delete($oldPath);
             }
             $path = $request->file('featured_image_file')->store('restaurants', 'public');
-            $data['featured_image'] = 'storage/' . $path;
+            if ($path) {
+                $data['featured_image'] = 'storage/' . $path;
+            }
         }
 
         $restaurant->update($data);

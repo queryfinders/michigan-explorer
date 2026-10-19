@@ -99,7 +99,9 @@ class HotelController extends Controller
 
         if ($request->hasFile('featured_image_file')) {
             $path = $request->file('featured_image_file')->store('hotels', 'public');
-            $data['featured_image'] = 'storage/' . $path;
+            if ($path) {
+                $data['featured_image'] = 'storage/' . $path;
+            }
         }
 
         if ($request->hasFile('video_file')) {
@@ -229,7 +231,9 @@ class HotelController extends Controller
 
         if ($request->hasFile('featured_image_file')) {
             $path = $request->file('featured_image_file')->store('hotels', 'public');
-            $data['featured_image'] = 'storage/' . $path;
+            if ($path) {
+                $data['featured_image'] = 'storage/' . $path;
+            }
         }
 
         // Handle video deletion

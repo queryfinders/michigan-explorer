@@ -441,7 +441,7 @@
       <input type="file" class="form-control" id="featured_image_file" name="featured_image_file" accept="image/*" onchange="previewFeaturedImage(event)" />
       <div class="form-text">Recommended: 1200×800px, JPG/PNG/WebP, max 2MB. This is the main image shown in listings.</div>
     </div>
-    @if(isset($hotel) && $hotel->featured_image)
+    @if(isset($hotel) && $hotel->featured_image && !in_array($hotel->featured_image, ['storage', 'storage/']) && str_contains($hotel->featured_image, '.'))
       <div class="mb-3" id="featured-preview-existing">
         <label class="form-label text-muted small">Current Featured Image</label>
         <div>
