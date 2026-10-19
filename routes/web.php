@@ -213,6 +213,10 @@ Route::get('/blog/category/{categorySlug}', [\App\Http\Controllers\Frontend\Blog
 Route::get('/blog/category/{categorySlug}/sort/{sort}', [\App\Http\Controllers\Frontend\BlogController::class, 'index'])->name('web.blogs.category.sort');
 Route::get('/blog/{slug}', [\App\Http\Controllers\Frontend\BlogController::class, 'show'])->name('web.blogs.show');
 
+// LLMs AI Documentation
+Route::get('/llms.txt', [\App\Http\Controllers\web\LlmsController::class, 'llms'])->name('web.llms');
+Route::get('/llms-full.txt', [\App\Http\Controllers\web\LlmsController::class, 'llmsFull'])->name('web.llms-full');
+
 // Pages
 Route::get('/{slug}', [\App\Http\Controllers\Frontend\PageController::class, 'show'])->name('web.pages.show');
 

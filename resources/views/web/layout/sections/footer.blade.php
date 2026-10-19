@@ -63,16 +63,55 @@
                         <button class="btn btn-primary rounded-pill px-4 fw-bold" type="submit">Join</button>
                     </div>
                 </form>
+
+                <!-- Ask AI Section -->
+                <div class="mt-4 pt-2">
+                    <h5 class="text-white mb-3 fw-bold text-uppercase tracking-wider fs-6">Ask AI About Michigan Explorer</h5>
+                    @php
+                        $aiPrompt = urlencode("Tell me about Michigan Explorer. What luxury hotels, fine dining restaurants, attractions, events, and travel guides do they offer, and how can I explore Michigan? Please use information from " . url('/'));
+                    @endphp
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <!-- ChatGPT -->
+                        <a href="https://chatgpt.com/?prompt={{ $aiPrompt }}" target="_blank" rel="noopener noreferrer" class="ai-tool-btn d-flex align-items-center justify-content-center rounded-3 text-white text-decoration-none transition-all" aria-label="Ask ChatGPT" title="Ask ChatGPT">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M11.217 19.384a3.501 3.501 0 0 0 6.783 -1.217v-5.167l-6 -3.35" />
+                                <path d="M5.214 15.014a3.501 3.501 0 0 0 4.446 5.266l4.34 -2.534v-6.946" />
+                                <path d="M6 7.63c-1.391 -.236 -2.787 .395 -3.534 1.689a3.474 3.474 0 0 0 1.271 4.745l4.263 2.514l6 -3.348" />
+                                <path d="M12.783 4.616a3.501 3.501 0 0 0 -6.783 1.217v5.067l6 3.45" />
+                                <path d="M18.786 8.986a3.501 3.501 0 0 0 -4.446 -5.266l-4.34 2.534v6.946" />
+                                <path d="M18 16.302c1.391 .236 2.787 -.395 3.534 -1.689a3.474 3.474 0 0 0 -1.271 -4.745l-4.308 -2.514l-5.955 3.42" />
+                            </svg>
+                        </a>
+                        <!-- Claude (Anthropic) -->
+                        <a href="https://claude.ai/new?q={{ $aiPrompt }}" target="_blank" rel="noopener noreferrer" class="ai-tool-btn d-flex align-items-center justify-content-center rounded-3 text-white text-decoration-none transition-all fw-bold" aria-label="Ask Claude" title="Ask Claude">
+                            <span style="font-weight: 800; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 15px; display:flex; align-items:center; justify-content:center;">A\</span>
+                        </a>
+                        <!-- Perplexity -->
+                        <a href="https://www.perplexity.ai/?q={{ $aiPrompt }}" target="_blank" rel="noopener noreferrer" class="ai-tool-btn d-flex align-items-center justify-content-center rounded-3 text-white text-decoration-none transition-all" aria-label="Ask Perplexity" title="Ask Perplexity">
+                            <svg fill="currentColor" width="20" height="20" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M22.3977 7.0896h-2.3106V.0676l-7.5094 6.3542V.1577h-1.1554v6.1966L4.4904 0v7.0896H1.6023v10.3976h2.8882V24l6.932-6.3591v6.2005h1.1554v-6.0469l6.9318 6.1807v-6.4879h2.8882V7.0896zm-3.4657-4.531v4.531h-5.355l5.355-4.531zm-13.2862.0676 4.8691 4.4634H5.6458V2.6262zM2.7576 16.332V8.245h7.8476l-6.1149 6.1147v1.9723H2.7576zm2.8882 5.0404v-3.8852h.0001v-2.6488l5.7763-5.7764v7.0111l-5.7764 5.2993zm12.7086.0248-5.7766-5.1509V9.0618l5.7766 5.7766v6.5588zm2.8882-5.0652h-1.733v-1.9723L13.3948 8.245h7.8478v8.087z"/>
+                            </svg>
+                        </a>
+                        <!-- Google AI / Gemini -->
+                        <a href="https://www.google.com/search?udm=50&q={{ $aiPrompt }}" target="_blank" rel="noopener noreferrer" class="ai-tool-btn d-flex align-items-center justify-content-center rounded-3 text-white text-decoration-none transition-all" aria-label="Ask Google AI" title="Ask Google Gemini">
+                            <svg fill="currentColor" width="20" height="20" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/>
+                            </svg>
+                        </a>
+                    </div>
+                    <div class="mt-3">
+                        <a href="{{ route('web.llms') }}" target="_blank" class="ai-learn-link text-white-50 text-decoration-none small d-inline-flex align-items-center gap-2">
+                            <span>✨</span>
+                            <span>Hey AI, learn about us</span>
+                            <span class="ai-learn-arrow">&rarr;</span>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
         
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-center border-top pt-4 mt-4 footer-bottom-border">
-            <p class="mb-2 mb-md-0 text-white-50 small">&copy; {{ date('Y') }} Michigan Explorer. Designed for luxury travel.</p>
-            <!-- <div class="d-flex gap-3 small">
-                <a href="#" class="text-white-50 text-decoration-none transition-base">Privacy</a>
-                <a href="#" class="text-white-50 text-decoration-none transition-base">Terms</a>
-                <a href="#" class="text-white-50 text-decoration-none transition-base">Sitemap</a>
-            </div> -->
+            <p class="mb-0 text-white-50 small">&copy; {{ date('Y') }} Michigan Explorer. Designed for luxury travel. All Rights Reserved.</p>
         </div>
     </div>
     
@@ -82,7 +121,60 @@
     </a>
 </footer>
 
-
+<style>
+    .ai-tool-btn {
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 8px;
+        color: #ffffff;
+        transition: all 0.25s ease;
+    }
+    .ai-tool-btn:hover {
+        background: #f59e0b !important;
+        border-color: #f59e0b !important;
+        color: #ffffff !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+    }
+    .hover-text-white:hover {
+        color: #ffffff !important;
+    }
+    .ai-learn-link {
+        font-size: 0.88rem;
+        color: rgba(255, 255, 255, 0.65) !important;
+        transition: color 0.2s ease;
+    }
+    .ai-learn-link:hover {
+        color: #ffffff !important;
+    }
+    .ai-learn-arrow {
+        transition: transform 0.2s ease;
+        display: inline-block;
+    }
+    .ai-learn-link:hover .ai-learn-arrow {
+        transform: translateX(4px);
+    }
+    .footer-newsletter .input-group {
+        background: #ffffff !important;
+        border: none !important;
+    }
+    .footer-newsletter .input-group .form-control {
+        border: 0 !important;
+        border-color: transparent !important;
+        outline: none !important;
+        box-shadow: none !important;
+        background-color: transparent !important;
+    }
+    .footer-newsletter .input-group .form-control:focus {
+        border: 0 !important;
+        border-color: transparent !important;
+        outline: none !important;
+        box-shadow: none !important;
+        background-color: transparent !important;
+    }
+</style>
 
 <script>
     // Back to top logic

@@ -16,9 +16,13 @@ class Restaurant extends Model
     {
         static::saved(function () {
             \Illuminate\Support\Facades\Cache::forget('home_restaurants');
+            \Illuminate\Support\Facades\Cache::forget('llms.txt');
+            \Illuminate\Support\Facades\Cache::forget('llms-full.txt');
         });
         static::deleted(function () {
             \Illuminate\Support\Facades\Cache::forget('home_restaurants');
+            \Illuminate\Support\Facades\Cache::forget('llms.txt');
+            \Illuminate\Support\Facades\Cache::forget('llms-full.txt');
         });
     }
 

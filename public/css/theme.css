@@ -3583,13 +3583,20 @@ font-size: 0.85rem;
 .transition-all {
     transition: all 0.3s ease;
 }
-.form-control {
+.form-control:not(.border-0) {
     border: 1px solid #ced4da !important;
 }
-.form-control:focus {
+.form-control.border-0 {
+    border: 0 !important;
+}
+.form-control:focus:not(.border-0) {
     background-color: #fff !important;
     border-color: var(--bs-primary) !important;
     box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+}
+.form-control.border-0:focus {
+    box-shadow: none !important;
+    outline: none !important;
 }
 .icon-box i {
     color: var(--bs-primary) !important;

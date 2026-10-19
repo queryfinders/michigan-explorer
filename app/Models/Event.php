@@ -13,10 +13,14 @@ class Event extends Model
         static::saved(function () {
             \Illuminate\Support\Facades\Cache::forget('home_events');
             \Illuminate\Support\Facades\Cache::forget('home_upcoming_events_widget');
+            \Illuminate\Support\Facades\Cache::forget('llms.txt');
+            \Illuminate\Support\Facades\Cache::forget('llms-full.txt');
         });
         static::deleted(function () {
             \Illuminate\Support\Facades\Cache::forget('home_events');
             \Illuminate\Support\Facades\Cache::forget('home_upcoming_events_widget');
+            \Illuminate\Support\Facades\Cache::forget('llms.txt');
+            \Illuminate\Support\Facades\Cache::forget('llms-full.txt');
         });
     }
 

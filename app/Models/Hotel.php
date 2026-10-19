@@ -12,9 +12,13 @@ class Hotel extends Model
     {
         static::saved(function () {
             \Illuminate\Support\Facades\Cache::forget('home_hotels');
+            \Illuminate\Support\Facades\Cache::forget('llms.txt');
+            \Illuminate\Support\Facades\Cache::forget('llms-full.txt');
         });
         static::deleted(function () {
             \Illuminate\Support\Facades\Cache::forget('home_hotels');
+            \Illuminate\Support\Facades\Cache::forget('llms.txt');
+            \Illuminate\Support\Facades\Cache::forget('llms-full.txt');
         });
     }
 
