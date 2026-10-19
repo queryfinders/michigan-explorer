@@ -12,7 +12,7 @@
 vendor.zip
 laravel_12.sql
 /storage/*.key
-/storage/app/public
+# /storage/app/public
 /storage/framework/cache/*
 /storage/framework/sessions/*
 /storage/framework/testing/*

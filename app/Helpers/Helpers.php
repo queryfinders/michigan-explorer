@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Helpers;
+namespace App\Helpers {
 
 use Config;
 use Illuminate\Support\Str;
@@ -180,6 +180,37 @@ class Helpers
           Config::set('custom.' . $demo . '.' . $config, $val);
         }
       }
+    }
+  }
+}
+
+}
+
+namespace {
+  if (!function_exists('storage_asset')) {
+    function storage_asset($path)
+    {
+      if (empty($path)) return '';
+      if (str_starts_with($path, 'http')) return $path;
+      
+      // Trim leading slashes
+      $path = ltrim($path, '/\\');
+      
+      if (str_starts_with($path, 'storage/')) {
+        $path = preg_replace('/^storage\/(?!app\/public\/)/', 'storage/app/public/', $path);
+      } elseif (str_starts_with($path, 'images/') || str_starts_with($path, 'website/') || str_starts_with($path, 'css/') || str_starts_with($path, 'js/') || str_starts_with($path, 'public/')) {
+        if (!str_starts_with($path, 'public/')) {
+          $path = 'public/' . $path;
+        }
+      } else {
+        $path = 'storage/app/public/' . $path;
+      }
+      
+      // Prevent duplicate storage folder nesting
+      $path = str_replace('storage/app/public/storage/', 'storage/app/public/', $path);
+      
+      $helper = 'asset';
+      return $helper($path);
     }
   }
 }
