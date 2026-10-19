@@ -96,7 +96,7 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::post('/admin/hotel-categories/quick-store', [\App\Http\Controllers\Admin\HotelCategoryController::class, 'quickStore'])->name('hotel-categories.quick-store');
     Route::get('/admin/hotel-categories/status/{id}/{status}', [\App\Http\Controllers\Admin\HotelCategoryController::class, 'changeStatus'])->name('hotel-categories.status');
     Route::resource('/admin/hotel-categories', \App\Http\Controllers\Admin\HotelCategoryController::class);
-    Route::get('/admin/hotels/status/{id}/{status}', [\App\Http\Controllers\Admin\HotelController::class, 'changeStatus'])->name('hotels.status');
+    Route::get('/admin/hotels/status/{id}/{status}', [\App\Http\Controllers\admin\HotelController::class, 'changeStatus'])->name('hotels.status');
     Route::resource('/admin/hotels', \App\Http\Controllers\Admin\HotelController::class);
     Route::get('/admin/booking-features/status/{id}/{status}', [\App\Http\Controllers\Admin\BookingFeatureController::class, 'changeStatus'])->name('booking-features.status');
     Route::resource('/admin/booking-features', \App\Http\Controllers\Admin\BookingFeatureController::class);
