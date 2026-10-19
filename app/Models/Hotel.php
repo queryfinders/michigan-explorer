@@ -8,6 +8,16 @@ class Hotel extends Model
 {
     protected $guarded = [];
 
+    protected static function booted()
+    {
+        static::saved(function () {
+            \Illuminate\Support\Facades\Cache::forget('home_hotels');
+        });
+        static::deleted(function () {
+            \Illuminate\Support\Facades\Cache::forget('home_hotels');
+        });
+    }
+
     public function seo()
     {
         return $this->morphOne(\App\Models\Seo::class, 'seoable');

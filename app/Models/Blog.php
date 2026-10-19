@@ -8,6 +8,16 @@ class Blog extends Model
 {
     protected $guarded = [];
 
+    protected static function booted()
+    {
+        static::saved(function () {
+            \Illuminate\Support\Facades\Cache::forget('home_blogs');
+        });
+        static::deleted(function () {
+            \Illuminate\Support\Facades\Cache::forget('home_blogs');
+        });
+    }
+
     public function category()
     {
         return $this->belongsTo(BlogCategory::class, 'blog_category_id');

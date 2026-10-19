@@ -8,6 +8,18 @@ class Event extends Model
 {
     protected $guarded = [];
 
+    protected static function booted()
+    {
+        static::saved(function () {
+            \Illuminate\Support\Facades\Cache::forget('home_events');
+            \Illuminate\Support\Facades\Cache::forget('home_upcoming_events_widget');
+        });
+        static::deleted(function () {
+            \Illuminate\Support\Facades\Cache::forget('home_events');
+            \Illuminate\Support\Facades\Cache::forget('home_upcoming_events_widget');
+        });
+    }
+
     public function seo()
     {
         return $this->morphOne(\App\Models\Seo::class, 'seoable');

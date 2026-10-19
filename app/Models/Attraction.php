@@ -8,6 +8,16 @@ class Attraction extends Model
 {
     protected $guarded = [];
 
+    protected static function booted()
+    {
+        static::saved(function () {
+            \Illuminate\Support\Facades\Cache::forget('home_attractions');
+        });
+        static::deleted(function () {
+            \Illuminate\Support\Facades\Cache::forget('home_attractions');
+        });
+    }
+
     public function seo()
     {
         return $this->morphOne(\App\Models\Seo::class, 'seoable');

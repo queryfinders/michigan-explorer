@@ -12,6 +12,16 @@ class Restaurant extends Model
         'opening_hours' => 'array',
     ];
 
+    protected static function booted()
+    {
+        static::saved(function () {
+            \Illuminate\Support\Facades\Cache::forget('home_restaurants');
+        });
+        static::deleted(function () {
+            \Illuminate\Support\Facades\Cache::forget('home_restaurants');
+        });
+    }
+
     public function seo()
     {
         return $this->morphOne(\App\Models\Seo::class, 'seoable');
