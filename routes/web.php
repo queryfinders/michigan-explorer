@@ -107,7 +107,7 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::post('/admin/restaurant-categories/quick-store', [\App\Http\Controllers\Admin\RestaurantCategoryController::class, 'quickStore'])->name('restaurant-categories.quick-store');
     Route::get('/admin/restaurant-categories/status/{id}/{status}', [\App\Http\Controllers\Admin\RestaurantCategoryController::class, 'changeStatus'])->name('restaurant-categories.status');
     Route::resource('/admin/restaurant-categories', \App\Http\Controllers\Admin\RestaurantCategoryController::class);
-    Route::get('/admin/restaurants/status/{id}/{status}', [\App\Http\Controllers\Admin\RestaurantController::class, 'changeStatus'])->name('restaurants.status');
+    Route::get('/admin/restaurants/status/{id}/{status}', [\App\Http\Controllers\admin\RestaurantController::class, 'changeStatus'])->name('restaurants.status');
     Route::resource('/admin/restaurants', \App\Http\Controllers\Admin\RestaurantController::class);
 
     // Cuisines Module
@@ -125,7 +125,7 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::get('/admin/attraction-categories/status/{id}/{status}', [\App\Http\Controllers\Admin\AttractionCategoryController::class, 'changeStatus'])->name('attraction-categories.status');
     Route::resource('/admin/attraction-categories', \App\Http\Controllers\Admin\AttractionCategoryController::class);
     Route::get('/admin/attractions/status/{id}/{status}', [\App\Http\Controllers\Admin\AttractionController::class, 'changeStatus'])->name('attractions.status');
-    Route::resource('/admin/attractions', \App\Http\Controllers\Admin\AttractionController::class);
+    Route::resource('/admin/attractions', \App\Http\Controllers\admin\AttractionController::class);
 
     // Events Module
     Route::post('/admin/event-categories/quick-store', [\App\Http\Controllers\Admin\EventCategoryController::class, 'quickStore'])->name('event-categories.quick-store');
