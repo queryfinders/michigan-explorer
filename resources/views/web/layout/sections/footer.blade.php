@@ -68,11 +68,11 @@
         
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-center border-top pt-4 mt-4 footer-bottom-border">
             <p class="mb-2 mb-md-0 text-white-50 small">&copy; {{ date('Y') }} Michigan Explorer. Designed for luxury travel.</p>
-            <div class="d-flex gap-3 small">
+            <!-- <div class="d-flex gap-3 small">
                 <a href="#" class="text-white-50 text-decoration-none transition-base">Privacy</a>
                 <a href="#" class="text-white-50 text-decoration-none transition-base">Terms</a>
-                <!-- <a href="#" class="text-white-50 text-decoration-none transition-base">Sitemap</a> -->
-            </div>
+                <a href="#" class="text-white-50 text-decoration-none transition-base">Sitemap</a>
+            </div> -->
         </div>
     </div>
     
