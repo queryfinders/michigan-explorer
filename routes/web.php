@@ -39,14 +39,14 @@ Route::get('/storageLink', function () {
 $controller_path = 'App\Http\Controllers';
 
 //login
-Route::get('admin', $controller_path . '\admin\LoginController@login')->name('login');
-Route::post('/admin/login-details', $controller_path . '\admin\LoginController@login_details')->name('admin.login');
+Route::get('admin', $controller_path . '\Admin\LoginController@login')->name('login');
+Route::post('/admin/login-details', $controller_path . '\Admin\LoginController@login_details')->name('admin.login');
 
 //forgot password
-Route::get('/admin/forgot_password', $controller_path . '\admin\LoginController@forgot_password')->name('forgot-password');
-Route::post('/admin/forgotpass', $controller_path . '\admin\LoginController@sendResetLinkEmail')->name('forgotpass');
-Route::get('/admin/reset_password/{token}', $controller_path . '\admin\LoginController@reset_password')->name('reset-password');
-Route::post('/admin/resetpass', $controller_path . '\admin\LoginController@reset')->name('resetpass');
+Route::get('/admin/forgot_password', $controller_path . '\Admin\LoginController@forgot_password')->name('forgot-password');
+Route::post('/admin/forgotpass', $controller_path . '\Admin\LoginController@sendResetLinkEmail')->name('forgotpass');
+Route::get('/admin/reset_password/{token}', $controller_path . '\Admin\LoginController@reset_password')->name('reset-password');
+Route::post('/admin/resetpass', $controller_path . '\Admin\LoginController@reset')->name('resetpass');
 
 //middleware
 Route::get('/search-shortcuts/track/{id}', [\App\Http\Controllers\Frontend\SearchController::class, 'trackShortcut'])->name('web.search_shortcuts.track');
@@ -96,7 +96,7 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::post('/admin/hotel-categories/quick-store', [\App\Http\Controllers\Admin\HotelCategoryController::class, 'quickStore'])->name('hotel-categories.quick-store');
     Route::get('/admin/hotel-categories/status/{id}/{status}', [\App\Http\Controllers\Admin\HotelCategoryController::class, 'changeStatus'])->name('hotel-categories.status');
     Route::resource('/admin/hotel-categories', \App\Http\Controllers\Admin\HotelCategoryController::class);
-    Route::get('/admin/hotels/status/{id}/{status}', [\App\Http\Controllers\admin\HotelController::class, 'changeStatus'])->name('hotels.status');
+    Route::get('/admin/hotels/status/{id}/{status}', [\App\Http\Controllers\Admin\HotelController::class, 'changeStatus'])->name('hotels.status');
     Route::resource('/admin/hotels', \App\Http\Controllers\Admin\HotelController::class);
     Route::get('/admin/booking-features/status/{id}/{status}', [\App\Http\Controllers\Admin\BookingFeatureController::class, 'changeStatus'])->name('booking-features.status');
     Route::resource('/admin/booking-features', \App\Http\Controllers\Admin\BookingFeatureController::class);
@@ -107,7 +107,7 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::post('/admin/restaurant-categories/quick-store', [\App\Http\Controllers\Admin\RestaurantCategoryController::class, 'quickStore'])->name('restaurant-categories.quick-store');
     Route::get('/admin/restaurant-categories/status/{id}/{status}', [\App\Http\Controllers\Admin\RestaurantCategoryController::class, 'changeStatus'])->name('restaurant-categories.status');
     Route::resource('/admin/restaurant-categories', \App\Http\Controllers\Admin\RestaurantCategoryController::class);
-    Route::get('/admin/restaurants/status/{id}/{status}', [\App\Http\Controllers\admin\RestaurantController::class, 'changeStatus'])->name('restaurants.status');
+    Route::get('/admin/restaurants/status/{id}/{status}', [\App\Http\Controllers\Admin\RestaurantController::class, 'changeStatus'])->name('restaurants.status');
     Route::resource('/admin/restaurants', \App\Http\Controllers\Admin\RestaurantController::class);
 
     // Cuisines Module
@@ -125,7 +125,7 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::get('/admin/attraction-categories/status/{id}/{status}', [\App\Http\Controllers\Admin\AttractionCategoryController::class, 'changeStatus'])->name('attraction-categories.status');
     Route::resource('/admin/attraction-categories', \App\Http\Controllers\Admin\AttractionCategoryController::class);
     Route::get('/admin/attractions/status/{id}/{status}', [\App\Http\Controllers\Admin\AttractionController::class, 'changeStatus'])->name('attractions.status');
-    Route::resource('/admin/attractions', \App\Http\Controllers\admin\AttractionController::class);
+    Route::resource('/admin/attractions', \App\Http\Controllers\Admin\AttractionController::class);
 
     // Events Module
     Route::post('/admin/event-categories/quick-store', [\App\Http\Controllers\Admin\EventCategoryController::class, 'quickStore'])->name('event-categories.quick-store');
@@ -151,7 +151,7 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::resource('/admin/amenities', \App\Http\Controllers\Admin\AmenityController::class);
     Route::get('/admin/amenities/status/{id}/{status}', [\App\Http\Controllers\Admin\AmenityController::class, 'changeStatus'])->name('amenities.status');
 
-    Route::resource('/admin/settings', \App\Http\Controllers\admin\SettingController::class);
+    Route::resource('/admin/settings', \App\Http\Controllers\Admin\SettingController::class);
 
     // Search Shortcuts
     Route::post('/admin/search-shortcuts/reorder', [\App\Http\Controllers\Admin\SearchShortcutController::class, 'reorder'])->name('search-shortcuts.reorder');
