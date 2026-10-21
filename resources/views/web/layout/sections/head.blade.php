@@ -34,10 +34,10 @@
     @yield('og_tags')
 @endif
 
-@hasSection('seo_canonical')
-    @yield('seo_canonical')
-@else
+@hasSection('canonical')
     @yield('canonical')
+@else
+    <link rel="canonical" href="{{ url()->current() }}">
 @endif
 
 <link rel="apple-touch-icon" href="{{ asset('assets/img/favicon/favicon.jpg') }}">

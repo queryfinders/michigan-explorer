@@ -4,7 +4,9 @@
     $pageTitle = $blog->title;
     $metaTitle = $blog->meta_title ?? ($blog->title . ' - Michigan Explorer');
     $metaDescription = $blog->meta_description ?? Str::limit(strip_tags($blog->content), 160);
-    $canonicalUrl = $blog->canonical_url ?? route('web.blogs.show', $blog->slug);
+    $canonicalUrl = (!empty($blog->canonical_url) && !str_contains($blog->canonical_url, '127.0.0.1') && !str_contains($blog->canonical_url, 'localhost')) 
+        ? $blog->canonical_url 
+        : route('web.blogs.show', $blog->slug);
     
     if ($blog->featured_image) {
         $heroImage = Str::startsWith($blog->featured_image, ['http://', 'https://']) 

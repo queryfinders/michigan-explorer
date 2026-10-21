@@ -28,14 +28,10 @@
         <meta name="description" content="{{ $activeSeo->meta_description ?? $defaultDesc }}">
     @endsection
     
-    @section('seo_canonical')
-        <link rel="canonical" href="{{ $activeSeo->canonical_url ?? request()->url() }}">
-    @endsection
-    
     @section('seo_og_tags')
         <!-- Open Graph / Facebook -->
         <meta property="og:type" content="website">
-        <meta property="og:url" content="{{ $activeSeo->canonical_url ?? request()->url() }}">
+        <meta property="og:url" content="{{ url()->current() }}">
         <meta property="og:title" content="{{ $activeSeo->og_title ?? $activeSeo->meta_title ?? $defaultTitle }}">
         <meta property="og:description" content="{{ $activeSeo->og_description ?? $activeSeo->meta_description ?? $defaultDesc }}">
         @if($activeSeo->og_image)
@@ -44,7 +40,7 @@
 
         <!-- Twitter -->
         <meta property="twitter:card" content="{{ $activeSeo->twitter_card ?? 'summary_large_image' }}">
-        <meta property="twitter:url" content="{{ $activeSeo->canonical_url ?? request()->url() }}">
+        <meta property="twitter:url" content="{{ url()->current() }}">
         <meta property="twitter:title" content="{{ $activeSeo->og_title ?? $activeSeo->meta_title ?? $defaultTitle }}">
         <meta property="twitter:description" content="{{ $activeSeo->og_description ?? $activeSeo->meta_description ?? $defaultDesc }}">
         @if($activeSeo->og_image)
@@ -54,7 +50,11 @@
     
     @if($activeSeo->schema_markup)
         @section('seo_structured_data')
-            {!! $activeSeo->schema_markup !!}
+            @php
+                $schemaJson = preg_replace('#https?://(?:127\.0\.0\.1|localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(?::\d+)?#i', rtrim(url('/'), '/'), $activeSeo->schema_markup);
+                $schemaJson = str_replace(rtrim(url('/'), '/') . '/home"', rtrim(url('/'), '/') . '"', $schemaJson);
+            @endphp
+            {!! $schemaJson !!}
         @endsection
     @endif
 @else
@@ -62,8 +62,5 @@
     @section('title', $defaultTitle)
     @section('meta_description')
         <meta name="description" content="{{ $defaultDesc }}">
-    @endsection
-    @section('canonical')
-        <link rel="canonical" href="{{ request()->url() }}">
     @endsection
 @endif
